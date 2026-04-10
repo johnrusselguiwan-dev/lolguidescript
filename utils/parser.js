@@ -36,3 +36,7 @@ function parseChampionText(htmlContent) {
     // 5. Return the cleaned string with tags preserved
     return $.html().trim();
 }
+
+module.exports = {
+    parseChampionText
+};
