@@ -43,27 +43,26 @@ function loadLocalMetadata() {
 }
 
 async function uploadToFirebaseSafe(finalizedData, patchVersion) {
-    const CHUNK_SIZE = 200;
+    const listEntries = finalizedData.map(item => item.listEntry);
+    const detailEntries = finalizedData.map(item => item.detailEntry);
 
-    for (let i = 0; i < finalizedData.length; i += CHUNK_SIZE) {
-        const batch = db.batch();
-        const chunk = finalizedData.slice(i, i + CHUNK_SIZE);
+    const batch = db.batch();
 
-        chunk.forEach(({ id, listEntry, detailEntry }) => {
-            batch.set(db.collection("champion_list").doc(id), listEntry);
-            batch.set(db.collection("champion_details").doc(id), detailEntry);
-        });
+    batch.set(db.collection("data").doc("champion_list"), {
+        json: JSON.stringify(listEntries)
+    });
 
-        if (i + CHUNK_SIZE >= finalizedData.length) {
-            batch.set(db.collection("system_metadata").doc("patch_info"), {
-                latestPatch: patchVersion,
-                lastUpdated: admin.firestore.FieldValue.serverTimestamp()
-            });
-        }
+    batch.set(db.collection("data").doc("champion_details"), {
+        json: JSON.stringify(detailEntries)
+    });
 
-        await batch.commit();
-        console.log(`✅ Uploaded batch chunk ${Math.floor(i / CHUNK_SIZE) + 1}`);
-    }
+    batch.set(db.collection("system_metadata").doc("patch_info"), {
+        latestPatch: patchVersion,
+        lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    await batch.commit();
+    console.log(`✅ Uploaded merged JSON data safely to Firebase`);
 }
 
 async function runMasterSync() {
@@ -110,8 +109,14 @@ async function runMasterSync() {
 
         if (answer.trim() === '2') {
             console.log("🚀 Phase 2: Exporting to local JSON...");
-            fs.writeFileSync(`./exports/export_patch_${globalVersion}.json`, JSON.stringify(finalizedData, null, 2));
-            console.log(`🎉 Export completed: export_patch_${globalVersion}.json`);
+
+            const listEntries = finalizedData.map(item => item.listEntry);
+            const detailEntries = finalizedData.map(item => item.detailEntry);
+
+            fs.writeFileSync(`./exports/export_list_patch_${globalVersion}.json`, JSON.stringify(listEntries, null, 2));
+            fs.writeFileSync(`./exports/export_details_patch_${globalVersion}.json`, JSON.stringify(detailEntries, null, 2));
+
+            console.log(`🎉 Export completed: export_list_patch_${globalVersion}.json and export_details_patch_${globalVersion}.json`);
         } else {
             console.log("🚀 Phase 2: Uploading safely to Firebase via Batch...");
             await uploadToFirebaseSafe(finalizedData, globalVersion);
