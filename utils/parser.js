@@ -27,7 +27,7 @@ function parseChampionText(htmlContent) {
     // 4. Remove all tags NOT in our "Keep" list
     $('*').each((i, el) => {
         const tagName = el.name.toLowerCase();
-        if (!tagsToKeep.includes(tagName)) {
+        if (el.name !== 'root' && !tagsToKeep.includes(tagName)) {
             // Unwraps the tag but keeps the text inside
             $(el).replaceWith($(el).contents());
         }
@@ -37,6 +37,30 @@ function parseChampionText(htmlContent) {
     return $.html().trim();
 }
 
+/**
+ * Splits descriptions for shapeshifters or standard paragraph breaks.
+ */
+function splitDescription(desc, id) {
+    let parts = desc.split(/<br><br>/i);
+    if (parts.length > 1) return [parts[0], parts[1]];
+    const splitMap = {
+        "Nidalee": /As a cougar,|In human form,/i,
+        "Elise": /Spider Form:|Human Form:/i,
+        "Jayce": /Hammer Stance:|Cannon Stance:/i,
+        "Gnar": /Mega Gnar:|Mini Gnar:/i
+    };
+    const pattern = splitMap[id];
+    if (pattern && desc.match(pattern)) {
+        const keywordMatch = desc.match(/(As a cougar,|Spider Form:|Human Form:|Cannon Stance:|Hammer Stance:|Mega Gnar:)/i);
+        if (keywordMatch) {
+            const index = keywordMatch.index;
+            return [desc.substring(0, index).trim(), desc.substring(index).trim()];
+        }
+    }
+    return [desc, desc];
+}
+
 module.exports = {
-    parseChampionText
+    parseChampionText,
+    splitDescription
 };
