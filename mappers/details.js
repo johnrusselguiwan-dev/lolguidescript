@@ -66,6 +66,7 @@ function buildDetailEntry(raw, meta, version) {
         id: raw.id,
         name: raw.name,
         title: raw.title,
+        avatar: `https://wiki.leagueoflegends.com/en-us/images/${raw.name.replace(/ /g, '_')}_Render.png`,
         background: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${raw.id}_0.jpg`,
         icon: `${BASE_URL}/${version}/img/champion/${raw.image.full}`,
         lore: parseChampionText(raw.lore),

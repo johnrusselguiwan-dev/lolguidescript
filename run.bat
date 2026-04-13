@@ -6,5 +6,5 @@ IF NOT EXIST "node_modules\" (
     echo Dependencies already installed.
 )
 echo Running script...
-node scripts/index.js
+node index.js
 pause

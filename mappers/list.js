@@ -2,7 +2,8 @@ function buildListEntry(detailEntry) {
     return {
         id: detailEntry.id,
         name: detailEntry.name,
-        image: detailEntry.icon,
+        avatar: detailEntry.avatar,
+        image: `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${detailEntry.id}_0.jpg`,
         lanes: detailEntry.lanes,
         region: detailEntry.region,
         roles: detailEntry.roles
