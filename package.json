@@ -1,4 +1,15 @@
 {
+  "name": "lol-guide-script",
+  "version": "1.0.0",
+  "description": "Fetches and syncs League of Legends data from Data Dragon to Firebase or local JSON.",
+  "main": "index.js",
+  "scripts": {
+    "sync": "node scripts/sync-master.js",
+    "sync:auto": "node scripts/sync-master.js --auto"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "axios": "^1.15.0",
     "cheerio": "^1.2.0",

@@ -1,24 +1,14 @@
 const axios = require("axios");
 const { db } = require("./config/firebase");
 
-// --- API Helpers ---
 const fetchDynamicData = async () => {
-    // This is a placeholder for your future Riot API or third-party API integration.
-    // Replace this setTimeout with your actual API fetch logic later.
-    
-    // Example Mock Return:
     return {
         "Aatrox": { winRate: "51.0%", pickRate: "6.2%", banRate: "3.1%", tier: "S" },
         "Ahri": { winRate: "49.5%", pickRate: "8.2%", banRate: "1.0%", tier: "A" }
     };
 };
 
-// --- Firebase Utilities ---
 async function updateDynamicDataSafely(dynamicDataMap) {
-    // IMPORTANT: Note how we use batch.update() instead of batch.set() here.
-    // batch.update() merges this data without deleting the massive static details we synced previously.
-    
-    // Firestore max batch write limit is 500, dropping to chunks of 200 is very safe.
     const CHUNK_SIZE = 200; 
     const championIds = Object.keys(dynamicDataMap);
     
@@ -28,8 +18,6 @@ async function updateDynamicDataSafely(dynamicDataMap) {
         
         chunk.forEach((id) => {
             const data = dynamicDataMap[id];
-            
-            // Assuming you want dynamic data stored in the champion_details collection.
             const detailRef = db.collection("champion_details").doc(id);
             
             batch.update(detailRef, {
@@ -45,13 +33,12 @@ async function updateDynamicDataSafely(dynamicDataMap) {
     }
 }
 
-// --- Main Execution ---
 async function runDynamicSync() {
     try {
-        console.log("🚀 Fetching dynamic data from custom API...");
+        console.log("🚀 Fetching dynamic data...");
         const dynamicData = await fetchDynamicData();
         
-        console.log("🚀 Safely updating Firestore (merging variables, preserving static data)...");
+        console.log("🚀 Updating Firestore documents...");
         await updateDynamicDataSafely(dynamicData);
         
         console.log(`🎉 Dynamic sync completed!`);
