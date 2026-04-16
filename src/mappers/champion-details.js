@@ -29,7 +29,7 @@ const transformIcons = {
     ]
 };
 
-function buildDetailEntry(raw, meta, version) {
+function buildDetailEntry(raw, meta, version, crawlerStats) {
     const id = raw.id;
     const isShapeshifter = ["Nidalee", "Jayce", "Elise", "Gnar"].includes(id);
 
@@ -92,9 +92,13 @@ function buildDetailEntry(raw, meta, version) {
         skillIcons,
         skillCooldowns,
         skillCosts,
-        winRate: "49.5%",
-        pickRate: "8.2%",
-        banRate: "12.0%",
+        // Crawler data — injected from CHAMPION_META if available
+        winRate: crawlerStats ? `${crawlerStats.winRate}%` : "0%",
+        pickRate: crawlerStats ? `${crawlerStats.pickRate}%` : "0%",
+        banRate: crawlerStats ? `${crawlerStats.banRate}%` : "0%",
+        builds: crawlerStats?.builds || [],
+        loadout: crawlerStats?.loadout || { spells: "N/A", runes: "N/A", skills: {} },
+        drafting: crawlerStats?.drafting || { strongAgainst: [], weakAgainst: [], synergizesWith: [] },
         priceGold: "4800",
         damageType: (raw.info.magic > raw.info.attack) ? "AP" : "AD"
     };

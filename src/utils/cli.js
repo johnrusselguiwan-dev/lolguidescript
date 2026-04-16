@@ -62,7 +62,8 @@ function showDataMenu() {
     console.log(`    ${c.cyan}[1]${c.reset}  Champions`);
     console.log(`    ${c.cyan}[2]${c.reset}  Items`);
     console.log(`    ${c.cyan}[3]${c.reset}  Runes`);
-    console.log(`    ${c.cyan}[4]${c.reset}  All Data  ${c.dim}(Champions + Items + Runes)${c.reset}`);
+    console.log(`    ${c.cyan}[4]${c.reset}  Summoner Spells`);
+    console.log(`    ${c.cyan}[5]${c.reset}  All Data  ${c.dim}(Champions + Items + Runes + Spells)${c.reset}`);
     console.log();
 }
 

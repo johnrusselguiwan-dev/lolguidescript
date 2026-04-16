@@ -68,4 +68,51 @@ async function uploadRunes(runeTrees, patchVersion) {
     printSuccess(`${runeTrees.length} rune trees uploaded to Firebase`);
 }
 
-module.exports = { uploadChampions, uploadItems, uploadRunes };
+async function uploadSpells(spells, patchVersion) {
+    const batch = db.batch();
+
+    batch.set(db.collection("data").doc("summoner_spells"), {
+        json: JSON.stringify(spells),
+    });
+
+    batch.set(
+        db.collection("system_metadata").doc("patch_info"),
+        {
+            latestPatch: patchVersion,
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+    );
+
+    await batch.commit();
+    printSuccess(`${spells.length} summoner spells uploaded to Firebase`);
+}
+
+async function uploadTierData(meta, rating, drafting) {
+    const batch = db.batch();
+
+    batch.set(db.collection("data").doc("champion_meta"), {
+        json: JSON.stringify(meta),
+    });
+
+    batch.set(db.collection("data").doc("champion_rating"), {
+        json: JSON.stringify(rating),
+    });
+
+    batch.set(db.collection("data").doc("champion_drafting"), {
+        json: JSON.stringify(drafting),
+    });
+
+    batch.set(
+        db.collection("system_metadata").doc("patch_info"),
+        {
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+    );
+
+    await batch.commit();
+    printSuccess("Champion meta, rating & drafting uploaded to Firebase");
+}
+
+module.exports = { uploadChampions, uploadItems, uploadRunes, uploadSpells, uploadTierData };

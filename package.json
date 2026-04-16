@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "sync": "node scripts/sync-master.js",
-    "sync:auto": "node scripts/sync-master.js --auto"
+    "sync:auto": "node scripts/sync-master.js --auto",
+    "crawl": "node scripts/crawl.js",
+    "draft": "node scripts/draft.js"
   },
   "engines": {
     "node": ">=18.0.0"

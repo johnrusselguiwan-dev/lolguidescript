@@ -11,8 +11,9 @@ const { api } = require("../src/api/ddragon");
 const { fetchAndProcessChampions } = require("../src/services/champions");
 const { fetchAndProcessItems } = require("../src/services/items");
 const { fetchAndProcessRunes } = require("../src/services/runes");
-const { uploadChampions, uploadItems, uploadRunes } = require("../src/output/firebase");
-const { exportChampions, exportItems, exportRunes } = require("../src/output/local-export");
+const { fetchAndProcessSpells } = require("../src/services/spells");
+const { uploadChampions, uploadItems, uploadRunes, uploadSpells } = require("../src/output/firebase");
+const { exportChampions, exportItems, exportRunes, exportSpells } = require("../src/output/local-export");
 const {
     askQuestion,
     printHeader,
@@ -37,11 +38,11 @@ async function runMasterSync() {
         const isAuto = process.argv.includes("--auto") || process.env.AUTO_SYNC === "true";
 
         // ── Select data ──────────────────────────────────────────────────
-        let dataChoice = "4";
+        let dataChoice = "5";
 
         if (!isAuto) {
             showDataMenu();
-            dataChoice = (await askQuestion("Enter choice (1-4): ")).trim();
+            dataChoice = (await askQuestion("Enter choice (1-5): ")).trim();
         } else {
             printAutoMode();
         }
@@ -52,15 +53,19 @@ async function runMasterSync() {
         let championData = null;
         let items = null;
         let runeTrees = null;
+        let spells = null;
 
-        if (dataChoice === "1" || dataChoice === "4") {
+        if (dataChoice === "1" || dataChoice === "5") {
             championData = await fetchAndProcessChampions(globalVersion);
         }
-        if (dataChoice === "2" || dataChoice === "4") {
+        if (dataChoice === "2" || dataChoice === "5") {
             items = await fetchAndProcessItems(globalVersion);
         }
-        if (dataChoice === "3" || dataChoice === "4") {
+        if (dataChoice === "3" || dataChoice === "5") {
             runeTrees = await fetchAndProcessRunes(globalVersion);
+        }
+        if (dataChoice === "4" || dataChoice === "5") {
+            spells = await fetchAndProcessSpells();
         }
 
         // ── Select destination ───────────────────────────────────────────
@@ -79,12 +84,14 @@ async function runMasterSync() {
             if (championData) exportChampions(championData, globalVersion);
             if (items) exportItems(items, globalVersion);
             if (runeTrees) exportRunes(runeTrees, globalVersion);
+            if (spells) exportSpells(spells, globalVersion);
         } else {
             printPhase(2, "Uploading to Firebase");
 
             if (championData) await uploadChampions(championData, globalVersion);
             if (items) await uploadItems(items, globalVersion);
             if (runeTrees) await uploadRunes(runeTrees, globalVersion);
+            if (spells) await uploadSpells(spells, globalVersion);
         }
 
         printComplete(globalVersion);

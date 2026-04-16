@@ -48,4 +48,13 @@ function exportRunes(runeTrees, version) {
     printSuccess(`${runeTrees.length} rune trees exported to local JSON`);
 }
 
-module.exports = { exportChampions, exportItems, exportRunes };
+function exportSpells(spells, version) {
+    ensureExportsDir();
+    fs.writeFileSync(
+        path.join(EXPORTS_DIR, `export_spells_patch_${version}.json`),
+        JSON.stringify(spells, null, 2)
+    );
+    printSuccess(`${spells.length} summoner spells exported to local JSON`);
+}
+
+module.exports = { exportChampions, exportItems, exportRunes, exportSpells };
