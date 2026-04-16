@@ -23,7 +23,6 @@ const { API, CRAWLER, STORAGE, RANK_HIERARCHY } = require("../config/constants")
 const RiotClient = require("../src/api/riot-client");
 const AssetManager = require("../src/services/asset-manager");
 const AnalyticsEngine = require("../src/services/analytics");
-const StaticDataExtractor = require("../src/services/static-data");
 const GlobalAggregator = require("../src/services/aggregator");
 const MatchRegistry = require("../src/services/match-registry");
 const { uploadTierData } = require("../src/output/firebase");
@@ -117,9 +116,8 @@ class Crawler {
             console.log("    [2]  👥 Team Crawl        (split ranks across laptops)");
             console.log("    [3]  📦 Merge & Upload    (combine data + push to Firebase)");
             console.log("    [4]  📊 Upload Only       (push existing data to Firebase)");
-            console.log("    [5]  🗄️  Static Data       (fetch items & runes mappings)");
             console.log();
-            rl.question("  ▸ Enter choice (1-5): ", (ans) => {
+            rl.question("  ▸ Enter choice (1-4): ", (ans) => {
                 rl.close();
                 resolve(ans.trim());
             });
@@ -158,16 +156,39 @@ class Crawler {
         return { startIndex, endIndex };
     }
 
+    async askConfirmation(warningText) {
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        return new Promise((resolve) => {
+            console.log();
+            Logger.warn(`⚠ ${warningText}`);
+            rl.question("  ▸ Are you sure you want to proceed? (y/N): ", (ans) => {
+                rl.close();
+                const confirm = ans.trim().toLowerCase();
+                resolve(confirm === "y" || confirm === "yes");
+            });
+        });
+    }
+
     // ── Main entry ──────────────────────────────────────────────────────
 
     async start() {
         const choice = await this.showMainMenu();
 
-        // ── Option 5: Static data ───────────────────────────────────────
-        if (choice === "5") {
-            await StaticDataExtractor.extractAndSave();
-            Logger.success("Static data extraction complete! You can find the data in the /data folder.");
-            process.exit(0);
+        if (choice === "1") {
+            if (!(await this.askConfirmation("You are about to start a Solo Crawl on a single machine."))) {
+                Logger.info("Operation cancelled.");
+                process.exit(0);
+            }
+        } else if (choice === "3") {
+            if (!(await this.askConfirmation("You are about to merge and DIRECTLY UPLOAD data to Firebase. This overwrites production data."))) {
+                Logger.info("Operation cancelled.");
+                process.exit(0);
+            }
+        } else if (choice === "4") {
+            if (!(await this.askConfirmation("You are about to DIRECTLY UPLOAD existing data to Firebase. This overwrites production data."))) {
+                Logger.info("Operation cancelled.");
+                process.exit(0);
+            }
         }
 
         // ── Option 3: Merge & Upload ────────────────────────────────────
@@ -423,4 +444,9 @@ class Crawler {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INIT
-new Crawler().start().catch((err) => Logger.error("Fatal Error", err));
+if (require.main === module) {
+    new Crawler().start().catch((err) => Logger.error("Fatal Error", err));
+}
+
+module.exports = Crawler;
+

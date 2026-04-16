@@ -86,6 +86,15 @@ async function runMasterSync() {
             if (runeTrees) exportRunes(runeTrees, globalVersion);
             if (spells) exportSpells(spells, globalVersion);
         } else {
+            if (!isAuto) {
+                console.log();
+                const confirm = (await askQuestion(`\x1b[33m⚠ WARNING: You are about to DIRECTLY UPLOAD static data to Firebase. This overwrites production data.\x1b[0m\n    Are you sure you want to proceed? (y/N): `)).trim().toLowerCase();
+                if (confirm !== "y" && confirm !== "yes") {
+                    console.log("\n  \x1b[36mℹ Operation cancelled.\x1b[0m\n");
+                    process.exit(0);
+                }
+            }
+
             printPhase(2, "Uploading to Firebase");
 
             if (championData) await uploadChampions(championData, globalVersion);
@@ -103,4 +112,8 @@ async function runMasterSync() {
     }
 }
 
-runMasterSync();
+if (require.main === module) {
+    runMasterSync();
+}
+
+module.exports = { runMasterSync };
