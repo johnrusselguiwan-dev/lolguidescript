@@ -245,6 +245,7 @@ class Crawler {
         if (state.rankIndex < rankStart) {
             state.rankIndex = rankStart;
             state.currentMatches = 0;
+            state.initialStoreSize = undefined;
         }
 
         // Load seen matches from Firebase (shared across laptops)
@@ -259,7 +260,7 @@ class Crawler {
 
         while (state.rankIndex < rankEnd) {
             if (this.isRestarting) {
-                state = { rankIndex: rankStart, currentMatches: 0 };
+                state = { rankIndex: rankStart, currentMatches: 0, initialStoreSize: undefined };
                 await writeJson(STORAGE.CRAWL_STATE, state);
                 this.isRestarting = false;
             }
@@ -276,11 +277,18 @@ class Crawler {
             const localStore = await readJson(path.join(rankDir, "matchStore.json"), []);
             const localTL = await readJson(path.join(rankDir, "timelines.json"), {});
 
-            state.currentMatches = localStore.length;
+            if (state.initialStoreSize === undefined) {
+                state.initialStoreSize = localStore.length;
+                state.currentMatches = 0;
+            } else {
+                state.currentMatches = Math.max(0, localStore.length - state.initialStoreSize);
+            }
+
             if (state.currentMatches >= CRAWLER.TARGET_MATCHES_PER_RANK) {
                 Logger.success(`Target hit for ${rankStr}! Transitioning to next rank.`);
                 state.rankIndex++;
                 state.currentMatches = 0;
+                state.initialStoreSize = undefined;
                 await writeJson(STORAGE.CRAWL_STATE, state);
                 await GlobalAggregator.mergeAll();
                 continue;
@@ -302,7 +310,9 @@ class Crawler {
             Logger.info(
                 `[CRAWLING ${rankStr}] Matches: ${state.currentMatches}/${CRAWLER.TARGET_MATCHES_PER_RANK} | ${bar} ${percent.toFixed(1)}% | ETA: ~${etaHours}h ${etaMinutes}m`
             );
-            const newMatchIds = await this.runCycle(rankDef, rankDir, localStore, localTL, globalSeen);
+            
+            const targetLength = state.initialStoreSize + CRAWLER.TARGET_MATCHES_PER_RANK;
+            const newMatchIds = await this.runCycle(rankDef, rankDir, localStore, localTL, globalSeen, targetLength);
 
             // Sync new matches to Firebase
             if (newMatchIds.length > 0) {
@@ -311,11 +321,11 @@ class Crawler {
 
             // Check progress
             const updatedStore = await readJson(path.join(rankDir, "matchStore.json"), []);
-            const newMatches = updatedStore.length - state.currentMatches;
-            if (newMatches === 0 && updatedStore.length < CRAWLER.TARGET_MATCHES_PER_RANK) {
-                Logger.warn(`⚠ No new matches added this cycle. Current: ${updatedStore.length}/100`);
+            const newMatches = newMatchIds.length;
+            if (newMatches === 0) {
+                Logger.warn(`No new matches added this cycle. Current: ${updatedStore.length}`);
             } else if (newMatches > 0) {
-                Logger.success(`✓ Added ${newMatches} new match(es). Total: ${updatedStore.length}/100`);
+                Logger.success(`Added ${newMatches} new match(es). Total: ${updatedStore.length}`);
             }
 
             await writeJson(STORAGE.CRAWL_STATE, state);
@@ -332,7 +342,7 @@ class Crawler {
 
     // ── Single crawl cycle ──────────────────────────────────────────────
 
-    async runCycle(rankDef, rankDir, localStore, localTL, globalSeen) {
+    async runCycle(rankDef, rankDir, localStore, localTL, globalSeen, targetLength) {
         const pStatePath = path.join(rankDir, "pageState.json");
         const pState = await readJson(pStatePath, { page: 1, offset: 0, stuckCounter: 0 });
         if (pState.stuckCounter === undefined) pState.stuckCounter = 0;
@@ -387,7 +397,7 @@ class Crawler {
         // Fetch matches from queue
         for (const id of queue) {
             if (this.client.used >= API.MAX_REQUESTS_PER_CYCLE - 1) break;
-            if (localStore.length >= CRAWLER.TARGET_MATCHES_PER_RANK) break;
+            if (localStore.length >= targetLength) break;
 
             try {
                 Logger.log(`[REQ ${this.client.used + 1}] Fetching ${id}`);
