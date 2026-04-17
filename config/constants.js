@@ -25,6 +25,7 @@ const CRAWLER = {
     PLAYERS_PER_PAGE: 5,
     MATCHES_PER_PLAYER: 5,
     PAUSE_MS_BETWEEN_CYCLES: 60 * 1000,
+    MAX_EMPTY_PAGES_BEFORE_SKIP: 5,
 };
 
 // ── Storage paths (relative to project root) ────────────────────────────────

@@ -17,16 +17,27 @@ class AnalyticsEngine {
      * @returns {Array} sorted champion stat objects (highest score first)
      */
     static analyze(matches, timelines, assets) {
-        const stats = {};
-        let totalRanked = 0;
+        const stats = this.initStats();
+        const total = this.processChunk(stats, 0, matches, timelines, assets);
+        return this.finalize(stats, total, assets);
+    }
 
+    static initStats() {
+        return {};
+    }
+
+    static processChunk(stats, currentTotal, matches, timelines, assets) {
+        let total = currentTotal;
         for (const m of matches) {
             if (m?.info?.queueId !== 420) continue;
-            totalRanked++;
+            total++;
 
             for (const p of m.info.participants) {
-                const hero = p.championName;
+                let hero = p.championName;
                 if (!hero) continue;
+
+                // Normalize case-sensitive names for DDragon compatibility
+                if (hero === "FiddleSticks") hero = "Fiddlesticks";
 
                 if (!stats[hero]) {
                     stats[hero] = {
@@ -58,10 +69,13 @@ class AnalyticsEngine {
                 // Counters & synergies
                 m.info.participants.forEach((other) => {
                     if (other.participantId === p.participantId) return;
+                    let otherHero = other.championName;
+                    if (otherHero === "FiddleSticks") otherHero = "Fiddlesticks";
+
                     const map = other.teamId === p.teamId ? s.synergies : s.counters;
-                    if (!map[other.championName]) map[other.championName] = { games: 0, wins: 0 };
-                    map[other.championName].games++;
-                    if (p.win) map[other.championName].wins++;
+                    if (!map[otherHero]) map[otherHero] = { games: 0, wins: 0 };
+                    map[otherHero].games++;
+                    if (p.win) map[otherHero].wins++;
                 });
 
                 // Build items (completed only)
@@ -111,9 +125,13 @@ class AnalyticsEngine {
                 });
             });
         }
+        return total;
+    }
 
+    static finalize(stats, totalRanked, assets) {
         return this.format(stats, totalRanked, assets);
     }
+
 
     // ── Helpers ─────────────────────────────────────────────────────────
 

@@ -13,21 +13,22 @@ const AssetManager = require("./asset-manager");
 class GlobalAggregator {
     static async mergeAll() {
         Logger.info("Running Global Aggregation...");
-
-        let globalStore = [];
-        let globalTimelines = {};
+        const stats = AnalyticsEngine.initStats();
+        let totalRanked = 0;
         const assets = await AssetManager.getAssets();
 
         for (const rank of RANK_HIERARCHY) {
             const rankDir = path.join(STORAGE.ROOT, rank.tier, rank.division);
             const store = await readJson(path.join(rankDir, "matchStore.json"), []);
             const tl = await readJson(path.join(rankDir, "timelines.json"), {});
-            globalStore = globalStore.concat(store);
-            globalTimelines = { ...globalTimelines, ...tl };
+
+            if (store.length > 0) {
+                totalRanked = AnalyticsEngine.processChunk(stats, totalRanked, store, tl, assets);
+            }
         }
 
-        if (globalStore.length > 0) {
-            const globalRanking = AnalyticsEngine.analyze(globalStore, globalTimelines, assets);
+        if (totalRanked > 0) {
+            const globalRanking = AnalyticsEngine.finalize(stats, totalRanked, assets);
 
             // CHAMPION_META — full champion data with trimmed drafting (top 10)
             const metaData = globalRanking.map((ch) => ({
@@ -67,7 +68,7 @@ class GlobalAggregator {
             await writeJson(STORAGE.CHAMPION_DRAFTING, draftData);
 
             Logger.success(
-                `Champion data updated! Total unique matches analyzed: ${globalStore.length}`
+                `Champion data updated! Total unique matches analyzed: ${totalRanked}`
             );
         }
     }

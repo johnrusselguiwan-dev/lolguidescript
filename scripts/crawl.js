@@ -312,11 +312,20 @@ class Crawler {
             );
             
             const targetLength = state.initialStoreSize + CRAWLER.TARGET_MATCHES_PER_RANK;
-            const newMatchIds = await this.runCycle(rankDef, rankDir, localStore, localTL, globalSeen, targetLength);
+            const { newMatchIds, shouldSkipRank } = await this.runCycle(rankDef, rankDir, localStore, localTL, globalSeen, targetLength);
 
             // Sync new matches to Firebase
             if (newMatchIds.length > 0) {
                 await MatchRegistry.markSeen(newMatchIds);
+            }
+
+            if (shouldSkipRank) {
+                Logger.warn(`Rank ${rankStr} seems depleted. Skipping to next rank to maintain progress.`);
+                state.rankIndex++;
+                state.currentMatches = 0;
+                state.initialStoreSize = undefined;
+                await writeJson(STORAGE.CRAWL_STATE, state);
+                continue;
             }
 
             // Check progress
@@ -344,8 +353,14 @@ class Crawler {
 
     async runCycle(rankDef, rankDir, localStore, localTL, globalSeen, targetLength) {
         const pStatePath = path.join(rankDir, "pageState.json");
-        const pState = await readJson(pStatePath, { page: 1, offset: 0, stuckCounter: 0 });
+        const pState = await readJson(pStatePath, { 
+            page: 1, 
+            offset: 0, 
+            stuckCounter: 0,
+            emptyPageCounter: 0 
+        });
         if (pState.stuckCounter === undefined) pState.stuckCounter = 0;
+        if (pState.emptyPageCounter === undefined) pState.emptyPageCounter = 0;
 
         this.client.used = 0;
 
@@ -423,16 +438,24 @@ class Crawler {
         }
 
         // Advance page state
+        let shouldSkipRank = false;
         if (matchesAddedThisCycle === 0) {
             pState.stuckCounter++;
             if (pState.stuckCounter >= 2) {
-                Logger.warn(`Stuck for ${pState.stuckCounter} cycles. Advancing to next page...`);
+                pState.emptyPageCounter++;
+                Logger.warn(`Stuck on page ${pState.page} (Empty pages: ${pState.emptyPageCounter}/${CRAWLER.MAX_EMPTY_PAGES_BEFORE_SKIP}). Advancing...`);
+                
+                if (pState.emptyPageCounter >= CRAWLER.MAX_EMPTY_PAGES_BEFORE_SKIP) {
+                    shouldSkipRank = true;
+                }
+
                 pState.page++;
                 pState.offset = 0;
                 pState.stuckCounter = 0;
             }
         } else {
             pState.stuckCounter = 0;
+            pState.emptyPageCounter = 0; // Reset counter if we found SOMETHING
             pState.offset += CRAWLER.MATCHES_PER_PLAYER;
             if (pState.offset >= 20) {
                 pState.offset = 0;
@@ -448,7 +471,7 @@ class Crawler {
         const ranking = AnalyticsEngine.analyze(localStore, localTL, assets);
         await writeJson(path.join(rankDir, "ranking.json"), ranking);
 
-        return newMatchIds;
+        return { newMatchIds, shouldSkipRank };
     }
 }
 

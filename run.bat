@@ -6,5 +6,5 @@ IF NOT EXIST "node_modules\" (
     echo Dependencies already installed.
 )
 echo Running script...
-node index.js
+node --max-old-space-size=8192 index.js
 pause
