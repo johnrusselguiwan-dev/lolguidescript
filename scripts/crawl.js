@@ -123,6 +123,12 @@ class Crawler {
         } else if (choice === "5") {
             await ImportManager.runImport();
             process.exit(0);
+        } else if (choice === "6") {
+            const config = await this.askHistoricalConfig();
+            rankStart = config.startIndex;
+            rankEnd = config.endIndex;
+            this.historicalDays = config.days;
+            Logger.info(`Starting Historical Crawl (${this.historicalDays} days back, Current Patch only)...`);
         }
 
         await this.run(rankStart, rankEnd);
@@ -131,6 +137,15 @@ class Crawler {
     async run(rankStart, rankEnd) {
         Logger.info(`Initializing crawl session (Ranks ${rankStart} to ${rankEnd-1})...`);
         
+        // Fetch current patch for filtering
+        try {
+            const realm = await (await fetch(require("../config/constants").DDRAGON.REALM_URL)).json();
+            this.currentPatch = realm.v.split(".").slice(0, 2).join("."); // e.g. "14.8"
+            Logger.info(`Current Match Patch: ${this.currentPatch}`);
+        } catch (e) {
+            Logger.warn("Failed to fetch current patch version. Patch filtering disabled.");
+        }
+
         this.enableShortcuts();
         Logger.info("Keyboard shortcuts active: [P] Pause, [R] Restart, [Q] Quit");
         
@@ -210,7 +225,14 @@ class Crawler {
             );
             
             const targetLength = state.initialStoreSize + CRAWLER.TARGET_MATCHES_PER_RANK;
-            const { newMatchIds, shouldSkipRank } = await this.runCycle(rankDef, rankDir, targetLength);
+            
+            let result;
+            if (this.historicalDays) {
+                result = await this.runHistoricalCycle(rankDef, rankDir, targetLength);
+            } else {
+                result = await this.runCycle(rankDef, rankDir, targetLength);
+            }
+            const { newMatchIds, shouldSkipRank } = result;
 
             // Sync new matches to Firebase cloud registry
             if (newMatchIds.length > 0) {
@@ -293,7 +315,7 @@ class Crawler {
                     // SAVE TO SQL
                     detail.tier = rankDef.tier;
                     detail.division = rankDef.division;
-                    const saved = await Database.saveMatch(detail, timeline, true); // STRIPPING enabled
+                    const saved = await Database.saveMatch(detail, timeline, true);
 
                     if (saved) {
                         newMatchIds.push(mid);
@@ -305,24 +327,136 @@ class Crawler {
                 if (currentTotal >= targetLength) break;
             }
 
-            // Always increment page at the end of a cycle to keep data fresh
             pState.page++;
-
             if (newMatchIds.length === 0) {
                 pState.stuckCounter++;
-                // Skip after 3 fruitless cycles (more aggressive than original 5)
                 if (pState.stuckCounter >= 3) shouldSkipRank = true;
             } else {
                 pState.stuckCounter = 0;
             }
 
-            // Safety cap: Skip rank if we reach Page 50 and it's still not hit target
             if (pState.page > 50) shouldSkipRank = true;
-
             await writeJson(pStatePath, pState);
 
         } catch (e) {
             Logger.error("Cycle failed: " + e.message);
+        }
+
+        return { newMatchIds, shouldSkipRank };
+    }
+
+    async runHistoricalCycle(rankDef, rankDir, targetLength) {
+        this.client.used = 0;
+        const pStatePath = path.join(rankDir, "pageState_hist.json");
+        const pState = await readJson(pStatePath, { page: 1, stuckCounter: 0, emptyPageCounter: 0 });
+
+        const newMatchIds = [];
+        let shouldSkipRank = false;
+
+        const startTime = Date.now() - (this.historicalDays * 24 * 60 * 60 * 1000);
+
+        try {
+            const players = await this.client.getPlayers(rankDef, pState.page);
+
+            if (!players || players.length === 0) {
+                pState.page = 1; // Reset to page 1 to find new players next time
+                await writeJson(pStatePath, pState);
+                return { newMatchIds, shouldSkipRank: true };
+            }
+
+            for (const player of players) {
+                if (this.isPaused || this.isRestarting) break;
+                
+                let playerOffset = 0;
+                let playerFinished = false;
+                let matchesInThisPlayer = 0;
+
+                while (!playerFinished && matchesInThisPlayer < CRAWLER.MAX_HISTORICAL_MATCHES_PER_PLAYER) {
+                    if (this.isPaused || this.isRestarting) break;
+
+                    const matches = await this.client.getMatchIds(player.puuid, { 
+                        start: playerOffset, 
+                        count: 20,
+                        startTime 
+                    });
+
+                    if (!matches || matches.length === 0) {
+                        playerFinished = true;
+                        break;
+                    }
+
+                    for (const mid of matches) {
+                        if (this.isPaused || this.isRestarting) break;
+
+                        // Check local DB first
+                        const alreadyInDb = await Database.isSeen(mid);
+                        // We CONTINUE even if already in DB for historical crawl (as per user request)
+                        // but we don't re-fetch details if we have them.
+
+                        const detail = await this.client.getMatchDetail(mid);
+                        if (!detail) continue;
+
+                        // 1. Patch Filter
+                        if (this.currentPatch) {
+                            const matchPatch = detail.info.gameVersion.split(".").slice(0, 2).join(".");
+                            if (matchPatch !== this.currentPatch) {
+                                Logger.info(`  ➜ Match ${mid} is from old patch (${matchPatch}). Stopping fetch for this player.`);
+                                playerFinished = true;
+                                break;
+                            }
+                        }
+
+                        // 2. Queue Filter
+                        if (detail.info.queueId !== 420) continue;
+
+                        // 3. Time Filter (Double check)
+                        if (detail.info.gameCreation < startTime) {
+                            playerFinished = true;
+                            break;
+                        }
+
+                        if (alreadyInDb) continue;
+
+                        const timeline = await this.client.getMatchTimeline(mid);
+                        if (!timeline) continue;
+
+                        // SAVE TO SQL
+                        detail.tier = rankDef.tier;
+                        detail.division = rankDef.division;
+                        const saved = await Database.saveMatch(detail, timeline, true);
+
+                        if (saved) {
+                            newMatchIds.push(mid);
+                            const currentTotal = await Database.getMatchCountForRank(rankDef.tier, rankDef.division);
+                            if (currentTotal >= targetLength) {
+                                playerFinished = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    playerOffset += 20;
+                    matchesInThisPlayer += 20;
+                    if (playerFinished) break;
+                }
+
+                const currentTotal = await Database.getMatchCountForRank(rankDef.tier, rankDef.division);
+                if (currentTotal >= targetLength) break;
+            }
+
+            pState.page++;
+            if (newMatchIds.length === 0) {
+                pState.stuckCounter++;
+                if (pState.stuckCounter >= 3) shouldSkipRank = true;
+            } else {
+                pState.stuckCounter = 0;
+            }
+
+            if (pState.page > 100) shouldSkipRank = true;
+            await writeJson(pStatePath, pState);
+
+        } catch (e) {
+            Logger.error("Historical Cycle failed: " + e.message);
         }
 
         return { newMatchIds, shouldSkipRank };
@@ -341,11 +475,12 @@ class Crawler {
                 console.log("    [3]  📦 Merge & Aggregate (Local Only)");
                 console.log("    [4]  📊 Upload Results    (Push local JSONs to Cloud)");
                 console.log("    [5]  📥 Import from Bin   (Merge matches from other machines)");
+                console.log("    [6]  📜 Historical Crawl  (Deep fetch within current patch)");
                 console.log();
-                rl.question("  ▸ Enter choice (1-5): ", (a) => { rl.close(); resolve(a.trim()); });
+                rl.question("  ▸ Enter choice (1-6): ", (a) => { rl.close(); resolve(a.trim()); });
             });
 
-            if (["1","2","3","4","5"].includes(ans)) return ans;
+            if (["1","2","3","4","5","6"].includes(ans)) return ans;
             Logger.warn("Invalid choice. Please enter 1, 2, 3, 4, or 5.");
         }
     }
@@ -384,6 +519,15 @@ class Crawler {
             }
             Logger.warn("Invalid selection. Please try again.");
         }
+    }
+
+    async askHistoricalConfig() {
+        console.log("\n  --- Historical Crawl Configuration ---");
+        const daysStr = await this.askQuestion(`How many days back to fetch? (Default: ${CRAWLER.HISTORICAL_DAYS_DEFAULT}): `);
+        const days = parseInt(daysStr) || CRAWLER.HISTORICAL_DAYS_DEFAULT;
+        
+        const config = await this.askSoloConfig();
+        return { ...config, days };
     }
 
     async askTeamConfig() {

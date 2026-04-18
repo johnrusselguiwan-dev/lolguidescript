@@ -138,11 +138,20 @@ class RiotClient {
             : [];
     }
 
-    async getMatchIds(puuid, offset = 0) {
-        const count = require("../../config/constants").CRAWLER.MATCHES_PER_PLAYER;
-        return await this.fetch(
-            `https://${API.MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${offset}&count=${count}`
-        );
+    async getMatchIds(puuid, options = {}) {
+        const {
+            start = 0,
+            count = require("../../config/constants").CRAWLER.MATCHES_PER_PLAYER,
+            startTime,
+            endTime,
+            queue = 420
+        } = options;
+
+        let url = `https://${API.MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}&queue=${queue}`;
+        if (startTime) url += `&startTime=${Math.floor(startTime / 1000)}`;
+        if (endTime) url += `&endTime=${Math.floor(endTime / 1000)}`;
+
+        return await this.fetch(url);
     }
 
     async getSummonerBySummonerId(summonerId) {

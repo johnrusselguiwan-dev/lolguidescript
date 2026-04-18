@@ -26,6 +26,9 @@ const CRAWLER = {
     MATCHES_PER_PLAYER: 5,
     PAUSE_MS_BETWEEN_CYCLES: 30 * 1000,
     MAX_EMPTY_PAGES_BEFORE_SKIP: 5,
+    HISTORICAL_DAYS_DEFAULT: 30,
+    MAX_HISTORICAL_MATCHES_PER_PLAYER: 100,
+    STRICT_PATCH_FILTER: true,
 };
 
 // ── Storage paths (relative to project root) ────────────────────────────────
