@@ -1,5 +1,16 @@
 node_modules/
 exports/
-data/
 .env
 league-of-legends-guide-202602-firebase-adminsdk-fbsvc-7f51437389.json
+
+data/assets/*
+data/database/*
+data/import/*
+data/outputs/*
+data/system/*
+
+!data/assets/.gitkeep
+!data/database/.gitkeep
+!data/import/.gitkeep
+!data/outputs/.gitkeep
+!data/system/.gitkeep
