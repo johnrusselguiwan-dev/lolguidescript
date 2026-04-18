@@ -12,6 +12,11 @@ const Logger = require("../utils/logger");
 
 class AssetManager {
     /**
+     * Cache for the current session to avoid repeated network checks to DDragon.
+     */
+    static cached = null;
+
+    /**
      * Fetches (or loads from cache) all Data Dragon assets and returns
      * convenient lookup maps.
      *
@@ -22,7 +27,7 @@ class AssetManager {
      * }>}
      */
     static async getAssets() {
-        Logger.info("Updating Data Dragon Assets...");
+        if (this.cached) return this.cached;
 
         const realm = await (await fetch(DDRAGON.REALM_URL)).json();
         const v = realm.v;
@@ -32,6 +37,7 @@ class AssetManager {
             const cachePath = path.join(STORAGE.ASSETS, `${name}_${v}.json`);
             let data = await readJson(cachePath);
             if (!data) {
+                Logger.info(`Downloading new LoL Patch Assets (${v}): ${name}...`);
                 data = await (await fetch(url)).json();
                 await writeJson(cachePath, data);
             }
@@ -59,7 +65,7 @@ class AssetManager {
             );
         });
 
-        return {
+        this.cached = {
             champMap,
             itemData: items.data,
             spellMap,
@@ -68,6 +74,8 @@ class AssetManager {
             champData: champs.data,
             ddragonVersion: v,
         };
+
+        return this.cached;
     }
 }
 

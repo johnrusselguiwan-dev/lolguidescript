@@ -1,6 +1,7 @@
 const readline = require("readline");
 const Crawler = require("./scripts/crawl");
 const { runMasterSync } = require("./scripts/sync-master");
+const GlobalAggregator = require("./src/services/aggregator");
 const { c } = require("./src/utils/cli");
 
 function ask(query) {
@@ -21,9 +22,10 @@ async function main() {
     console.log();
     console.log(`    ${c.cyan}[1]${c.reset}  🗄️  Static Data Sync     ${c.dim}(Base Champions, Items, Runes, Spells)${c.reset}`);
     console.log(`    ${c.cyan}[2]${c.reset}  ⚔️  Live Data Crawler    ${c.dim}(Ranked Matches, Win Rates, Builds)${c.reset}`);
+    console.log(`    ${c.cyan}[3]${c.reset}  📦 Merge & Aggregate    ${c.dim}(Combine Bin + Local into JSON outputs)${c.reset}`);
     console.log();
     
-    const choice = await ask("Enter choice (1-2): ");
+    const choice = await ask("Enter choice (1-3): ");
     
     if (choice === "1") {
         console.clear();
@@ -31,6 +33,9 @@ async function main() {
     } else if (choice === "2") {
         console.clear();
         new Crawler().start().catch((err) => console.error("Fatal Error", err));
+    } else if (choice === "3") {
+        console.clear();
+        GlobalAggregator.mergeAll(true).catch((err) => console.error("Aggregation Error", err));
     } else {
         console.log(`\n  ${c.red}❌ Invalid choice. Exiting.${c.reset}\n`);
         process.exit(1);

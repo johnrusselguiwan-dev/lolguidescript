@@ -14,7 +14,8 @@ const path = require("path");
  */
 async function readJson(filePath, fallback = null) {
     try {
-        return JSON.parse(await fs.readFile(filePath, "utf8"));
+        const content = await fs.readFile(filePath, "utf8");
+        return JSON.parse(content);
     } catch {
         return fallback;
     }
@@ -23,10 +24,19 @@ async function readJson(filePath, fallback = null) {
 /**
  * Serialize `data` and write it to `filePath`.
  * Creates any missing parent directories automatically.
+ * 
+ * @param {string} filePath - Path to save the file
+ * @param {any} data - Object to serialize
+ * @param {boolean} minify - If true, saves without spaces/newlines (safest for huge files)
  */
-async function writeJson(filePath, data) {
+async function writeJson(filePath, data, minify = true) {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
+    
+    // For very large objects, pretty-printing (null, 2) can double the string size 
+    // and hit V8's 1GB string limit. Minifying prevents this.
+    const json = minify ? JSON.stringify(data) : JSON.stringify(data, null, 2);
+    
+    await fs.writeFile(filePath, json, "utf8");
 }
 
 module.exports = { readJson, writeJson };

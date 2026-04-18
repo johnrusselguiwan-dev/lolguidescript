@@ -42,6 +42,11 @@ class RiotClient {
         this.lastCallTime = Date.now();
         this.used++;
 
+        // Log the actual API request
+        const isMatch = url.includes("/matches/");
+        const label = isMatch ? url.split("/").pop() : url;
+        Logger.request(this.used, `Fetching ${label}`);
+
         for (let i = 0; i < API.RETRY_ATTEMPTS; i++) {
             try {
                 const res = await fetch(url, {
@@ -83,7 +88,19 @@ class RiotClient {
                     throw new Error("BLACKLISTED");
                 }
                 if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+                    let errorBody = await res.text().catch(() => "Unknown error");
+                    
+                    // Cleanup HTML error pages (e.g. Cloudflare 5xx)
+                    if (errorBody.includes("<!DOCTYPE") || errorBody.includes("<html")) {
+                        errorBody = `[HTML Error Page] ${res.statusText || ""}`;
+                    }
+
+                    // Truncate overly long error messages
+                    if (errorBody.length > 200) {
+                        errorBody = errorBody.substring(0, 200) + "...";
+                    }
+
+                    throw new Error(`HTTP ${res.status}: ${errorBody}`);
                 }
 
                 return await res.json();
@@ -121,7 +138,7 @@ class RiotClient {
             : [];
     }
 
-    async getMatchIds(puuid, offset) {
+    async getMatchIds(puuid, offset = 0) {
         const count = require("../../config/constants").CRAWLER.MATCHES_PER_PLAYER;
         return await this.fetch(
             `https://${API.MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${offset}&count=${count}`
@@ -140,7 +157,7 @@ class RiotClient {
         );
     }
 
-    async getTimeline(id) {
+    async getMatchTimeline(id) {
         return await this.fetch(
             `https://${API.MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/${id}/timeline`
         );

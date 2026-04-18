@@ -22,6 +22,11 @@ const Logger = {
 
     error: (msg, err) =>
         console.error(`\x1b[31m✘ ${msg}\x1b[0m`, err?.message || ""),
+
+    request: (reqNum, msg) => {
+        const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+        console.log(`[${time}] [REQ ${reqNum}] ${msg}`);
+    }
 };
 
 module.exports = Logger;

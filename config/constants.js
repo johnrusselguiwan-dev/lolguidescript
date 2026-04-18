@@ -13,8 +13,8 @@ const API = {
     PLATFORM: "sg2",
     MATCH_REGION: "sea",
     QUEUE: "RANKED_SOLO_5x5",
-    MAX_REQUESTS_PER_CYCLE: 40,
-    SAFE_DELAY_MS: 3200,
+    MAX_REQUESTS_PER_CYCLE: 80,
+    SAFE_DELAY_MS: 1500,
     RETRY_ATTEMPTS: 3,
 };
 
@@ -24,24 +24,31 @@ const CRAWLER = {
     TARGET_MATCHES_PER_RANK: 100,
     PLAYERS_PER_PAGE: 5,
     MATCHES_PER_PLAYER: 5,
-    PAUSE_MS_BETWEEN_CYCLES: 60 * 1000,
+    PAUSE_MS_BETWEEN_CYCLES: 30 * 1000,
     MAX_EMPTY_PAGES_BEFORE_SKIP: 5,
 };
 
 // ── Storage paths (relative to project root) ────────────────────────────────
 
 const DATA_ROOT = path.join(__dirname, "..", "data");
+const DATABASE_ROOT = path.join(DATA_ROOT, "database");
+const OUTPUT_ROOT = path.join(DATA_ROOT, "outputs");
+const SYSTEM_ROOT = path.join(DATA_ROOT, "system");
+const IMPORT_ROOT = path.join(DATA_ROOT, "import");
 
 const STORAGE = {
-    ROOT: DATA_ROOT,
+    ROOT: DATABASE_ROOT,
     ASSETS: path.join(DATA_ROOT, "assets"),
-    GLOBAL_SEEN: path.join(DATA_ROOT, "globalSeenMatches.json"),
-    CHAMPION_META: path.join(DATA_ROOT, "CHAMPION_META.json"),
-    CHAMPION_RATING: path.join(DATA_ROOT, "CHAMPION_RATING.json"),
-    CHAMPION_DRAFTING: path.join(DATA_ROOT, "CHAMPION_DRAFTING.json"),
-    CRAWL_STATE: path.join(DATA_ROOT, "crawlerState.json"),
-    ITEMS_SUMMARY: path.join(DATA_ROOT, "ITEMS_SUMMARY.json"),
-    RUNES_SUMMARY: path.join(DATA_ROOT, "RUNES_SUMMARY.json"),
+    IMPORT: IMPORT_ROOT,
+    DATABASE: path.join(DATA_ROOT, "system", "crawler.db"),
+    GLOBAL_SEEN: path.join(SYSTEM_ROOT, "seen_matches.json"),
+    CHAMPION_META: path.join(OUTPUT_ROOT, "champions_meta.json"),
+    CHAMPION_RATING: path.join(OUTPUT_ROOT, "champions_rating.json"),
+    RATES_SUMMARY: path.join(OUTPUT_ROOT, "rates_summary.json"),
+    CHAMPION_DRAFTING: path.join(OUTPUT_ROOT, "champions_drafting.json"),
+    CRAWL_STATE: path.join(SYSTEM_ROOT, "crawler_state.json"),
+    ITEMS_SUMMARY: path.join(OUTPUT_ROOT, "items_summary.json"),
+    RUNES_SUMMARY: path.join(OUTPUT_ROOT, "runes_summary.json"),
 };
 
 // ── Data Dragon CDN ─────────────────────────────────────────────────────────

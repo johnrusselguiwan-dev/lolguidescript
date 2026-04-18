@@ -1,266 +1,159 @@
-/**
- * Autonomous Tier Crawler — crawls the Riot API ranked ladder,
- * collects match data per rank, and runs analytics.
- *
- * Usage:
- *   node scripts/crawl.js              # Interactive menu
- *   npm run crawl                      # Same, via npm
- *
- * Runtime controls (while crawling):
- *   [P] / [Space] — Pause / Resume
- *   [R]           — Restart from Iron IV
- *   [Q] / Ctrl+C  — Quit safely
- */
-
-require("dotenv/config");
-
-const fs = require("fs/promises");
-const path = require("path");
+require("dotenv").config();
 const readline = require("readline");
-const { stdin: input } = require("process");
-
-const { API, CRAWLER, STORAGE, RANK_HIERARCHY } = require("../config/constants");
+const path = require("path");
+const { 
+    CRAWLER, 
+    RANK_HIERARCHY, 
+    STORAGE 
+} = require("../config/constants");
 const RiotClient = require("../src/api/riot-client");
 const AssetManager = require("../src/services/asset-manager");
 const AnalyticsEngine = require("../src/services/analytics");
 const GlobalAggregator = require("../src/services/aggregator");
 const MatchRegistry = require("../src/services/match-registry");
+const ImportManager = require("../src/services/import-manager");
+const Database = require("../src/services/database");
 const { uploadTierData } = require("../src/output/firebase");
 const { readJson, writeJson } = require("../src/utils/io");
 const Logger = require("../src/utils/logger");
-const sleep = require("../src/utils/sleep");
 
-// ─────────────────────────────────────────────────────────────────────────────
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
 class Crawler {
     constructor() {
         this.client = new RiotClient(process.env.RIOT_API_KEY);
         this.isPaused = false;
         this.isRestarting = false;
-        this.isQuitting = false;
+        
+        // Session tracking for ETA
+        this.sessionStartTime = null;
+        this.matchesFetchedInSession = 0;
+        this.totalTargetInSession = 0;
+
+        this.shortcutsEnabled = false;
+        this.setupKeyboardListener();
     }
 
-    // ── CLI key bindings ────────────────────────────────────────────────
-
-    setupCLI() {
-        readline.emitKeypressEvents(input);
-        if (input.isTTY) input.setRawMode(true);
-        input.resume(); // Re-activate stdin after readline paused it
-
-        input.on("keypress", (_str, key) => {
-            if (!key) return;
-            if ((key.ctrl && key.name === "c") || key.name === "q") {
-                Logger.info("\nSafely exiting... Bye!");
-                this.isQuitting = true;
-                process.exit();
-            }
-            if (key.name === "p" || key.name === "space") {
-                this.isPaused = !this.isPaused;
-                if (this.isPaused) Logger.info("\n⏸  PAUSED. Press 'p' to continue.");
-                else Logger.info("\n▶  RESUMED.");
-            }
-            if (key.name === "r") {
-                Logger.warn("\n⚠ RESTARTING LADDER FROM SCRATCH...");
-                this.isRestarting = true;
-                this.isPaused = false;
-            }
-        });
-
-        console.log("\n====================================");
-        console.log("🎮 AUTONOMOUS CRAWLER CONTROLS 🎮");
-        console.log("   [P] - Pause / Resume");
-        console.log("   [R] - Restart from Iron IV");
-        console.log("   [Q] - Quit Script");
-        console.log("====================================\n");
-    }
-
-    /**
-     * Interruptible sleep — checks for state changes (pause/restart/quit)
-     * every 500ms so hotkeys remain responsive during long waits.
-     */
-    async interruptibleSleep(ms) {
-        const tick = 500;
-        let remaining = ms;
-        while (remaining > 0) {
-            if (this.isQuitting || this.isRestarting) return;
-            if (this.isPaused) {
-                await sleep(tick);
-                continue; // don't decrement while paused
-            }
-            await sleep(Math.min(tick, remaining));
-            remaining -= tick;
+    setupKeyboardListener() {
+        if (process.stdin.isTTY) {
+            readline.emitKeypressEvents(process.stdin);
+            process.stdin.on("keypress", (str, key) => {
+                if (!this.shortcutsEnabled) return;
+                
+                if (key.ctrl && key.name === "c") process.exit();
+                if (key.name === "p") {
+                    this.isPaused = !this.isPaused;
+                    Logger.info(this.isPaused ? "Crawl PAUSED. Press 'P' to resume." : "Crawl RESUMED.");
+                }
+                if (key.name === "r") {
+                    Logger.warn("Restarting crawl session...");
+                    this.isRestarting = true;
+                }
+                if (key.name === "q") {
+                    Logger.info("Safely exiting... Bye!");
+                    process.exit(0);
+                }
+            });
         }
     }
 
-    // ── Progress bar ────────────────────────────────────────────────────
-
-    getProgressBar(percent, length = 20) {
-        const p = Math.max(0, Math.min(100, percent));
-        const filled = Math.round((length * p) / 100);
-        const empty = length - filled;
-        return `[${"█".repeat(filled)}${"░".repeat(empty)}]`;
-    }
-
-    // ── Interactive menu ────────────────────────────────────────────────
-
-    async showMainMenu() {
-        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-        return new Promise((resolve) => {
-            console.log("\n╔════════════════════════════════════════════════╗");
-            console.log("║       LoL Guide  ·  Data Crawler              ║");
-            console.log("╚════════════════════════════════════════════════╝");
-            console.log();
-            console.log("  What would you like to do?");
-            console.log();
-            console.log("    [1]  🔄 Solo Crawl        (all ranks, single machine)");
-            console.log("    [2]  👥 Team Crawl        (split ranks across laptops)");
-            console.log("    [3]  📦 Merge & Upload    (combine data + push to Firebase)");
-            console.log("    [4]  📊 Upload Only       (push existing data to Firebase)");
-            console.log();
-            rl.question("  ▸ Enter choice (1-4): ", (ans) => {
-                rl.close();
-                resolve(ans.trim());
-            });
-        });
-    }
-
-    async askTeamConfig() {
-        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-        const ask = (q) => new Promise((res) => rl.question(q, (a) => res(a.trim())));
-
-        console.log();
-        const totalStr = await ask("  How many laptops are working together?\n  ▸ Enter total laptops (e.g. 3): ");
-        const workerStr = await ask("\n  Which laptop is this one?\n  ▸ Enter this laptop's number (1-" + totalStr + "): ");
-        rl.close();
-
-        const total = parseInt(totalStr, 10);
-        const worker = parseInt(workerStr, 10);
-
-        if (isNaN(total) || isNaN(worker) || total < 1 || worker < 1 || worker > total) {
-            Logger.error("Invalid input. Please enter valid numbers.");
-            process.exit(1);
+    enableShortcuts() {
+        this.shortcutsEnabled = true;
+        if (process.stdin.isTTY) {
+            process.stdin.setRawMode(true);
+            process.stdin.resume(); // Ensure stream is flowing
         }
-
-        // Calculate rank slice for this worker
-        const perWorker = Math.ceil(RANK_HIERARCHY.length / total);
-        const startIndex = (worker - 1) * perWorker;
-        const endIndex = Math.min(worker * perWorker, RANK_HIERARCHY.length);
-
-        const startRank = RANK_HIERARCHY[startIndex];
-        const endRank = RANK_HIERARCHY[endIndex - 1];
-
-        console.log();
-        Logger.success(`This laptop will crawl: ${startRank.tier} ${startRank.division} → ${endRank.tier} ${endRank.division} (${endIndex - startIndex} ranks)`);
-        console.log();
-
-        return { startIndex, endIndex };
     }
 
-    async askConfirmation(warningText) {
-        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-        return new Promise((resolve) => {
-            console.log();
-            Logger.warn(`⚠ ${warningText}`);
-            rl.question("  ▸ Are you sure you want to proceed? (y/N): ", (ans) => {
-                rl.close();
-                const confirm = ans.trim().toLowerCase();
-                resolve(confirm === "y" || confirm === "yes");
-            });
-        });
+    disableShortcuts() {
+        this.shortcutsEnabled = false;
+        if (process.stdin.isTTY) process.stdin.setRawMode(false);
     }
-
-    // ── Main entry ──────────────────────────────────────────────────────
 
     async start() {
-        const choice = await this.showMainMenu();
+        const choice = await this.askChoice();
+        
+        // Ensure Database is connected
+        await Database.connect();
 
-        if (choice === "1") {
-            if (!(await this.askConfirmation("You are about to start a Solo Crawl on a single machine."))) {
-                Logger.info("Operation cancelled.");
-                process.exit(0);
-            }
-        } else if (choice === "3") {
-            if (!(await this.askConfirmation("You are about to merge and DIRECTLY UPLOAD data to Firebase. This overwrites production data."))) {
-                Logger.info("Operation cancelled.");
-                process.exit(0);
-            }
-        } else if (choice === "4") {
-            if (!(await this.askConfirmation("You are about to DIRECTLY UPLOAD existing data to Firebase. This overwrites production data."))) {
-                Logger.info("Operation cancelled.");
-                process.exit(0);
-            }
-        }
-
-        // ── Option 3: Merge & Upload ────────────────────────────────────
-        if (choice === "3") {
-            Logger.info("Merging all rank data and uploading to Firebase...");
-            await GlobalAggregator.mergeAll();
-
-            const meta = await readJson(STORAGE.CHAMPION_META, []);
-            const rating = await readJson(STORAGE.CHAMPION_RATING, []);
-            const drafting = await readJson(STORAGE.CHAMPION_DRAFTING, []);
-
-            if (meta.length > 0) {
-                await uploadTierData(meta, rating, drafting);
-                Logger.success("All data merged and uploaded to Firebase!");
-            } else {
-                Logger.warn("No data to upload. Run a crawl first.");
-            }
-            process.exit(0);
-        }
-
-        // ── Option 4: Upload Only ───────────────────────────────────────
-        if (choice === "4") {
-            Logger.info("Uploading existing data to Firebase...");
-            const meta = await readJson(STORAGE.CHAMPION_META, []);
-            const rating = await readJson(STORAGE.CHAMPION_RATING, []);
-            const drafting = await readJson(STORAGE.CHAMPION_DRAFTING, []);
-
-            if (meta.length > 0) {
-                await uploadTierData(meta, rating, drafting);
-                Logger.success("Data uploaded to Firebase!");
-            } else {
-                Logger.warn("No data found. Run a crawl and merge first.");
-            }
-            process.exit(0);
-        }
-
-        // ── Option 2: Team Crawl ────────────────────────────────────────
         let rankStart = 0;
         let rankEnd = RANK_HIERARCHY.length;
 
-        if (choice === "2") {
+        if (choice === "1") {
+            const config = await this.askSoloConfig();
+            rankStart = config.startIndex;
+            rankEnd = config.endIndex;
+
+            const startText = RANK_HIERARCHY[rankStart].tier + (RANK_HIERARCHY[rankStart].division ? " " + RANK_HIERARCHY[rankStart].division : "");
+            const endText = RANK_HIERARCHY[rankEnd - 1].tier + (RANK_HIERARCHY[rankEnd - 1].division ? " " + RANK_HIERARCHY[rankEnd - 1].division : "");
+            
+            if (!(await this.askConfirmation(`You are about to start a Solo Crawl from ${startText} to ${endText}.`))) {
+                Logger.info("Operation cancelled.");
+                process.exit(0);
+            }
+        } else if (choice === "2") {
             const config = await this.askTeamConfig();
             rankStart = config.startIndex;
             rankEnd = config.endIndex;
+        } else if (choice === "3") {
+            if (!(await this.askConfirmation("You are about to merge and aggregate all local data. This updates champions_meta.json and rates_summary.json locally."))) {
+                Logger.info("Operation cancelled.");
+                process.exit(0);
+            }
+            await GlobalAggregator.mergeAll(true); // true = auto import from bin
+            process.exit(0);
+        } else if (choice === "4") {
+            if (!(await this.askConfirmation("You are about to scan local output files and UPLOAD them to Firebase. This overwrites cloud data."))) {
+                Logger.info("Operation cancelled.");
+                process.exit(0);
+            }
+            
+            Logger.info("Reading local data for upload...");
+            const meta = await readJson(STORAGE.CHAMPION_META);
+            const rating = await readJson(STORAGE.CHAMPION_RATING);
+            const drafting = await readJson(STORAGE.CHAMPION_DRAFTING);
+
+            if (!meta || !rating || !drafting) {
+                Logger.error("Failed to load local data. Run Choice [3] first.");
+                process.exit(1);
+            }
+
+            await uploadTierData(meta, rating, drafting);
+            process.exit(0);
+        } else if (choice === "5") {
+            await ImportManager.runImport();
+            process.exit(0);
         }
 
-        // ── Option 1 & 2: Start crawling ────────────────────────────────
-        this.setupCLI();
+        await this.run(rankStart, rankEnd);
+    }
 
-        await fs.mkdir(STORAGE.ROOT, { recursive: true });
-        let state = await readJson(STORAGE.CRAWL_STATE, { rankIndex: rankStart, currentMatches: 0 });
+    async run(rankStart, rankEnd) {
+        Logger.info(`Initializing crawl session (Ranks ${rankStart} to ${rankEnd-1})...`);
+        
+        this.enableShortcuts();
+        Logger.info("Keyboard shortcuts active: [P] Pause, [R] Restart, [Q] Quit");
+        
+        this.sessionStartTime = Date.now();
+        this.matchesFetchedInSession = 0;
+        this.totalTargetInSession = (rankEnd - rankStart) * CRAWLER.TARGET_MATCHES_PER_RANK;
 
-        // If resuming, clamp state to our assigned range
-        if (state.rankIndex < rankStart) {
+        let state = await readJson(STORAGE.CRAWL_STATE, { 
+            rankIndex: rankStart, 
+            currentMatches: 0 
+        });
+
+        if (state.rankIndex < rankStart || state.rankIndex >= rankEnd) {
             state.rankIndex = rankStart;
             state.currentMatches = 0;
-            state.initialStoreSize = undefined;
         }
-
-        // Load seen matches from Firebase (shared across laptops)
-        Logger.info("Syncing seen matches from Firebase...");
-        const globalSeen = await MatchRegistry.loadSeen();
-        // Also merge local seen matches
-        const localSeen = await readJson(STORAGE.GLOBAL_SEEN, []);
-        localSeen.forEach((id) => globalSeen.add(id));
 
         // ── Crawl loop ──────────────────────────────────────────────────
         const totalRanksForThisWorker = rankEnd - rankStart;
 
         while (state.rankIndex < rankEnd) {
             if (this.isRestarting) {
-                state = { rankIndex: rankStart, currentMatches: 0, initialStoreSize: undefined };
+                state = { rankIndex: rankStart, currentMatches: 0 };
                 await writeJson(STORAGE.CRAWL_STATE, state);
                 this.isRestarting = false;
             }
@@ -274,14 +167,14 @@ class Crawler {
             const rankStr = `${rankDef.tier} ${rankDef.division}`;
             const rankDir = path.join(STORAGE.ROOT, rankDef.tier, rankDef.division);
 
-            const localStore = await readJson(path.join(rankDir, "matchStore.json"), []);
-            const localTL = await readJson(path.join(rankDir, "timelines.json"), {});
-
+            // Get current progress from Database
+            const currentCount = await Database.getMatchCountForRank(rankDef.tier, rankDef.division);
+            
             if (state.initialStoreSize === undefined) {
-                state.initialStoreSize = localStore.length;
+                state.initialStoreSize = currentCount;
                 state.currentMatches = 0;
             } else {
-                state.currentMatches = Math.max(0, localStore.length - state.initialStoreSize);
+                state.currentMatches = Math.max(0, currentCount - state.initialStoreSize);
             }
 
             if (state.currentMatches >= CRAWLER.TARGET_MATCHES_PER_RANK) {
@@ -290,37 +183,42 @@ class Crawler {
                 state.currentMatches = 0;
                 state.initialStoreSize = undefined;
                 await writeJson(STORAGE.CRAWL_STATE, state);
-                await GlobalAggregator.mergeAll();
+                await GlobalAggregator.mergeAll(false); // don't auto-import during loop
                 continue;
             }
 
             // ETA calculation
-            const totalTargetMatches = totalRanksForThisWorker * CRAWLER.TARGET_MATCHES_PER_RANK;
-            const ranksCompleted = state.rankIndex - rankStart;
-            const totalCompleted =
-                ranksCompleted * CRAWLER.TARGET_MATCHES_PER_RANK + state.currentMatches;
-            const matchesRemaining = totalTargetMatches - totalCompleted;
-            const etaSeconds = matchesRemaining * 9.5;
-            const etaHours = Math.floor(etaSeconds / 3600);
-            const etaMinutes = Math.floor((etaSeconds % 3600) / 60);
+            const matchesDoneInSession = ((state.rankIndex - rankStart) * CRAWLER.TARGET_MATCHES_PER_RANK) + state.currentMatches;
+            const matchesRemainingInSession = Math.max(0, this.totalTargetInSession - matchesDoneInSession);
+            
+            let etaStr = "N/A";
+            if (this.matchesFetchedInSession > 0) {
+                const timeElapsed = Date.now() - this.sessionStartTime;
+                const msPerMatch = timeElapsed / this.matchesFetchedInSession;
+                const etaMs = matchesRemainingInSession * msPerMatch;
+                
+                const etaHours = Math.floor(etaMs / 3600000);
+                const etaMins = Math.floor((etaMs % 3600000) / 60000);
+                etaStr = `~${etaHours}h ${etaMins}m`;
+            }
 
-            const percent = (totalCompleted / totalTargetMatches) * 100;
+            const percent = (state.currentMatches / CRAWLER.TARGET_MATCHES_PER_RANK) * 100;
             const bar = this.getProgressBar(percent);
 
             Logger.info(
-                `[CRAWLING ${rankStr}] Matches: ${state.currentMatches}/${CRAWLER.TARGET_MATCHES_PER_RANK} | ${bar} ${percent.toFixed(1)}% | ETA: ~${etaHours}h ${etaMinutes}m`
+                `[CRAWLING ${rankStr}] Matches: ${state.currentMatches}/${CRAWLER.TARGET_MATCHES_PER_RANK} | ${bar} ${percent.toFixed(1)}% | ETA: ${etaStr}`
             );
             
             const targetLength = state.initialStoreSize + CRAWLER.TARGET_MATCHES_PER_RANK;
-            const { newMatchIds, shouldSkipRank } = await this.runCycle(rankDef, rankDir, localStore, localTL, globalSeen, targetLength);
+            const { newMatchIds, shouldSkipRank } = await this.runCycle(rankDef, rankDir, targetLength);
 
-            // Sync new matches to Firebase
+            // Sync new matches to Firebase cloud registry
             if (newMatchIds.length > 0) {
                 await MatchRegistry.markSeen(newMatchIds);
             }
 
             if (shouldSkipRank) {
-                Logger.warn(`Rank ${rankStr} seems depleted. Skipping to next rank to maintain progress.`);
+                Logger.warn(`Rank ${rankStr} seems depleted. Skipping to next rank.`);
                 state.rankIndex++;
                 state.currentMatches = 0;
                 state.initialStoreSize = undefined;
@@ -328,158 +226,204 @@ class Crawler {
                 continue;
             }
 
-            // Check progress
-            const updatedStore = await readJson(path.join(rankDir, "matchStore.json"), []);
-            const newMatches = newMatchIds.length;
-            if (newMatches === 0) {
-                Logger.warn(`No new matches added this cycle. Current: ${updatedStore.length}`);
-            } else if (newMatches > 0) {
-                Logger.success(`Added ${newMatches} new match(es). Total: ${updatedStore.length}`);
+            const finalCount = await Database.getMatchCountForRank(rankDef.tier, rankDef.division);
+            const added = finalCount - currentCount;
+            if (added === 0) {
+                Logger.warn(`No new matches added this cycle. Current total: ${finalCount}`);
+            } else {
+                this.matchesFetchedInSession += added;
+                Logger.success(`Added ${added} new match(es). Total: ${finalCount}`);
             }
 
             await writeJson(STORAGE.CRAWL_STATE, state);
-            await writeJson(STORAGE.GLOBAL_SEEN, [...globalSeen]);
 
-            Logger.info(`Resting for ${CRAWLER.PAUSE_MS_BETWEEN_CYCLES / 1000}s... (Press P to pause, Q to quit)`);
+            Logger.info(`Resting for ${CRAWLER.PAUSE_MS_BETWEEN_CYCLES / 1000}s... (Press P to pause, R to restart, Q to quit)`);
             await this.interruptibleSleep(CRAWLER.PAUSE_MS_BETWEEN_CYCLES);
         }
 
-        // Final aggregation
-        await GlobalAggregator.mergeAll();
+        await GlobalAggregator.mergeAll(true);
+        this.disableShortcuts();
         Logger.success("Crawl Complete!");
     }
 
-    // ── Single crawl cycle ──────────────────────────────────────────────
-
-    async runCycle(rankDef, rankDir, localStore, localTL, globalSeen, targetLength) {
-        const pStatePath = path.join(rankDir, "pageState.json");
-        const pState = await readJson(pStatePath, { 
-            page: 1, 
-            offset: 0, 
-            stuckCounter: 0,
-            emptyPageCounter: 0 
-        });
-        if (pState.stuckCounter === undefined) pState.stuckCounter = 0;
-        if (pState.emptyPageCounter === undefined) pState.emptyPageCounter = 0;
-
+    async runCycle(rankDef, rankDir, targetLength) {
         this.client.used = 0;
+        const pStatePath = path.join(rankDir, "pageState.json");
+        const pState = await readJson(pStatePath, { page: 1, stuckCounter: 0, emptyPageCounter: 0 });
 
-        const queue = [];
-        let matchesAddedThisCycle = 0;
         const newMatchIds = [];
+        let shouldSkipRank = false;
 
         try {
             const players = await this.client.getPlayers(rankDef, pState.page);
 
-            if (players.length === 0) {
-                Logger.warn(`No players found on page ${pState.page}, advancing page...`);
-                pState.page++;
-                pState.offset = 0;
-                pState.stuckCounter = 0;
-            } else {
-                for (const p of players) {
-                    if (this.client.used >= API.MAX_REQUESTS_PER_CYCLE) break;
-
-                    let puuid = p.puuid;
-                    if (!puuid && p.summonerId && this.client.used < API.MAX_REQUESTS_PER_CYCLE) {
-                        const sDetails = await this.client.getSummonerBySummonerId(p.summonerId);
-                        puuid = sDetails?.puuid;
-                    }
-
-                    if (puuid) {
-                        const ids = await this.client.getMatchIds(puuid, pState.offset);
-                        ids.forEach((id) => {
-                            if (!globalSeen.has(id)) queue.push(id);
-                        });
-                    }
-                }
-            }
-        } catch (e) {
-            if (e.message === "BLACKLISTED" || e.message === "API_KEY_INVALID") {
-                const reason = e.message === "API_KEY_INVALID"
-                    ? "API Key is invalid/expired"
-                    : "API Key blacklisted";
-                Logger.error(`FALLBACK: ${reason}. Pausing crawler — update your .env and press 'P' to resume.`);
-                this.isPaused = true;
-                return newMatchIds;
-            }
-            Logger.warn("Match discovery halted: " + e.message);
-            await this.interruptibleSleep(5000);
-        }
-
-        if (this.isPaused) return newMatchIds;
-
-        // Fetch matches from queue
-        for (const id of queue) {
-            if (this.client.used >= API.MAX_REQUESTS_PER_CYCLE - 1) break;
-            if (localStore.length >= targetLength) break;
-
-            try {
-                Logger.log(`[REQ ${this.client.used + 1}] Fetching ${id}`);
-                const detail = await this.client.getMatchDetail(id);
-                const timeline = await this.client.getTimeline(id);
-
-                localStore.push(detail);
-                localTL[id] = timeline;
-                globalSeen.add(id);
-                newMatchIds.push(id);
-                matchesAddedThisCycle++;
-            } catch (e) {
-                if (e.message === "BLACKLISTED" || e.message === "API_KEY_INVALID") {
-                    const reason = e.message === "API_KEY_INVALID"
-                        ? "API Key is invalid/expired"
-                        : "API Key blacklisted";
-                    Logger.error(`FALLBACK: ${reason}. Pausing. Progress is safely stored.`);
-                    this.isPaused = true;
-                    break;
-                }
-                Logger.error(`Skip Match ${id}`, e);
-            }
-        }
-
-        // Advance page state
-        let shouldSkipRank = false;
-        if (matchesAddedThisCycle === 0) {
-            pState.stuckCounter++;
-            if (pState.stuckCounter >= 2) {
+            if (!players || players.length === 0) {
                 pState.emptyPageCounter++;
-                Logger.warn(`Stuck on page ${pState.page} (Empty pages: ${pState.emptyPageCounter}/${CRAWLER.MAX_EMPTY_PAGES_BEFORE_SKIP}). Advancing...`);
-                
-                if (pState.emptyPageCounter >= CRAWLER.MAX_EMPTY_PAGES_BEFORE_SKIP) {
-                    shouldSkipRank = true;
+                if (pState.emptyPageCounter > CRAWLER.MAX_EMPTY_PAGES_BEFORE_SKIP) {
+                    pState.page = 1;
+                    pState.emptyPageCounter = 0;
+                } else {
+                    pState.page++;
                 }
+                await writeJson(pStatePath, pState);
+                return { newMatchIds, shouldSkipRank };
+            }
 
-                pState.page++;
-                pState.offset = 0;
+            pState.emptyPageCounter = 0;
+
+            for (const player of players) {
+                if (this.isPaused || this.isRestarting) break;
+                
+                const matches = await this.client.getMatchIds(player.puuid);
+                for (const mid of matches) {
+                    if (this.isPaused || this.isRestarting) break;
+
+                    const seenLocallyOrCloud = await MatchRegistry.isSeen(mid);
+                    if (seenLocallyOrCloud) continue;
+
+                    const detail = await this.client.getMatchDetail(mid);
+                    if (!detail) continue;
+
+                    // Skip non-SoloQ matches
+                    if (detail.info.queueId !== 420) continue;
+
+                    const timeline = await this.client.getMatchTimeline(mid);
+                    if (!timeline) continue;
+
+                    // SAVE TO SQL
+                    detail.tier = rankDef.tier;
+                    detail.division = rankDef.division;
+                    const saved = await Database.saveMatch(detail, timeline, true); // STRIPPING enabled
+
+                    if (saved) {
+                        newMatchIds.push(mid);
+                        const currentTotal = await Database.getMatchCountForRank(rankDef.tier, rankDef.division);
+                        if (currentTotal >= targetLength) break;
+                    }
+                }
+                const currentTotal = await Database.getMatchCountForRank(rankDef.tier, rankDef.division);
+                if (currentTotal >= targetLength) break;
+            }
+
+            // Always increment page at the end of a cycle to keep data fresh
+            pState.page++;
+
+            if (newMatchIds.length === 0) {
+                pState.stuckCounter++;
+                // Skip after 3 fruitless cycles (more aggressive than original 5)
+                if (pState.stuckCounter >= 3) shouldSkipRank = true;
+            } else {
                 pState.stuckCounter = 0;
             }
-        } else {
-            pState.stuckCounter = 0;
-            pState.emptyPageCounter = 0; // Reset counter if we found SOMETHING
-            pState.offset += CRAWLER.MATCHES_PER_PLAYER;
-            if (pState.offset >= 20) {
-                pState.offset = 0;
-                pState.page++;
-            }
+
+            // Safety cap: Skip rank if we reach Page 50 and it's still not hit target
+            if (pState.page > 50) shouldSkipRank = true;
+
+            await writeJson(pStatePath, pState);
+
+        } catch (e) {
+            Logger.error("Cycle failed: " + e.message);
         }
-
-        await writeJson(pStatePath, pState);
-        await writeJson(path.join(rankDir, "matchStore.json"), localStore);
-        await writeJson(path.join(rankDir, "timelines.json"), localTL);
-
-        const assets = await AssetManager.getAssets();
-        const ranking = AnalyticsEngine.analyze(localStore, localTL, assets);
-        await writeJson(path.join(rankDir, "ranking.json"), ranking);
 
         return { newMatchIds, shouldSkipRank };
     }
+
+    async askChoice() {
+        while (true) {
+            const ans = await new Promise((resolve) => {
+                const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+                console.log("\n╔════════════════════════════════════════════════╗");
+                console.log("║       LoL Guide  ·  Data Crawler              ║");
+                console.log("╚════════════════════════════════════════════════╝");
+                console.log("\n  What would you like to do?\n");
+                console.log("    [1]  🔄 Solo Crawl        (all ranks, single machine)");
+                console.log("    [2]  👥 Team Crawl        (split ranks across laptops)");
+                console.log("    [3]  📦 Merge & Aggregate (Local Only)");
+                console.log("    [4]  📊 Upload Results    (Push local JSONs to Cloud)");
+                console.log("    [5]  📥 Import from Bin   (Merge matches from other machines)");
+                console.log();
+                rl.question("  ▸ Enter choice (1-5): ", (a) => { rl.close(); resolve(a.trim()); });
+            });
+
+            if (["1","2","3","4","5"].includes(ans)) return ans;
+            Logger.warn("Invalid choice. Please enter 1, 2, 3, 4, or 5.");
+        }
+    }
+
+    async askSoloConfig() {
+        while (true) {
+            const scope = await new Promise((resolve) => {
+                const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+                console.log("\n  --- Solo Crawl Configuration ---");
+                console.log("  [1] Full Ladder (Iron to Challenger)");
+                console.log("  [2] Specific Tier (e.g. Bronze only)");
+                console.log("  [3] Specific Division (e.g. Platinum I only)");
+                rl.question("\n  ▸ Select scope: ", (s) => { rl.close(); resolve(s.trim()); });
+            });
+
+            if (scope === "1") return { startIndex: 0, endIndex: RANK_HIERARCHY.length };
+            
+            if (scope === "2") {
+                const tiers = [...new Set(RANK_HIERARCHY.map(r => r.tier))];
+                tiers.forEach((t, i) => console.log(`  [${i+1}] ${t}`));
+                const tIdxStr = await this.askQuestion("Select Tier: ");
+                const tIdx = parseInt(tIdxStr);
+                if (!isNaN(tIdx) && tIdx >= 1 && tIdx <= tiers.length) {
+                    const tier = tiers[tIdx-1];
+                    const filtered = RANK_HIERARCHY.filter(r => r.tier === tier);
+                    return { startIndex: RANK_HIERARCHY.indexOf(filtered[0]), endIndex: RANK_HIERARCHY.indexOf(filtered[filtered.length-1]) + 1 };
+                }
+            } else if (scope === "3") {
+                RANK_HIERARCHY.forEach((r, i) => console.log(`  [${i+1}] ${r.tier} ${r.division}`));
+                const rIdxStr = await this.askQuestion("Select Rank: ");
+                const rIdx = parseInt(rIdxStr);
+                if (!isNaN(rIdx) && rIdx >= 1 && rIdx <= RANK_HIERARCHY.length) {
+                    const idx = rIdx - 1;
+                    return { startIndex: idx, endIndex: idx + 1 };
+                }
+            }
+            Logger.warn("Invalid selection. Please try again.");
+        }
+    }
+
+    async askTeamConfig() {
+        const total = await this.askQuestion("Total laptops in the team? ");
+        const id = await this.askQuestion("Worker ID for this machine (1, 2, ...)? ");
+        const count = parseInt(total);
+        const worker = parseInt(id) - 1;
+        const perWorker = Math.ceil(RANK_HIERARCHY.length / count);
+        return { startIndex: worker * perWorker, endIndex: Math.min((worker + 1) * perWorker, RANK_HIERARCHY.length) };
+    }
+
+    askQuestion(q) {
+        return new Promise((res) => {
+            const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+            rl.question(`  ▸ ${q}`, (ans) => { rl.close(); res(ans.trim()); });
+        });
+    }
+
+    async askConfirmation(q) {
+        const ans = await this.askQuestion(`${q}\n  ▸ Are you sure? (y/N): `);
+        return ans.toLowerCase() === "y";
+    }
+
+    getProgressBar(percent) {
+        const size = 20;
+        const filled = Math.round((size * percent) / 100);
+        return "[" + "█".repeat(filled) + "░".repeat(size - filled) + "]";
+    }
+
+    async interruptibleSleep(ms) {
+        const start = Date.now();
+        while (Date.now() - start < ms) {
+            if (this.isPaused) { await sleep(500); continue; }
+            await sleep(500);
+        }
+    }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// INIT
 if (require.main === module) {
-    new Crawler().start().catch((err) => Logger.error("Fatal Error", err));
+    new Crawler().start().catch((err) => Logger.error("Fatal Error: " + err.stack));
 }
 
 module.exports = Crawler;
-
