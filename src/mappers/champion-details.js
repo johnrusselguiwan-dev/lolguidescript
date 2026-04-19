@@ -64,6 +64,7 @@ function buildDetailEntry(raw, meta, version) {
 
     const detailEntry = {
         id: raw.id,
+        championId: parseInt(raw.key, 10),
         name: raw.name,
         title: raw.title,
         avatar: `https://wiki.leagueoflegends.com/en-us/images/${raw.name.replace(/ /g, '_')}_Render.png`,

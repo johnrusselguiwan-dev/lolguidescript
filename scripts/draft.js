@@ -34,7 +34,7 @@ function getSuggestions(myTeam, enemyTeam, stats) {
     const scores = {};
 
     stats.forEach((s) => {
-        const hero = s.championName;
+        const hero = s.championDisplayName || s.championName;
         if (myTeam.includes(hero) || enemyTeam.includes(hero)) return;
 
         scores[hero] = s.score * 10;
@@ -90,14 +90,16 @@ async function start() {
             if (answer.toLowerCase() === "exit") break;
 
             const champRegex = new RegExp(`^${answer}$`, "i");
-            const matchedChamp = stats.find((s) => champRegex.test(s.championName));
+            const matchedChamp = stats.find((s) => 
+                champRegex.test(s.championName) || champRegex.test(s.championDisplayName)
+            );
 
             if (!matchedChamp) {
                 console.log(`⚠ Champion '${answer}' not found in the database. Please try again.`);
                 continue;
             }
 
-            const hero = matchedChamp.championName;
+            const hero = matchedChamp.championDisplayName || matchedChamp.championName;
             if (blueTeam.includes(hero) || redTeam.includes(hero)) {
                 console.log(`⚠ '${hero}' has already been picked!`);
                 continue;

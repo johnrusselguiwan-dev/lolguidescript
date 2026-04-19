@@ -77,7 +77,7 @@ class GlobalAggregator {
         }
 
         Logger.info("Running Global Aggregation from SQLite database...");
-        
+
         // 2. Connect to DB
         await Database.connect();
 
@@ -100,10 +100,10 @@ class GlobalAggregator {
             const matches = activePatch
                 ? await Database.getMatchesForRankAndPatch(rank.tier, rank.division, activePatch)
                 : await Database.getMatchesForRank(rank.tier, rank.division);
-            
+
             if (matches.length > 0) {
                 Logger.info(`Processing ${rank.tier} ${rank.division} (${matches.length} matches)...`);
-                
+
                 // Fetch timelines for these specific matches (only Skill events remain)
                 const matchIds = matches.map(m => m.metadata.matchId);
                 const timelines = await Database.getTimelinesForMatches(matchIds);
@@ -117,33 +117,38 @@ class GlobalAggregator {
             const globalRanking = AnalyticsEngine.finalize(stats, totalRanked, assets);
 
             // CHAMPION_META — full data (with patch info)
-            const metaData = globalRanking.map((ch) => ({
-                ...ch,
-                patch: activePatch,
-                isFallback,
-                drafting: {
-                    strongAgainst: (ch.drafting.strongAgainst || []).slice(0, 10),
-                    weakAgainst: (ch.drafting.weakAgainst || []).slice(0, 10),
-                    synergizesWith: (ch.drafting.synergizesWith || []).slice(0, 10),
-                },
-            }));
+            const metaData = globalRanking.map((ch) => {
+                const slimCh = { ...ch };
+                
+                // Remove redundant fields that are now handled by champion_rating and champion_drafting
+                delete slimCh.winRate;
+                delete slimCh.pickRate;
+                delete slimCh.banRate;
+                delete slimCh.drafting;
+
+                return {
+                    ...slimCh,
+                    patch: activePatch,
+                    isFallback,
+                };
+            });
             await writeJson(STORAGE.CHAMPION_META, metaData, true); // true = minify
 
             // CHAMPION_RATING — slim rates
             const ratingData = globalRanking.map((ch) => {
-                const champBase = assets.champData[ch.championName];
                 return {
-                    id: ch.championId,
-                    name: champBase ? champBase.name : ch.championName,
+                    id: ch.id,
+                    championId: ch.championId,
+                    name: ch.name,
                     score: ch.score, // Identical to meta's score
                     winRate: `${ch.winRate.toFixed(2)}%`,
                     pickRate: `${ch.pickRate.toFixed(2)}%`,
                     banRate: `${ch.banRate.toFixed(2)}%`,
-                    icon: champBase
-                        ? `https://ddragon.leagueoflegends.com/cdn/${assets.ddragonVersion}/img/champion/${champBase.image.full}`
+                    icon: ch.id && assets.champData[ch.id]
+                        ? `https://ddragon.leagueoflegends.com/cdn/${assets.ddragonVersion}/img/champion/${assets.champData[ch.id].image.full}`
                         : "",
                     lane: ch.lanes && ch.lanes.length > 0 ? ch.lanes : ["Unknown"],
-                    role: champBase ? champBase.tags : ["Unknown"],
+                    role: assets.champData[ch.id] ? assets.champData[ch.id].tags : ["Unknown"],
                     patch: activePatch,
                     isFallback,
                 };
@@ -153,8 +158,9 @@ class GlobalAggregator {
 
             // CHAMPION_DRAFTING — matchups
             const draftData = globalRanking.map((ch) => ({
-                id: ch.championId,
-                name: ch.championName,
+                id: ch.id,
+                championId: ch.championId,
+                name: ch.name,
                 drafting: ch.drafting,
             }));
             await writeJson(STORAGE.CHAMPION_DRAFTING, draftData, true);
@@ -167,14 +173,14 @@ class GlobalAggregator {
             if (!isFallback && currentPatch) {
                 const patches = await Database.getDistinctPatches();
                 const patchNames = patches.map(p => p.patch);
-                
+
                 // Keep current patch + at most 1 previous
                 const keepPatches = [currentPatch];
                 const olderPatches = patchNames
                     .filter(p => p !== currentPatch)
                     .sort()
                     .reverse();
-                
+
                 if (olderPatches.length > 0 && CRAWLER.ALLOWED_PATCHES > 1) {
                     keepPatches.push(olderPatches[0]); // Keep 1 fallback
                 }

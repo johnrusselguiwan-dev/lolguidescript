@@ -35,11 +35,8 @@ class AnalyticsEngine {
             total++;
 
             for (const p of m.info.participants) {
-                let hero = p.championName;
+                let hero = assets.champMap[p.championId] || p.championName;
                 if (!hero) continue;
-
-                // Normalize case-sensitive names for DDragon compatibility
-                if (hero === "FiddleSticks") hero = "Fiddlesticks";
 
                 if (!stats[hero]) {
                     stats[hero] = {
@@ -71,8 +68,7 @@ class AnalyticsEngine {
                 // Counters & synergies
                 m.info.participants.forEach((other) => {
                     if (other.participantId === p.participantId) return;
-                    let otherHero = other.championName;
-                    if (otherHero === "FiddleSticks") otherHero = "Fiddlesticks";
+                    let otherHero = assets.champMap[other.championId] || other.championName;
 
                     const map = other.teamId === p.teamId ? s.synergies : s.counters;
                     if (!map[otherHero]) map[otherHero] = { games: 0, wins: 0 };
@@ -197,6 +193,9 @@ class AnalyticsEngine {
         const getTop = (obj) =>
             Object.entries(obj).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
 
+        // Resolve DDragon key (e.g. "MonkeyKing") to display name (e.g. "Wukong")
+        const resolveName = (ddKey) => assets.champData[ddKey]?.name || ddKey;
+
         return Object.entries(stats)
             .map(([hero, s]) => {
                 const winRate = (s.wins / s.games) * 100;
@@ -263,8 +262,11 @@ class AnalyticsEngine {
                 };
 
                 return {
+                    id: hero,
                     championId: s.id,
+                    name: resolveName(hero),
                     championName: hero,
+                    championDisplayName: resolveName(hero),
                     score: +score.toFixed(4),
                     winRate: +winRate.toFixed(2),
                     pickRate: +pickRate.toFixed(2),
@@ -278,19 +280,22 @@ class AnalyticsEngine {
                         skills: this.parseSkillSequence(getTop(s.skills)),
                     },
                     drafting: {
-                        strongAgainst: counters
-                            .filter((m) => m[1].wins / m[1].games >= 0.5)
-                            .map((m) => `${m[0]} (${((m[1].wins / m[1].games) * 100).toFixed(1)}%)`),
-                        weakAgainst: [...counters]
-                            .reverse()
-                            .filter((m) => m[1].wins / m[1].games < 0.5)
-                            .map(
-                                (m) =>
-                                    `${m[0]} (${(((m[1].games - m[1].wins) / m[1].games) * 100).toFixed(1)}%)`
-                            ),
-                        synergizesWith: syn
-                            .filter((m) => m[1].wins / m[1].games >= 0.5)
-                            .map((m) => `${m[0]} (${((m[1].wins / m[1].games) * 100).toFixed(1)}%)`),
+                        strongAgainst: Object.fromEntries(
+                            counters
+                                .filter((m) => m[1].wins / m[1].games >= 0.5)
+                                .map((m) => [m[0], +((m[1].wins / m[1].games) * 100).toFixed(1)])
+                        ),
+                        weakAgainst: Object.fromEntries(
+                            [...counters]
+                                .reverse()
+                                .filter((m) => m[1].wins / m[1].games < 0.5)
+                                .map((m) => [m[0], +(((m[1].games - m[1].wins) / m[1].games) * 100).toFixed(1)])
+                        ),
+                        synergizesWith: Object.fromEntries(
+                            syn
+                                .filter((m) => m[1].wins / m[1].games >= 0.5)
+                                .map((m) => [m[0], +((m[1].wins / m[1].games) * 100).toFixed(1)])
+                        ),
                     },
                 };
             })
