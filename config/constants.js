@@ -10,9 +10,13 @@ const path = require("path");
 // ── API settings ────────────────────────────────────────────────────────────
 
 const API = {
-    PLATFORM: "sg2",
-    MATCH_REGION: "sea",
-    QUEUE: "RANKED_SOLO_5x5",
+    PLATFORMS: ["sg2", "tw2", "vn2"],       // All SEA platforms to crawl for player discovery
+    MATCH_REGION: "sea",                     // Shared match-v5 endpoint for all SEA platforms
+    QUEUES: [
+        { name: "RANKED_SOLO_5x5", id: 420 },
+        { name: "RANKED_FLEX_SR",  id: 440 },
+    ],
+    QUEUE_IDS: [420, 440],                   // Convenience array for filtering
     MAX_REQUESTS_PER_CYCLE: 80,
     SAFE_DELAY_MS: 1500,
     RETRY_ATTEMPTS: 3,
@@ -23,12 +27,12 @@ const API = {
 const CRAWLER = {
     TARGET_MATCHES_PER_RANK: 100,
     PLAYERS_PER_PAGE: 5,
-    MATCHES_PER_PLAYER: 5,
+    MATCHES_PER_PLAYER: 10,
     PAUSE_MS_BETWEEN_CYCLES: 30 * 1000,
     MAX_EMPTY_PAGES_BEFORE_SKIP: 5,
-    HISTORICAL_DAYS_DEFAULT: 30,
-    MAX_HISTORICAL_MATCHES_PER_PLAYER: 100,
     STRICT_PATCH_FILTER: true,
+    MIN_MATCHES_FOR_NEW_PATCH: 500,          // Threshold before switching from fallback patch
+    ALLOWED_PATCHES: 2,                      // Keep at most current + 1 fallback
 };
 
 // ── Storage paths (relative to project root) ────────────────────────────────

@@ -89,6 +89,11 @@ async function uploadSpells(spells, patchVersion) {
 }
 
 async function uploadTierData(meta, rating, drafting) {
+    // Extract patch info from the data (if available)
+    const sampleEntry = (meta && meta.length > 0) ? meta[0] : null;
+    const dataPatch = sampleEntry?.patch || "unknown";
+    const isFallback = sampleEntry?.isFallback || false;
+
     const batch = db.batch();
 
     batch.set(db.collection("data").doc("champion_meta"), {
@@ -106,13 +111,15 @@ async function uploadTierData(meta, rating, drafting) {
     batch.set(
         db.collection("system_metadata").doc("patch_info"),
         {
+            dataPatch,
+            isFallback,
             lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
         },
         { merge: true }
     );
 
     await batch.commit();
-    printSuccess("Champion meta, rating & drafting uploaded to Firebase");
+    printSuccess(`Champion meta, rating & drafting uploaded to Firebase (Patch: ${dataPatch}${isFallback ? " [FALLBACK]" : ""})`);
 }
 
 module.exports = { uploadChampions, uploadItems, uploadRunes, uploadSpells, uploadTierData };

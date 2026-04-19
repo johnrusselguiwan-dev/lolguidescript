@@ -6,6 +6,8 @@
  * All methods are static — no instance state required.
  */
 
+const { API } = require("../../config/constants");
+
 class AnalyticsEngine {
     /**
      * Main entry point. Analyses an array of match objects against their
@@ -29,7 +31,7 @@ class AnalyticsEngine {
     static processChunk(stats, currentTotal, matches, timelines, assets) {
         let total = currentTotal;
         for (const m of matches) {
-            if (m?.info?.queueId !== 420) continue;
+            if (!m?.info?.queueId || !API.QUEUE_IDS.includes(m.info.queueId)) continue;
             total++;
 
             for (const p of m.info.participants) {
@@ -228,15 +230,37 @@ class AnalyticsEngine {
 
                 const rawItems = Object.entries(s.items).sort((a, b) => b[1] - a[1]);
                 
-                // Find the most popular boots
-                const topBootsId = rawItems.find(i => Object.values(assets.itemData[i[0]]?.tags || {}).includes("Boots"))?.[0];
-                const bootsName = topBootsId ? assets.itemData[topBootsId]?.name : null;
+                // Separate boots and legendary items
+                const isBoots = (itemId) => Object.values(assets.itemData[itemId]?.tags || {}).includes("Boots");
+                const allBoots = rawItems.filter(i => isBoots(i[0])).map(i => assets.itemData[i[0]]?.name).filter(Boolean);
+                const nonBoots = rawItems.filter(i => !isBoots(i[0])).map(i => assets.itemData[i[0]]?.name).filter(Boolean);
                 
-                // Filter out the identified boots from the rest of the items list
-                const sortedOtherItems = rawItems
-                    .filter(i => i[0] !== topBootsId)
-                    .map(i => assets.itemData[i[0]]?.name)
-                    .filter(Boolean);
+                const bootsName = allBoots[0] || null;
+
+                let nonBootsIdx = 0;
+                let bootsIdx = 1;
+
+                const makeBuild = () => {
+                    const items = nonBoots.slice(nonBootsIdx, nonBootsIdx + 5);
+                    nonBootsIdx += 5;
+                    
+                    const spareItems = [];
+                    // Allow at most 1 spare boots item per build
+                    if (bootsIdx < allBoots.length) {
+                        spareItems.push(allBoots[bootsIdx]);
+                        bootsIdx++;
+                    }
+                    // Fill the rest with legendary items
+                    if (nonBootsIdx < nonBoots.length) {
+                        spareItems.push(nonBoots[nonBootsIdx]);
+                        nonBootsIdx++;
+                    }
+                    if (spareItems.length < 2 && nonBootsIdx < nonBoots.length) {
+                        spareItems.push(nonBoots[nonBootsIdx]);
+                        nonBootsIdx++;
+                    }
+                    return { boots: bootsName, items, spareItems };
+                };
 
                 return {
                     championId: s.id,
@@ -247,11 +271,7 @@ class AnalyticsEngine {
                     banRate: +banRate.toFixed(2),
                     games: s.games,
                     lanes: lanesArray,
-                    builds: [
-                        { boots: bootsName, items: sortedOtherItems.slice(0, 5), spareItems: sortedOtherItems.slice(5, 7) },
-                        { boots: bootsName, items: sortedOtherItems.slice(7, 12), spareItems: sortedOtherItems.slice(12, 14) },
-                        { boots: bootsName, items: sortedOtherItems.slice(14, 19), spareItems: sortedOtherItems.slice(19, 21) },
-                    ],
+                    builds: [makeBuild(), makeBuild(), makeBuild()],
                     loadout: {
                         spells: getTop(s.spells),
                         runes: getTop(s.runes),

@@ -9,15 +9,36 @@ const FIELD = "seenMatches";
 class MatchRegistry {
     static cachedSeen = null;
     static lastSync = 0;
+    static pendingSync = new Set();
+    static SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
     /**
      * Internal helper to sync cache with cloud
      */
     static async syncCache() {
         const now = Date.now();
-        // Only sync from cloud every 2 minutes or if never synced
-        if (this.cachedSeen && (now - this.lastSync < 120000)) return;
+        // Only sync from cloud every 5 minutes or if never synced
+        if (this.cachedSeen && (now - this.lastSync < this.SYNC_INTERVAL)) return;
 
+        // 1. Push any pending writes to the cloud first
+        if (this.pendingSync.size > 0) {
+            try {
+                const ref = db.collection(COLLECTION).doc(DOC_ID);
+                const FieldValue = admin.firestore.FieldValue;
+                const matchIds = Array.from(this.pendingSync);
+                
+                await ref.set({
+                    [FIELD]: FieldValue.arrayUnion(...matchIds),
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+                
+                this.pendingSync.clear();
+            } catch (e) {
+                Logger.warn("Cloud registry write sync failed: " + e.message);
+            }
+        }
+
+        // 2. Fetch the latest from cloud
         try {
             const doc = await db.collection(COLLECTION).doc(DOC_ID).get();
             if (doc.exists) {
@@ -27,7 +48,7 @@ class MatchRegistry {
             }
             this.lastSync = now;
         } catch (e) {
-            Logger.warn("Failed to sync cloud seen matches: " + e.message);
+            Logger.warn("Failed to read cloud seen matches: " + e.message);
             if (!this.cachedSeen) this.cachedSeen = new Set();
         }
     }
@@ -43,36 +64,22 @@ class MatchRegistry {
 
         // 2. Check Session Cache (Syncs with Cloud periodically)
         await this.syncCache();
-        return this.cachedSeen.has(matchId);
+        return this.cachedSeen.has(matchId) || this.pendingSync.has(matchId);
     }
 
     /**
      * Mark IDs as seen in the Cloud (Firestore).
+     * We batch these and upload them during the next syncCache() call to save writes.
      */
     static async markSeen(matchIds) {
         if (!matchIds || matchIds.length === 0) return;
 
-        // 1. Update Session Cache immediately
         if (!this.cachedSeen) this.cachedSeen = new Set();
-        matchIds.forEach(id => this.cachedSeen.add(id));
-
-        // 2. Update Cloud
-        try {
-            const ref = db.collection(COLLECTION).doc(DOC_ID);
-            
-            // Firebase limits array size in doc (1MB), but arrayUnion is efficient
-            // Firestore.FieldValue.arrayUnion is usually accessed via admin.firestore
-            const FieldValue = admin.firestore.FieldValue;
-            
-            // Firestore batch update or single set with merge
-            await ref.set({
-                [FIELD]: FieldValue.arrayUnion(...matchIds),
-                updatedAt: new Date().toISOString()
-            }, { merge: true });
-
-        } catch (e) {
-            Logger.warn("Cloud registry sync failed: " + e.message);
-        }
+        
+        matchIds.forEach(id => {
+            this.cachedSeen.add(id);
+            this.pendingSync.add(id);
+        });
     }
 }
 

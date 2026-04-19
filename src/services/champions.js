@@ -14,18 +14,6 @@ const Logger = require("../utils/logger");
 const FETCH_CHUNK_SIZE = 20;
 
 async function fetchAndProcessChampions(version) {
-    // Load crawler data if available (CHAMPION_META.json)
-    const championMeta = await readJson(STORAGE.CHAMPION_META, []);
-    const crawlerMap = {};
-    for (const entry of championMeta) {
-        crawlerMap[entry.championName] = entry;
-    }
-    if (championMeta.length > 0) {
-        Logger.info(`Loaded crawler data for ${championMeta.length} champions from CHAMPION_META.json`);
-    } else {
-        Logger.warn("No CHAMPION_META.json found — champion details will use default values. Run the crawler first.");
-    }
-
     const metaMap = loadLocalMetadata();
     const listData = await api.getChampionList(version);
     const championKeys = Object.keys(listData);
@@ -40,9 +28,7 @@ async function fetchAndProcessChampions(version) {
             const raw = await api.getChampionDetail(version, id);
             const meta = metaMap[raw.key] || { lanes: ["Unknown"], region: "Runeterra" };
 
-            // Pass crawler stats for this champion (matched by DDragon id, e.g. "Mel", "DrMundo")
-            const crawlerStats = crawlerMap[id] || null;
-            const detailEntry = buildDetailEntry(raw, meta, version, crawlerStats);
+            const detailEntry = buildDetailEntry(raw, meta, version);
             const listEntry = buildListEntry(detailEntry);
 
             detailEntry.patchVersion = version;

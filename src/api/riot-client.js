@@ -115,7 +115,14 @@ class RiotClient {
 
     // ── Endpoint helpers ────────────────────────────────────────────────
 
-    async getPlayers(rankDef, page) {
+    /**
+     * Get ranked players for a specific rank from a specific platform and queue.
+     * @param {Object} rankDef — { tier, division, isApex }
+     * @param {number} page — page number for paginated results
+     * @param {string} platform — platform routing value (e.g. "sg2", "tw2", "vn2")
+     * @param {string} queueName — queue name (e.g. "RANKED_SOLO_5x5", "RANKED_FLEX_SR")
+     */
+    async getPlayers(rankDef, page, platform = API.PLATFORMS[0], queueName = API.QUEUES[0].name) {
         if (rankDef.isApex) {
             const apexMap = {
                 MASTER: "masterleagues",
@@ -123,7 +130,7 @@ class RiotClient {
                 CHALLENGER: "challengerleagues",
             };
             const data = await this.fetch(
-                `https://${API.PLATFORM}.api.riotgames.com/lol/league/v4/${apexMap[rankDef.tier]}/by-queue/${API.QUEUE}`
+                `https://${platform}.api.riotgames.com/lol/league/v4/${apexMap[rankDef.tier]}/by-queue/${queueName}`
             );
             return data?.entries
                 ? data.entries.slice(0, require("../../config/constants").CRAWLER.PLAYERS_PER_PAGE)
@@ -131,23 +138,29 @@ class RiotClient {
         }
 
         const data = await this.fetch(
-            `https://${API.PLATFORM}.api.riotgames.com/lol/league/v4/entries/${API.QUEUE}/${rankDef.tier}/${rankDef.division}?page=${page}`
+            `https://${platform}.api.riotgames.com/lol/league/v4/entries/${queueName}/${rankDef.tier}/${rankDef.division}?page=${page}`
         );
         return Array.isArray(data)
             ? data.slice(0, require("../../config/constants").CRAWLER.PLAYERS_PER_PAGE)
             : [];
     }
 
+    /**
+     * Get match IDs for a player.
+     * @param {string} puuid — player's PUUID
+     * @param {Object} options — { start, count, startTime, endTime, queue }
+     */
     async getMatchIds(puuid, options = {}) {
         const {
             start = 0,
             count = require("../../config/constants").CRAWLER.MATCHES_PER_PLAYER,
             startTime,
             endTime,
-            queue = 420
+            queue
         } = options;
 
-        let url = `https://${API.MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}&queue=${queue}`;
+        let url = `https://${API.MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}`;
+        if (queue) url += `&queue=${queue}`;
         if (startTime) url += `&startTime=${Math.floor(startTime / 1000)}`;
         if (endTime) url += `&endTime=${Math.floor(endTime / 1000)}`;
 
@@ -156,7 +169,7 @@ class RiotClient {
 
     async getSummonerBySummonerId(summonerId) {
         return await this.fetch(
-            `https://${API.PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/${summonerId}`
+            `https://${API.PLATFORMS[0]}.api.riotgames.com/lol/summoner/v4/summoners/${summonerId}`
         );
     }
 

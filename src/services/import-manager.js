@@ -1,114 +1,159 @@
 /**
- * Import Manager — handles "Smart Merging" of match data from other laptops.
- * Now using SQLite for high-performance deduplication and storage.
+ * Import Manager — Handles exporting and importing SQLite databases
+ * for easy team sharing without needing to move JSON files around.
  */
 
 const fs = require("fs/promises");
 const path = require("path");
-const { STORAGE, RANK_HIERARCHY } = require("../../config/constants");
-const { readJson } = require("../utils/io");
+const os = require("os");
+const sqlite3 = require("sqlite3").verbose();
+const { STORAGE } = require("../../config/constants");
 const Database = require("./database");
-const MatchRegistry = require("./match-registry");
 const Logger = require("../utils/logger");
+const MatchRegistry = require("./match-registry");
 
 class ImportManager {
     /**
-     * Main entry point for the import process.
+     * Export the local crawler.db to the user's Desktop.
+     * Before exporting, it runs VACUUM to ensure the file is as small as possible.
      */
-    static async runImport() {
-        // Ensure DB is connected
-        await Database.connect();
-
-        Logger.info("Starting Smart Import from 'data/import/'...");
-        
+    static async exportDatabase() {
         try {
-            await fs.access(STORAGE.IMPORT);
-        } catch {
-            Logger.warn("Import directory 'data/import/' not found.");
-            return;
-        }
+            await Database.connect();
+            Logger.info("Optimizing database before export...");
+            await Database.vacuum();
 
-        let totalNewMatches = 0;
-        let totalProcessedRanks = 0;
-        const allNewIds = [];
+            const dateStr = new Date().toISOString().split("T")[0];
+            const desktopPath = path.join(os.homedir(), "Desktop");
+            const exportFileName = `worker_export_${dateStr}.db`;
+            const exportPath = path.join(desktopPath, exportFileName);
 
-        for (const rank of RANK_HIERARCHY) {
-            const importRankDir = path.join(STORAGE.IMPORT, rank.tier, rank.division);
+            Logger.info(`Copying database to ${exportPath}...`);
             
-            try {
-                await fs.access(importRankDir);
-            } catch {
-                continue; 
-            }
+            // Close DB briefly to ensure safe copy
+            Database.close();
+            await fs.copyFile(STORAGE.DATABASE, exportPath);
+            await Database.connect(); // Reconnect
 
-            Logger.info(`Processing ${rank.tier} ${rank.division} from bin...`);
-            totalProcessedRanks++;
+            const stats = await fs.stat(exportPath);
+            const sizeMB = (stats.size / (1024 * 1024)).toFixed(2);
 
-            // Load incoming data
-            const incomingStore = await readJson(path.join(importRankDir, "matchStore.json"), []);
-            const incomingTL = await readJson(path.join(importRankDir, "timelines.json"), {});
+            Logger.success(`\nExport complete! File saved to your Desktop:`);
+            Logger.success(`  ➜ ${exportFileName} (${sizeMB} MB)`);
+            Logger.info(`Send this file to your Master laptop for aggregation.\n`);
 
-            if (incomingStore.length === 0) {
-                Logger.warn(`  ↳ Bin for ${rank.tier} ${rank.division} is empty.`);
-                continue;
-            }
-
-            // Transactional Save to SQLite
-            await Database.run("BEGIN TRANSACTION");
-            let rankNewMatches = 0;
-
-            for (const m of incomingStore) {
-                const matchId = m.metadata.matchId;
-                
-                // Check if already in SQL
-                const exists = await Database.isSeen(matchId);
-                if (!exists) {
-                    m.tier = rank.tier;
-                    m.division = rank.division;
-                    const success = await Database.saveMatch(m, incomingTL[matchId], true);
-                    if (success) {
-                        rankNewMatches++;
-                        allNewIds.push(matchId);
-                    }
-                }
-            }
-
-            await Database.run("COMMIT");
-
-            if (rankNewMatches > 0) {
-                totalNewMatches += rankNewMatches;
-                Logger.success(`  ↳ Merged ${rankNewMatches} new matches.`);
-            } else {
-                Logger.info(`  ↳ All matches in bin are duplicates.`);
-            }
-        }
-
-        if (totalProcessedRanks > 0 && totalNewMatches > 0) {
-            // Update cloud seen status
-            Logger.info(`Syncing ${allNewIds.length} new IDs to Firebase...`);
-            await MatchRegistry.markSeen(allNewIds);
-            Logger.success(`\nImport Complete! Added ${totalNewMatches} matches.`);
-        } else if (totalProcessedRanks > 0) {
-            Logger.info("\nImport finished. No new data found.");
-        }
-
-        // Cleanup bin after successful import
-        if (totalProcessedRanks > 0) {
-            Logger.info("Cleaning up 'data/import/'...");
-            await this.cleanImportDir();
+        } catch (e) {
+            Logger.error("Failed to export database: " + e.message);
         }
     }
 
-    static async cleanImportDir() {
+    /**
+     * Import matches from a coworker's exported .db file.
+     * @param {string} incomingDbPath 
+     */
+    static async runImport(incomingDbPath) {
+        if (!incomingDbPath) return;
+        
+        // Clean up quotes if user dragged-and-dropped the file
+        incomingDbPath = incomingDbPath.replace(/^["']|["']$/g, "").trim();
+
         try {
-            const files = await fs.readdir(STORAGE.IMPORT);
-            for (const file of files) {
-                const fullPath = path.join(STORAGE.IMPORT, file);
-                await fs.rm(fullPath, { recursive: true, force: true });
-            }
-        } catch (e) {
-            Logger.warn("Cleanup failed: " + e.message);
+            await fs.access(incomingDbPath);
+        } catch {
+            Logger.error(`Cannot read file at: ${incomingDbPath}`);
+            return;
         }
+
+        Logger.info(`Connecting to incoming database at ${incomingDbPath}...`);
+        
+        await Database.connect();
+
+        return new Promise((resolve, reject) => {
+            const incomingDb = new sqlite3.Database(incomingDbPath, sqlite3.OPEN_READONLY, async (err) => {
+                if (err) {
+                    Logger.error("Failed to open incoming DB: " + err.message);
+                    return resolve();
+                }
+
+                try {
+                    Logger.info("Reading matches from incoming database...");
+                    
+                    // Fetch all matches from incoming DB
+                    const matches = await new Promise((res, rej) => {
+                        incomingDb.all("SELECT * FROM matches", (e, rows) => {
+                            if (e) rej(e);
+                            else res(rows);
+                        });
+                    });
+
+                    // Fetch all timelines from incoming DB
+                    const timelines = await new Promise((res, rej) => {
+                        incomingDb.all("SELECT * FROM timelines", (e, rows) => {
+                            if (e) rej(e);
+                            else res(rows);
+                        });
+                    });
+
+                    if (matches.length === 0) {
+                        Logger.warn("Incoming database has no matches.");
+                        incomingDb.close();
+                        return resolve();
+                    }
+
+                    Logger.info(`Found ${matches.length} matches. Merging into local database...`);
+
+                    // Create lookup map for timelines
+                    const tlMap = {};
+                    for (const tl of timelines) {
+                        tlMap[tl.matchId] = tl.data;
+                    }
+
+                    await Database.run("BEGIN TRANSACTION");
+                    
+                    let newMatches = 0;
+                    const newIds = [];
+
+                    for (const m of matches) {
+                        // Check if we already have it
+                        const exists = await Database.isSeen(m.matchId);
+                        if (!exists) {
+                            try {
+                                const detail = JSON.parse(m.data);
+                                detail.tier = m.tier;
+                                detail.division = m.division;
+                                
+                                const tlData = tlMap[m.matchId] ? JSON.parse(tlMap[m.matchId]) : null;
+                                
+                                const saved = await Database.saveMatch(detail, tlData, false); // false = already stripped
+                                if (saved) {
+                                    newMatches++;
+                                    newIds.push(m.matchId);
+                                }
+                            } catch (e) {
+                                // Skip malformed
+                            }
+                        }
+                    }
+
+                    await Database.run("COMMIT");
+
+                    if (newMatches > 0) {
+                        Logger.success(`Successfully merged ${newMatches} new matches!`);
+                        Logger.info("Syncing new IDs to Firebase cache...");
+                        await MatchRegistry.markSeen(newIds);
+                    } else {
+                        Logger.info("All matches in the incoming database are already in your local database. Nothing new to add.");
+                    }
+
+                } catch (e) {
+                    await Database.run("ROLLBACK").catch(() => {});
+                    Logger.error("Error during import: " + e.message);
+                } finally {
+                    incomingDb.close();
+                    resolve();
+                }
+            });
+        });
     }
 }
 
