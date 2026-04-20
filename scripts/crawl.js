@@ -121,10 +121,12 @@ class Crawler {
         }
 
         // Check if patch changed since last crawl — reset state if so
-        const state = await readJson(STORAGE.CRAWL_STATE, {
+        const stateDefaults = {
             rankIndex: rankStart,
-            currentMatches: 0
-        });
+            currentMatches: 0,
+            lastPatch: null
+        };
+        const state = { ...stateDefaults, ...(await readJson(STORAGE.CRAWL_STATE, stateDefaults)) };
 
         if (state.lastPatch && this.currentPatch && state.lastPatch !== this.currentPatch) {
             Logger.warn(`Patch changed! ${state.lastPatch} → ${this.currentPatch}. Resetting crawl state.`);
@@ -256,13 +258,14 @@ class Crawler {
     async runCycle(rankDef, rankDir, targetLength) {
         this.client.used = 0;
         const pStatePath = path.join(rankDir, "pageState.json");
-        const pState = await readJson(pStatePath, {
+        const pStateDefaults = {
             page: 1,
             stuckCounter: 0,
             emptyPageCounter: 0,
             platformIndex: 0,
             queueIndex: 0
-        });
+        };
+        const pState = { ...pStateDefaults, ...(await readJson(pStatePath, pStateDefaults)) };
 
         const newMatchIds = [];
         let shouldSkipRank = false;
