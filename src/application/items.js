@@ -2,9 +2,9 @@
  * Item data service — fetches and processes item data from Data Dragon.
  */
 
-const { api } = require("../api/ddragon");
-const { mapItemList } = require("../mappers/items");
-const { printSuccess } = require("../utils/cli");
+const { api } = require("../infrastructure/api/ddragon");
+const { mapItemList } = require("../domain/mappers/items");
+const { printSuccess } = require("../presentation/cli-utils");
 
 async function fetchAndProcessItems(version) {
     const rawItems = await api.getItemList(version);

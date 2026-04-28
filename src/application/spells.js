@@ -2,9 +2,9 @@
  * Summoner Spells data service
  */
 
-const { cdragon } = require("../api/cdragon");
-const { mapSpellList } = require("../mappers/spells");
-const { printSuccess } = require("../utils/cli");
+const { cdragon } = require("../infrastructure/api/cdragon");
+const { mapSpellList } = require("../domain/mappers/spells");
+const { printSuccess } = require("../presentation/cli-utils");
 
 async function fetchAndProcessSpells() {
     const rawSpells = await cdragon.getSpells();

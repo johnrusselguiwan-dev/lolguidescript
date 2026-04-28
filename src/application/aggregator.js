@@ -8,13 +8,14 @@
  * Now includes INTEGRATED IMPORT — optionally merges the 'Bin' before starting.
  */
 
-const Database = require("./database");
+const Database = require("../infrastructure/database/sqlite-client");
 const ImportManager = require("./import-manager");
 const AnalyticsEngine = require("./analytics");
 const AssetManager = require("./asset-manager");
+const { api } = require("../infrastructure/api/ddragon");
 const { STORAGE, RANK_HIERARCHY, CRAWLER, DDRAGON } = require("../../config/constants");
-const { writeJson } = require("../utils/io");
-const Logger = require("../utils/logger");
+const { writeJson } = require("../infrastructure/utils/io");
+const Logger = require("../infrastructure/utils/logger");
 
 class GlobalAggregator {
     /**
@@ -23,7 +24,7 @@ class GlobalAggregator {
      */
     static async getCurrentPatch() {
         try {
-            const realm = await (await fetch(DDRAGON.REALM_URL)).json();
+            const realm = await api.getRealm(DDRAGON.REALM_URL);
             return realm.v.split(".").slice(0, 2).join(".");
         } catch (e) {
             Logger.warn("Failed to fetch current patch: " + e.message);
@@ -95,11 +96,11 @@ class GlobalAggregator {
         let totalRanked = 0;
         const assets = await AssetManager.getAssets();
 
-        // 4. Process each rank from the Database (filtered by patch)
+        // 4. Process each rank from the Database (no patch filtering)
         for (const rank of RANK_HIERARCHY) {
-            const matches = activePatch
-                ? await Database.getMatchesForRankAndPatch(rank.tier, rank.division, activePatch)
-                : await Database.getMatchesForRank(rank.tier, rank.division);
+            // We fetch ALL matches available in the DB for this rank.
+            // The DB itself (auto-purge) limits this to the last 2 patches.
+            const matches = await Database.getMatchesForRank(rank.tier, rank.division);
 
             if (matches.length > 0) {
                 Logger.info(`Processing ${rank.tier} ${rank.division} (${matches.length} matches)...`);
@@ -108,7 +109,7 @@ class GlobalAggregator {
                 const matchIds = matches.map(m => m.metadata.matchId);
                 const timelines = await Database.getTimelinesForMatches(matchIds);
 
-                totalRanked = AnalyticsEngine.processChunk(stats, totalRanked, matches, timelines, assets);
+                totalRanked = AnalyticsEngine.processChunk(stats, totalRanked, matches, timelines, assets, activePatch);
             }
         }
 
@@ -128,7 +129,7 @@ class GlobalAggregator {
 
                 return {
                     ...slimCh,
-                    patch: activePatch,
+                    patch: activePatch ? `${activePatch} (+Fallback)` : "ALL",
                     isFallback,
                 };
             });
@@ -149,7 +150,7 @@ class GlobalAggregator {
                         : "",
                     lane: ch.lanes && ch.lanes.length > 0 ? ch.lanes : ["Unknown"],
                     role: assets.champData[ch.id] ? assets.champData[ch.id].tags : ["Unknown"],
-                    patch: activePatch,
+                    patch: activePatch ? `${activePatch} (+Fallback)` : "ALL",
                     isFallback,
                 };
             });
@@ -164,6 +165,14 @@ class GlobalAggregator {
                 drafting: ch.drafting,
             }));
             await writeJson(STORAGE.CHAMPION_DRAFTING, draftData, true);
+
+            // CHAMPION_SCALING — power spikes
+            const scalingData = globalRanking.map((ch) => ({
+                id: ch.id,
+                championName: ch.name,
+                scalingData: ch.scalingData,
+            }));
+            await writeJson(STORAGE.CHAMPION_SCALING, scalingData, true);
 
             Logger.success(
                 `Champion data updated! Patch: ${activePatch}${isFallback ? " (fallback)" : ""} | Total matches analyzed: ${totalRanked}`

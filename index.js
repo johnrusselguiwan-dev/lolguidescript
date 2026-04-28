@@ -1,13 +1,13 @@
 const readline = require("readline");
-const Crawler = require("./scripts/crawl");
-const { runMasterSync } = require("./scripts/sync-master");
-const GlobalAggregator = require("./src/services/aggregator");
-const ImportManager = require("./src/services/import-manager");
-const { uploadTierData } = require("./src/output/firebase");
-const { readJson } = require("./src/utils/io");
+const Crawler = require("./src/application/crawler");
+const { runMasterSync } = require("./src/application/sync-master");
+const GlobalAggregator = require("./src/application/aggregator");
+const ImportManager = require("./src/application/import-manager");
+const { uploadTierData } = require("./src/infrastructure/output/firebase-storage");
+const { readJson } = require("./src/infrastructure/utils/io");
 const { STORAGE } = require("./config/constants");
-const { c } = require("./src/utils/cli");
-const Logger = require("./src/utils/logger");
+const { c } = require("./src/presentation/cli-utils");
+const Logger = require("./src/infrastructure/utils/logger");
 
 function ask(query) {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -81,11 +81,12 @@ async function main() {
                     const meta = await readJson(STORAGE.CHAMPION_META);
                     const rating = await readJson(STORAGE.CHAMPION_RATING);
                     const drafting = await readJson(STORAGE.CHAMPION_DRAFTING);
+                    const scaling = await readJson(STORAGE.CHAMPION_SCALING);
 
                     if (!meta || !rating || !drafting) {
                         Logger.error("Failed to load local data. You must run [4] Aggregate Data first!");
                     } else {
-                        await uploadTierData(meta, rating, drafting);
+                        await uploadTierData(meta, rating, drafting, scaling || []);
                     }
                 }
             }

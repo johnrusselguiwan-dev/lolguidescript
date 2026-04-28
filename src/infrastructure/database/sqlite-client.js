@@ -4,7 +4,7 @@
  */
 
 const sqlite3 = require("sqlite3").verbose();
-const { STORAGE } = require("../../config/constants");
+const { STORAGE } = require("../../../config/constants");
 const Logger = require("../utils/logger");
 
 class Database {

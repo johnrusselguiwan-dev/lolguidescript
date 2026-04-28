@@ -20,19 +20,26 @@ class AnalyticsEngine {
      */
     static analyze(matches, timelines, assets) {
         const stats = this.initStats();
-        const total = this.processChunk(stats, 0, matches, timelines, assets);
+        // Fallback for direct analyze calls without patch context
+        const total = this.processChunk(stats, 0, matches, timelines, assets, null);
         return this.finalize(stats, total, assets);
     }
 
     static initStats() {
-        return {};
+        return { _meta: { weightedGames: 0 } };
     }
 
-    static processChunk(stats, currentTotal, matches, timelines, assets) {
+    static processChunk(stats, currentTotal, matches, timelines, assets, activePatch) {
         let total = currentTotal;
         for (const m of matches) {
             if (!m?.info?.queueId || !API.QUEUE_IDS.includes(m.info.queueId)) continue;
             total++;
+
+            const matchPatch = m.info.gameVersion ? m.info.gameVersion.split(".").slice(0, 2).join(".") : null;
+            // If activePatch is provided and it matches, give full 1.0 weight, else 0.5 (or if doing generic all-patch, 1.0)
+            const weight = (!activePatch || matchPatch === activePatch) ? 1.0 : 0.5;
+
+            stats._meta.weightedGames += weight;
 
             for (const p of m.info.participants) {
                 let hero = assets.champMap[p.championId] || p.championName;
@@ -52,18 +59,39 @@ class AnalyticsEngine {
                         counters: {},
                         synergies: {},
                         lanes: {},
+                        scaling: {
+                            "15": { games: 0, wins: 0, count: 0 },
+                            "20": { games: 0, wins: 0, count: 0 },
+                            "25": { games: 0, wins: 0, count: 0 },
+                            "30": { games: 0, wins: 0, count: 0 },
+                            "35": { games: 0, wins: 0, count: 0 },
+                            "40": { games: 0, wins: 0, count: 0 }
+                        },
                     };
                 }
 
                 const s = stats[hero];
-                s.games++;
-                if (p.win) s.wins++;
-                s.kda += (p.kills + p.assists) / Math.max(1, p.deaths);
+                s.games += weight;
+                if (p.win) s.wins += weight;
+                s.kda += ((p.kills + p.assists) / Math.max(1, p.deaths)) * weight;
 
                 // Lane tracking
                 if (p.teamPosition && p.teamPosition !== "INVALID" && p.teamPosition !== "") {
-                    s.lanes[p.teamPosition] = (s.lanes[p.teamPosition] || 0) + 1;
+                    s.lanes[p.teamPosition] = (s.lanes[p.teamPosition] || 0) + weight;
                 }
+
+                // Scaling tracking (All ranked queues)
+                const durationInSecs = m.info.gameDuration;
+                let bucket = 40;
+                if (durationInSecs < 1050) bucket = 15;
+                else if (durationInSecs < 1350) bucket = 20;
+                else if (durationInSecs < 1650) bucket = 25;
+                else if (durationInSecs < 1950) bucket = 30;
+                else if (durationInSecs < 2250) bucket = 35;
+
+                s.scaling[bucket].games += weight;
+                s.scaling[bucket].count += 1;
+                if (p.win) s.scaling[bucket].wins += weight;
 
                 // Counters & synergies
                 m.info.participants.forEach((other) => {
@@ -72,8 +100,8 @@ class AnalyticsEngine {
 
                     const map = other.teamId === p.teamId ? s.synergies : s.counters;
                     if (!map[otherHero]) map[otherHero] = { games: 0, wins: 0 };
-                    map[otherHero].games++;
-                    if (p.win) map[otherHero].wins++;
+                    map[otherHero].games += weight;
+                    if (p.win) map[otherHero].wins += weight;
                 });
 
                 // Build items (completed only)
@@ -93,7 +121,7 @@ class AnalyticsEngine {
                         normalizedId = BOOT_DOWNGRADE_MAP[normalizedId];
                     }
                     if (normalizedId && assets.itemData[normalizedId] && this.isCompletedItem(assets.itemData[normalizedId])) {
-                        s.items[normalizedId] = (s.items[normalizedId] || 0) + 1;
+                        s.items[normalizedId] = (s.items[normalizedId] || 0) + weight;
                     }
                 });
 
@@ -101,17 +129,17 @@ class AnalyticsEngine {
                 const combo = [assets.spellMap[p.summoner1Id], assets.spellMap[p.summoner2Id]]
                     .sort()
                     .join(" + ");
-                s.spells[combo] = (s.spells[combo] || 0) + 1;
+                s.spells[combo] = (s.spells[combo] || 0) + weight;
 
                 // Runes
                 const runeStr = this.parseRunes(p.perks, assets);
-                if (runeStr) s.runes[runeStr] = (s.runes[runeStr] || 0) + 1;
+                if (runeStr) s.runes[runeStr] = (s.runes[runeStr] || 0) + weight;
 
                 // Skill order
                 const tl = timelines[m.metadata.matchId];
                 if (tl) {
                     const seq = this.parseSkills(tl, p.participantId);
-                    if (seq) s.skills[seq] = (s.skills[seq] || 0) + 1;
+                    if (seq) s.skills[seq] = (s.skills[seq] || 0) + weight;
                 }
             }
 
@@ -119,7 +147,7 @@ class AnalyticsEngine {
             (m.info.teams || []).forEach((t) => {
                 (t.bans || []).forEach((ban) => {
                     const n = assets.champMap[ban.championId];
-                    if (n && stats[n]) stats[n].bans++;
+                    if (n && stats[n]) stats[n].bans += weight;
                 });
             });
         }
@@ -190,6 +218,9 @@ class AnalyticsEngine {
     }
 
     static format(stats, totalGames, assets) {
+        const weightedTotalGames = stats._meta?.weightedGames || totalGames;
+        delete stats._meta;
+
         const getTop = (obj) =>
             Object.entries(obj).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
 
@@ -198,19 +229,19 @@ class AnalyticsEngine {
 
         return Object.entries(stats)
             .map(([hero, s]) => {
-                const winRate = (s.wins / s.games) * 100;
-                const pickRate = totalGames ? (s.games / totalGames) * 100 : 0;
-                const banRate = totalGames ? (s.bans / totalGames) * 100 : 0;
+                const winRate = s.games ? (s.wins / s.games) * 100 : 0;
+                const pickRate = weightedTotalGames ? (s.games / weightedTotalGames) * 100 : 0;
+                const banRate = weightedTotalGames ? (s.bans / weightedTotalGames) * 100 : 0;
                 const score =
                     (winRate * 0.45 +
                         pickRate * 0.25 +
                         banRate * 0.15 +
-                        Math.min(s.kda / s.games / 5, 1) * 0.15) *
+                        Math.min(s.kda / Math.max(s.games, 1) / 5, 1) * 0.15) *
                     (1 - Math.exp(-s.games / 3));
 
                 const sortInteractions = (dict) =>
                     Object.entries(dict)
-                        .filter((m) => m[1].games >= 2)
+                        .filter((m) => m[1].games >= 20) // Raised from 2 to 20 to filter out 100% statistical flukes
                         .sort((a, b) => b[1].wins / b[1].games - a[1].wins / a[1].games);
 
                 const counters = sortInteractions(s.counters);
@@ -297,6 +328,12 @@ class AnalyticsEngine {
                                 .map((m) => [m[0], +((m[1].wins / m[1].games) * 100).toFixed(1)])
                         ),
                     },
+                    scalingData: Object.entries(s.scaling)
+                        .filter(([_, data]) => data.count >= 5) // Reduced from 100 to 5 to show data on smaller crawls
+                        .map(([minutes, data]) => ({
+                            minute: parseInt(minutes, 10),
+                            winRate: +((data.wins / data.games) * 100).toFixed(1)
+                        }))
                 };
             })
             .sort((a, b) => b.score - a.score);

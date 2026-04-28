@@ -8,9 +8,9 @@ const path = require("path");
 const os = require("os");
 const sqlite3 = require("sqlite3").verbose();
 const { STORAGE } = require("../../config/constants");
-const Database = require("./database");
-const Logger = require("../utils/logger");
-const MatchRegistry = require("./match-registry");
+const Database = require("../infrastructure/database/sqlite-client");
+const Logger = require("../infrastructure/utils/logger");
+const MatchRegistry = require("../infrastructure/database/firebase-firestore");
 
 class ImportManager {
     /**

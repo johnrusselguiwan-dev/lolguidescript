@@ -39,6 +39,23 @@ const api = {
         const res = await axios.get(`${BASE_URL}/${version}/data/${LANGUAGE}/runesReforged.json`);
         return res.data;
     },
+
+    /** Fetches the latest patch realm info dynamically */
+    getRealm: async (realmUrl) => {
+        const res = await axios.get(realmUrl);
+        return res.data;
+    },
+
+    /** Fetches a generic JSON asset from the provided URL, with error catching */
+    getAsset: async (url) => {
+        try {
+            const res = await axios.get(url, { timeout: 10000 });
+            return res.data;
+        } catch (error) {
+            console.error(`[API Error] Failed to fetch asset from ${url}:`, error.message);
+            throw error;
+        }
+    }
 };
 
 module.exports = { api, BASE_URL, LANGUAGE };

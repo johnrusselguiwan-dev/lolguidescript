@@ -6,7 +6,7 @@
  * exceeding Riot's rate limits, and exponential back-off handles 429s.
  */
 
-const { API } = require("../../config/constants");
+const { API } = require("../../../config/constants");
 const Logger = require("../utils/logger");
 const sleep = require("../utils/sleep");
 
@@ -133,7 +133,7 @@ class RiotClient {
                 `https://${platform}.api.riotgames.com/lol/league/v4/${apexMap[rankDef.tier]}/by-queue/${queueName}`
             );
             return data?.entries
-                ? data.entries.slice(0, require("../../config/constants").CRAWLER.PLAYERS_PER_PAGE)
+                ? data.entries.slice(0, require("../../../config/constants").CRAWLER.PLAYERS_PER_PAGE)
                 : [];
         }
 
@@ -141,7 +141,7 @@ class RiotClient {
             `https://${platform}.api.riotgames.com/lol/league/v4/entries/${queueName}/${rankDef.tier}/${rankDef.division}?page=${page}`
         );
         return Array.isArray(data)
-            ? data.slice(0, require("../../config/constants").CRAWLER.PLAYERS_PER_PAGE)
+            ? data.slice(0, require("../../../config/constants").CRAWLER.PLAYERS_PER_PAGE)
             : [];
     }
 
@@ -153,7 +153,7 @@ class RiotClient {
     async getMatchIds(puuid, options = {}) {
         const {
             start = 0,
-            count = require("../../config/constants").CRAWLER.MATCHES_PER_PLAYER,
+            count = require("../../../config/constants").CRAWLER.MATCHES_PER_PLAYER,
             startTime,
             endTime,
             queue

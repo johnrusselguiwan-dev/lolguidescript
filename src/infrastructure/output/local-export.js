@@ -4,9 +4,9 @@
 
 const fs = require("fs");
 const path = require("path");
-const { printSuccess } = require("../utils/cli");
+const { printSuccess } = require("../../presentation/cli-utils");
 
-const EXPORTS_BASE = path.join(__dirname, "../../exports");
+const EXPORTS_BASE = path.join(__dirname, "../../../exports");
 
 function ensureDir(dirPath) {
     if (!fs.existsSync(dirPath)) {

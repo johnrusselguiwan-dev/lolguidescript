@@ -1,4 +1,4 @@
-const { parseChampionText, splitDescription } = require("../utils/parser");
+const { parseChampionText, splitDescription } = require("../parser");
 
 const BASE_URL = "https://ddragon.leagueoflegends.com/cdn";
 
@@ -67,7 +67,9 @@ function buildDetailEntry(raw, meta, version) {
         championId: parseInt(raw.key, 10),
         name: raw.name,
         title: raw.title,
-        avatar: `https://wiki.leagueoflegends.com/en-us/images/${raw.name.replace(/ /g, '_')}_Render.png`,
+        avatar: raw.id === "Kayle" 
+            ? "https://wiki.leagueoflegends.com/en-us/images/Kayle_Zealous_Render.png" 
+            : `https://wiki.leagueoflegends.com/en-us/images/${raw.name.replace(/ /g, '_')}_Render.png`,
         background: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${raw.id}_0.jpg`,
         icon: `${BASE_URL}/${version}/img/champion/${raw.image.full}`,
         lore: parseChampionText(raw.lore),
@@ -78,6 +80,11 @@ function buildDetailEntry(raw, meta, version) {
         defense: raw.info.defense,
         magic: raw.info.magic,
         difficulty: raw.info.difficulty,
+        playstyleDamage: meta.playstyle ? meta.playstyle.damage : 2,
+        playstyleDurability: meta.playstyle ? meta.playstyle.durability : 2,
+        playstyleCrowdControl: meta.playstyle ? meta.playstyle.crowdControl : 1,
+        playstyleMobility: meta.playstyle ? meta.playstyle.mobility : 1,
+        playstyleUtility: meta.playstyle ? meta.playstyle.utility : 1,
         hp: raw.stats.hp,
         mp: raw.stats.mp,
         attackDamage: raw.stats.attackdamage,
@@ -93,7 +100,8 @@ function buildDetailEntry(raw, meta, version) {
         skillIcons,
         skillCooldowns,
         skillCosts,
-        priceGold: "4800",
+        priceBlueEssence: meta.price ? meta.price.blue_essence : 4800,
+        priceRiotPoints: meta.price ? meta.price.riot_points : 880,
         damageType: (raw.info.magic > raw.info.attack) ? "AP" : "AD"
     };
 

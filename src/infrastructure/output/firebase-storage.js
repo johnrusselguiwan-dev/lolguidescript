@@ -2,8 +2,8 @@
  * Firebase output handler — all Firestore upload logic lives here.
  */
 
-const { db, admin } = require("../../config/firebase");
-const { printSuccess } = require("../utils/cli");
+const { db, admin } = require("../../../config/firebase");
+const { printSuccess } = require("../../presentation/cli-utils");
 
 async function uploadChampions(championData, patchVersion) {
     const listEntries = championData.map((item) => item.listEntry);
@@ -88,7 +88,7 @@ async function uploadSpells(spells, patchVersion) {
     printSuccess(`${spells.length} summoner spells uploaded to Firebase`);
 }
 
-async function uploadTierData(meta, rating, drafting) {
+async function uploadTierData(meta, rating, drafting, scaling) {
     // Extract patch info from the data (if available)
     const sampleEntry = (meta && meta.length > 0) ? meta[0] : null;
     const dataPatch = sampleEntry?.patch || "unknown";
@@ -108,6 +108,12 @@ async function uploadTierData(meta, rating, drafting) {
         json: JSON.stringify(drafting),
     });
 
+    if (scaling && Object.keys(scaling).length > 0) {
+        batch.set(db.collection("data").doc("champion_scaling"), {
+            json: JSON.stringify(scaling),
+        });
+    }
+
     batch.set(
         db.collection("system_metadata").doc("patch_info"),
         {
@@ -119,7 +125,7 @@ async function uploadTierData(meta, rating, drafting) {
     );
 
     await batch.commit();
-    printSuccess(`Champion meta, rating & drafting uploaded to Firebase (Patch: ${dataPatch}${isFallback ? " [FALLBACK]" : ""})`);
+    printSuccess(`Champion meta, rating, drafting & scaling uploaded to Firebase (Patch: ${dataPatch}${isFallback ? " [FALLBACK]" : ""})`);
 }
 
 module.exports = { uploadChampions, uploadItems, uploadRunes, uploadSpells, uploadTierData };

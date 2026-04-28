@@ -7,8 +7,9 @@
 
 const path = require("path");
 const { DDRAGON, STORAGE } = require("../../config/constants");
-const { readJson, writeJson } = require("../utils/io");
-const Logger = require("../utils/logger");
+const { api } = require("../infrastructure/api/ddragon");
+const { readJson, writeJson } = require("../infrastructure/utils/io");
+const Logger = require("../infrastructure/utils/logger");
 
 class AssetManager {
     /**
@@ -29,7 +30,14 @@ class AssetManager {
     static async getAssets() {
         if (this.cached) return this.cached;
 
-        const realm = await (await fetch(DDRAGON.REALM_URL)).json();
+        let realm;
+        try {
+            realm = await api.getRealm(DDRAGON.REALM_URL);
+        } catch (err) {
+            Logger.error("Failed to fetch DDragon Realm. Check network connection.");
+            throw err;
+        }
+
         const v = realm.v;
         const base = `${DDRAGON.BASE_URL}/${v}/data/en_US`;
 
@@ -38,18 +46,24 @@ class AssetManager {
             let data = await readJson(cachePath);
             if (!data) {
                 Logger.info(`Downloading new LoL Patch Assets (${v}): ${name}...`);
-                data = await (await fetch(url)).json();
+                data = await api.getAsset(url);
                 await writeJson(cachePath, data);
             }
             return data;
         };
 
-        const [champs, items, spells, runes] = await Promise.all([
-            fetchCache("champions", `${base}/champion.json`),
-            fetchCache("items", `${base}/item.json`),
-            fetchCache("summoners", `${base}/summoner.json`),
-            fetchCache("runes", `${base}/runesReforged.json`),
-        ]);
+        let champs, items, spells, runes;
+        try {
+            [champs, items, spells, runes] = await Promise.all([
+                fetchCache("champions", `${base}/champion.json`),
+                fetchCache("items", `${base}/item.json`),
+                fetchCache("summoners", `${base}/summoner.json`),
+                fetchCache("runes", `${base}/runesReforged.json`),
+            ]);
+        } catch (e) {
+            Logger.error("Critical error while downloading base assets: " + e.message);
+            throw new Error("ASSET_DOWNLOAD_FAILED");
+        }
 
         const champMap = {};
         const spellMap = {};

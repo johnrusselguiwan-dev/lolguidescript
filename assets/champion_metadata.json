@@ -5,7 +5,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "103",
@@ -13,7 +24,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "84",
@@ -22,7 +44,18 @@
       "Mid Lane",
       "Top Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "166",
@@ -31,7 +64,18 @@
       "Mid Lane",
       "Top Lane"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 2
+    }
   },
   {
     "id": "12",
@@ -39,7 +83,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "799",
@@ -47,7 +102,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 6300,
+      "riot_points": 975
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "32",
@@ -56,7 +122,18 @@
       "Jungle",
       "Support"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "34",
@@ -64,7 +141,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "1",
@@ -73,7 +161,18 @@
       "Mid Lane",
       "Support"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "523",
@@ -81,7 +180,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "22",
@@ -90,7 +200,18 @@
       "Bot Lane",
       "Support"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "136",
@@ -98,7 +219,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "893",
@@ -107,7 +239,18 @@
       "Top Lane",
       "Mid Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 6300,
+      "riot_points": 975
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "268",
@@ -115,7 +258,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "432",
@@ -123,7 +277,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 3
+    }
   },
   {
     "id": "200",
@@ -131,7 +296,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "The Void"
+    "region": "The Void",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "53",
@@ -139,7 +315,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 2,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "63",
@@ -149,7 +336,18 @@
       "Jungle",
       "Mid Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "201",
@@ -157,7 +355,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 2,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "233",
@@ -165,7 +374,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 6300,
+      "riot_points": 975
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 3,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "51",
@@ -173,7 +393,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Piltover"
+    "region": "Piltover",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "164",
@@ -181,7 +412,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Piltover"
+    "region": "Piltover",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "69",
@@ -190,7 +432,18 @@
       "Mid Lane",
       "Top Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "31",
@@ -199,7 +452,18 @@
       "Top Lane",
       "Mid Lane"
     ],
-    "region": "The Void"
+    "region": "The Void",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "42",
@@ -208,7 +472,18 @@
       "Mid Lane",
       "Bot Lane"
     ],
-    "region": "Bandle City"
+    "region": "Bandle City",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "122",
@@ -216,7 +491,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "131",
@@ -225,7 +511,18 @@
       "Jungle",
       "Mid Lane"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "36",
@@ -233,7 +530,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "119",
@@ -241,7 +549,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "245",
@@ -250,7 +569,18 @@
       "Jungle",
       "Mid Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "60",
@@ -258,7 +588,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "28",
@@ -266,7 +607,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "81",
@@ -274,7 +626,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Piltover"
+    "region": "Piltover",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "9",
@@ -282,7 +645,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "114",
@@ -290,7 +664,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "105",
@@ -298,7 +683,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "3",
@@ -307,7 +703,18 @@
       "Mid Lane",
       "Support"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "41",
@@ -316,7 +723,18 @@
       "Top Lane",
       "Mid Lane"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "86",
@@ -324,7 +742,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "150",
@@ -332,7 +761,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "79",
@@ -342,7 +782,18 @@
       "Jungle",
       "Mid Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "104",
@@ -350,7 +801,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "887",
@@ -359,7 +821,18 @@
       "Top Lane",
       "Jungle"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "120",
@@ -367,7 +840,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "74",
@@ -377,7 +861,18 @@
       "Support",
       "Top Lane"
     ],
-    "region": "Piltover"
+    "region": "Piltover",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "910",
@@ -386,7 +881,18 @@
       "Mid Lane",
       "Support"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 6300,
+      "riot_points": 975
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "420",
@@ -394,7 +900,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "39",
@@ -403,7 +920,18 @@
       "Top Lane",
       "Mid Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 2
+    }
   },
   {
     "id": "427",
@@ -411,7 +939,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 3
+    }
   },
   {
     "id": "40",
@@ -419,7 +958,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "59",
@@ -427,7 +977,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "24",
@@ -436,7 +997,18 @@
       "Top Lane",
       "Jungle"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "126",
@@ -445,7 +1017,18 @@
       "Top Lane",
       "Mid Lane"
     ],
-    "region": "Piltover"
+    "region": "Piltover",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "202",
@@ -453,7 +1036,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "222",
@@ -461,7 +1055,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "897",
@@ -469,7 +1074,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "145",
@@ -477,7 +1093,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "The Void"
+    "region": "The Void",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 0,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "429",
@@ -485,7 +1112,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 2
+    }
   },
   {
     "id": "43",
@@ -494,7 +1132,18 @@
       "Support",
       "Mid Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "30",
@@ -503,7 +1152,18 @@
       "Jungle",
       "Bot Lane"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "38",
@@ -511,7 +1171,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "The Void"
+    "region": "The Void",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "55",
@@ -519,7 +1190,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "10",
@@ -528,7 +1210,18 @@
       "Top Lane",
       "Mid Lane"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "141",
@@ -536,7 +1229,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "85",
@@ -545,7 +1249,18 @@
       "Top Lane",
       "Mid Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "121",
@@ -553,7 +1268,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "The Void"
+    "region": "The Void",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "203",
@@ -561,7 +1287,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 2
+    }
   },
   {
     "id": "240",
@@ -569,7 +1306,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "96",
@@ -578,7 +1326,18 @@
       "Bot Lane",
       "Mid Lane"
     ],
-    "region": "The Void"
+    "region": "The Void",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "7",
@@ -586,7 +1345,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "64",
@@ -594,7 +1364,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "89",
@@ -602,7 +1383,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "876",
@@ -610,7 +1402,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "127",
@@ -618,7 +1421,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "236",
@@ -627,7 +1441,18 @@
       "Bot Lane",
       "Mid Lane"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "117",
@@ -635,7 +1460,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Bandle City"
+    "region": "Bandle City",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "99",
@@ -644,7 +1480,18 @@
       "Mid Lane",
       "Support"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "54",
@@ -654,7 +1501,18 @@
       "Mid Lane",
       "Support"
     ],
-    "region": "Ixtal"
+    "region": "Ixtal",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "90",
@@ -662,7 +1520,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "The Void"
+    "region": "The Void",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "57",
@@ -672,7 +1541,18 @@
       "Jungle",
       "Support"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "11",
@@ -680,7 +1560,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "800",
@@ -689,7 +1580,18 @@
       "Mid Lane",
       "Support"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 6300,
+      "riot_points": 975
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "902",
@@ -697,7 +1599,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Ixtal"
+    "region": "Ixtal",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "21",
@@ -705,7 +1618,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "82",
@@ -713,7 +1637,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "25",
@@ -723,7 +1658,18 @@
       "Mid Lane",
       "Jungle"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "950",
@@ -731,7 +1677,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 6300,
+      "riot_points": 975
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "267",
@@ -739,7 +1696,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "75",
@@ -747,7 +1715,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "111",
@@ -755,7 +1734,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "518",
@@ -764,7 +1754,18 @@
       "Mid Lane",
       "Support"
     ],
-    "region": "Ixtal"
+    "region": "Ixtal",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "76",
@@ -772,7 +1773,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Ixtal"
+    "region": "Ixtal",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 2
+    }
   },
   {
     "id": "895",
@@ -780,7 +1792,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 2
+    }
   },
   {
     "id": "56",
@@ -788,7 +1811,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "20",
@@ -796,7 +1830,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "2",
@@ -805,7 +1850,18 @@
       "Top Lane",
       "Jungle"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "61",
@@ -813,7 +1869,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Piltover"
+    "region": "Piltover",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "516",
@@ -821,7 +1888,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "80",
@@ -831,7 +1909,18 @@
       "Support",
       "Top Lane"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "78",
@@ -841,7 +1930,18 @@
       "Jungle",
       "Support"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "555",
@@ -850,7 +1950,18 @@
       "Support",
       "Mid Lane"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "246",
@@ -859,7 +1970,18 @@
       "Mid Lane",
       "Jungle"
     ],
-    "region": "Ixtal"
+    "region": "Ixtal",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "133",
@@ -867,7 +1989,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "497",
@@ -875,7 +2008,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 2,
+      "crowdControl": 3,
+      "mobility": 3,
+      "utility": 3
+    }
   },
   {
     "id": "33",
@@ -883,7 +2027,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "421",
@@ -891,7 +2046,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "The Void"
+    "region": "The Void",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "526",
@@ -900,7 +2066,18 @@
       "Support",
       "Jungle"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "888",
@@ -908,7 +2085,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "58",
@@ -916,7 +2104,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "107",
@@ -925,7 +2124,18 @@
       "Jungle",
       "Top Lane"
     ],
-    "region": "Ixtal"
+    "region": "Ixtal",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "92",
@@ -933,7 +2143,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "68",
@@ -942,7 +2163,18 @@
       "Top Lane",
       "Mid Lane"
     ],
-    "region": "Bandle City"
+    "region": "Bandle City",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "13",
@@ -951,7 +2183,18 @@
       "Mid Lane",
       "Top Lane"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "360",
@@ -959,7 +2202,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "113",
@@ -968,7 +2222,18 @@
       "Jungle",
       "Top Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "235",
@@ -977,7 +2242,18 @@
       "Support",
       "Bot Lane"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "147",
@@ -987,7 +2263,18 @@
       "Bot Lane",
       "Mid Lane"
     ],
-    "region": "Piltover"
+    "region": "Piltover",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "875",
@@ -996,7 +2283,18 @@
       "Top Lane",
       "Support"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "35",
@@ -1005,7 +2303,18 @@
       "Jungle",
       "Support"
     ],
-    "region": "Runeterra"
+    "region": "Runeterra",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "98",
@@ -1014,7 +2323,18 @@
       "Top Lane",
       "Support"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 3
+    }
   },
   {
     "id": "102",
@@ -1022,7 +2342,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "27",
@@ -1030,7 +2361,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "14",
@@ -1038,7 +2380,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "15",
@@ -1046,7 +2399,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "72",
@@ -1055,7 +2419,18 @@
       "Jungle",
       "Top Lane"
     ],
-    "region": "Ixtal"
+    "region": "Ixtal",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "901",
@@ -1064,7 +2439,18 @@
       "Bot Lane",
       "Mid Lane"
     ],
-    "region": "Camavor"
+    "region": "Camavor",
+    "price": {
+      "blue_essence": 6300,
+      "riot_points": 975
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "37",
@@ -1072,7 +2458,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "16",
@@ -1080,7 +2477,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "50",
@@ -1090,7 +2498,18 @@
       "Mid Lane",
       "Bot Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "517",
@@ -1099,7 +2518,18 @@
       "Mid Lane",
       "Jungle"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "134",
@@ -1107,7 +2537,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "223",
@@ -1116,7 +2557,18 @@
       "Support",
       "Top Lane"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "163",
@@ -1125,7 +2577,18 @@
       "Jungle",
       "Mid Lane"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "91",
@@ -1134,7 +2597,18 @@
       "Mid Lane",
       "Jungle"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "44",
@@ -1143,7 +2617,18 @@
       "Support",
       "Jungle"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "17",
@@ -1151,7 +2636,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Bandle City"
+    "region": "Bandle City",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "412",
@@ -1159,7 +2655,18 @@
     "lanes": [
       "Support"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 2,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 3
+    }
   },
   {
     "id": "18",
@@ -1168,7 +2675,18 @@
       "Bot Lane",
       "Mid Lane"
     ],
-    "region": "Bandle City"
+    "region": "Bandle City",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "48",
@@ -1177,7 +2695,18 @@
       "Jungle",
       "Top Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "23",
@@ -1185,7 +2714,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "4",
@@ -1194,7 +2734,18 @@
       "Mid Lane",
       "Bot Lane"
     ],
-    "region": "Bilgewater"
+    "region": "Bilgewater",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 2
+    }
   },
   {
     "id": "29",
@@ -1203,7 +2754,18 @@
       "Bot Lane",
       "Jungle"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "77",
@@ -1212,7 +2774,18 @@
       "Jungle",
       "Top Lane"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "6",
@@ -1220,7 +2793,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "110",
@@ -1229,7 +2813,18 @@
       "Bot Lane",
       "Mid Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "67",
@@ -1238,7 +2833,18 @@
       "Bot Lane",
       "Top Lane"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "45",
@@ -1247,7 +2853,18 @@
       "Mid Lane",
       "Bot Lane"
     ],
-    "region": "Bandle City"
+    "region": "Bandle City",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "161",
@@ -1256,7 +2873,18 @@
       "Mid Lane",
       "Support"
     ],
-    "region": "The Void"
+    "region": "The Void",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "711",
@@ -1264,7 +2892,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "254",
@@ -1272,7 +2911,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Piltover"
+    "region": "Piltover",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "234",
@@ -1280,7 +2930,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "112",
@@ -1288,7 +2949,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "8",
@@ -1297,7 +2969,18 @@
       "Mid Lane",
       "Top Lane"
     ],
-    "region": "Noxus"
+    "region": "Noxus",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 1,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "106",
@@ -1306,7 +2989,18 @@
       "Top Lane",
       "Jungle"
     ],
-    "region": "Freljord"
+    "region": "Freljord",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "19",
@@ -1315,7 +3009,18 @@
       "Jungle",
       "Top Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "62",
@@ -1324,7 +3029,18 @@
       "Top Lane",
       "Jungle"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "498",
@@ -1332,7 +3048,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 2,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "101",
@@ -1341,7 +3068,18 @@
       "Mid Lane",
       "Support"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 1
+    }
   },
   {
     "id": "5",
@@ -1349,7 +3087,18 @@
     "lanes": [
       "Jungle"
     ],
-    "region": "Demacia"
+    "region": "Demacia",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "157",
@@ -1358,7 +3107,18 @@
       "Mid Lane",
       "Top Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 2
+    }
   },
   {
     "id": "777",
@@ -1367,7 +3127,18 @@
       "Mid Lane",
       "Top Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "83",
@@ -1375,7 +3146,18 @@
     "lanes": [
       "Top Lane"
     ],
-    "region": "Shadow Isles"
+    "region": "Shadow Isles",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 1,
+      "utility": 2
+    }
   },
   {
     "id": "350",
@@ -1383,24 +3165,57 @@
     "lanes": [
       "Support"
     ],
-    "region": "Bandle City"
+    "region": "Bandle City",
+    "price": {
+      "blue_essence": 450,
+      "riot_points": 260
+    },
+    "playstyle": {
+      "damage": 1,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 3
+    }
   },
   {
-    "id": "801",
+    "id": "804",
     "name": "Yunara",
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 6300,
+      "riot_points": 975
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 2,
+      "utility": 0
+    }
   },
   {
-    "id": "802",
+    "id": "904",
     "name": "Zaahen",
     "lanes": [
       "Top Lane",
       "Jungle"
     ],
-    "region": "Shurima"
+    "region": "Shurima",
+    "price": {
+      "blue_essence": 6300,
+      "riot_points": 975
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 2,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "154",
@@ -1409,7 +3224,18 @@
       "Jungle",
       "Top Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 3,
+      "crowdControl": 3,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "238",
@@ -1417,7 +3243,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Ionia"
+    "region": "Ionia",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 1,
+      "mobility": 3,
+      "utility": 1
+    }
   },
   {
     "id": "221",
@@ -1425,7 +3262,18 @@
     "lanes": [
       "Bot Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 3,
+      "utility": 0
+    }
   },
   {
     "id": "115",
@@ -1434,7 +3282,18 @@
       "Bot Lane",
       "Mid Lane"
     ],
-    "region": "Zaun"
+    "region": "Zaun",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "26",
@@ -1443,7 +3302,18 @@
       "Support",
       "Mid Lane"
     ],
-    "region": "Icathia"
+    "region": "Icathia",
+    "price": {
+      "blue_essence": 1350,
+      "riot_points": 585
+    },
+    "playstyle": {
+      "damage": 2,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 3
+    }
   },
   {
     "id": "142",
@@ -1451,7 +3321,18 @@
     "lanes": [
       "Mid Lane"
     ],
-    "region": "Targon"
+    "region": "Targon",
+    "price": {
+      "blue_essence": 4800,
+      "riot_points": 880
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 2,
+      "mobility": 2,
+      "utility": 1
+    }
   },
   {
     "id": "143",
@@ -1460,6 +3341,17 @@
       "Support",
       "Mid Lane"
     ],
-    "region": "Ixtal"
+    "region": "Ixtal",
+    "price": {
+      "blue_essence": 3150,
+      "riot_points": 790
+    },
+    "playstyle": {
+      "damage": 3,
+      "durability": 1,
+      "crowdControl": 3,
+      "mobility": 1,
+      "utility": 1
+    }
   }
 ]

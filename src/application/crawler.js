@@ -7,17 +7,17 @@ const {
     RANK_HIERARCHY,
     STORAGE,
     DDRAGON
-} = require("../config/constants");
-const RiotClient = require("../src/api/riot-client");
-const AssetManager = require("../src/services/asset-manager");
-const AnalyticsEngine = require("../src/services/analytics");
-const GlobalAggregator = require("../src/services/aggregator");
-const MatchRegistry = require("../src/services/match-registry");
-const ImportManager = require("../src/services/import-manager");
-const Database = require("../src/services/database");
-const { uploadTierData } = require("../src/output/firebase");
-const { readJson, writeJson } = require("../src/utils/io");
-const Logger = require("../src/utils/logger");
+} = require("../../config/constants");
+const RiotClient = require("../infrastructure/api/riot-client");
+const AssetManager = require("./asset-manager");
+const AnalyticsEngine = require("./analytics");
+const GlobalAggregator = require("./aggregator");
+const MatchRegistry = require("../infrastructure/database/firebase-firestore");
+const ImportManager = require("./import-manager");
+const Database = require("../infrastructure/database/sqlite-client");
+const { uploadTierData } = require("../infrastructure/output/firebase-storage");
+const { readJson, writeJson } = require("../infrastructure/utils/io");
+const Logger = require("../infrastructure/utils/logger");
 
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -113,7 +113,8 @@ class Crawler {
 
         // Fetch current patch for filtering
         try {
-            const realm = await (await fetch(DDRAGON.REALM_URL)).json();
+            const { api } = require("../infrastructure/api/ddragon");
+            const realm = await api.getRealm(DDRAGON.REALM_URL);
             this.currentPatch = realm.v.split(".").slice(0, 2).join("."); // e.g. "16.8"
             Logger.info(`Current Match Patch: ${this.currentPatch}`);
         } catch (e) {

@@ -1,5 +1,5 @@
-const Database = require("./database");
-const { db, admin } = require("../../config/firebase"); // Assuming admin is exported for FieldValue
+const Database = require("./sqlite-client");
+const { db, admin } = require("../../../config/firebase"); // Assuming admin is exported for FieldValue
 const Logger = require("../utils/logger");
 
 const COLLECTION = "system_metadata";
@@ -23,15 +23,34 @@ class MatchRegistry {
         // 1. Push any pending writes to the cloud first
         if (this.pendingSync.size > 0) {
             try {
-                const ref = db.collection(COLLECTION).doc(DOC_ID);
-                const FieldValue = admin.firestore.FieldValue;
                 const matchIds = Array.from(this.pendingSync);
+                const batch = db.batch();
                 
-                await ref.set({
-                    [FIELD]: FieldValue.arrayUnion(...matchIds),
+                // Group match IDs by their last character (0-9) to shard the arrays
+                // This keeps array sizes reasonable while drastically reducing document read/writes
+                const shards = {};
+                for (const matchId of matchIds) {
+                    const shardKey = matchId.slice(-1); 
+                    if (!shards[shardKey]) shards[shardKey] = [];
+                    shards[shardKey].push(matchId);
+                }
+
+                for (const [key, ids] of Object.entries(shards)) {
+                    const shardRef = db.collection(COLLECTION).doc(DOC_ID).collection("seen_matches").doc(`shard_${key}`);
+                    // ArrayUnion max is technically high, but if chunks ever get huge we could further shard
+                    // For typical 400 IDs, this is totally fine and merges smoothly.
+                    batch.set(shardRef, {
+                        matches: admin.firestore.FieldValue.arrayUnion(...ids),
+                        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                }
+
+                // Update root timestamp
+                batch.set(db.collection(COLLECTION).doc(DOC_ID), {
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
                 
+                await batch.commit();
                 this.pendingSync.clear();
             } catch (e) {
                 Logger.warn("Cloud registry write sync failed: " + e.message);
@@ -40,12 +59,15 @@ class MatchRegistry {
 
         // 2. Fetch the latest from cloud
         try {
-            const doc = await db.collection(COLLECTION).doc(DOC_ID).get();
-            if (doc.exists) {
-                this.cachedSeen = new Set(doc.data()[FIELD] || []);
-            } else {
-                this.cachedSeen = new Set();
-            }
+            const snapshot = await db.collection(COLLECTION).doc(DOC_ID).collection("seen_matches").get();
+            const ids = new Set();
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                if (data.matches && Array.isArray(data.matches)) {
+                    data.matches.forEach(id => ids.add(id));
+                }
+            });
+            this.cachedSeen = ids;
             this.lastSync = now;
         } catch (e) {
             Logger.warn("Failed to read cloud seen matches: " + e.message);

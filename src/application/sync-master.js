@@ -7,13 +7,13 @@
  *   node scripts/sync-master.js --auto   # Auto-sync all data to Firebase
  */
 
-const { api } = require("../src/api/ddragon");
-const { fetchAndProcessChampions } = require("../src/services/champions");
-const { fetchAndProcessItems } = require("../src/services/items");
-const { fetchAndProcessRunes } = require("../src/services/runes");
-const { fetchAndProcessSpells } = require("../src/services/spells");
-const { uploadChampions, uploadItems, uploadRunes, uploadSpells } = require("../src/output/firebase");
-const { exportChampions, exportItems, exportRunes, exportSpells } = require("../src/output/local-export");
+const { api } = require("../infrastructure/api/ddragon");
+const { fetchAndProcessChampions } = require("./champions");
+const { fetchAndProcessItems } = require("./items");
+const { fetchAndProcessRunes } = require("./runes");
+const { fetchAndProcessSpells } = require("./spells");
+const { uploadChampions, uploadItems, uploadRunes, uploadSpells } = require("../infrastructure/output/firebase-storage");
+const { exportChampions, exportItems, exportRunes, exportSpells } = require("../infrastructure/output/local-export");
 const {
     askQuestion,
     printHeader,
@@ -23,7 +23,7 @@ const {
     printAutoMode,
     printComplete,
     printError,
-} = require("../src/utils/cli");
+} = require("../presentation/cli-utils");
 
 // ─────────────────────────────────────────────────────────────────────────────
 

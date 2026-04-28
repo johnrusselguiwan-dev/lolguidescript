@@ -5,8 +5,9 @@
  */
 
 const { DDRAGON, STORAGE } = require("../../config/constants");
-const { writeJson } = require("../utils/io");
-const Logger = require("../utils/logger");
+const { api } = require("../infrastructure/api/ddragon");
+const { writeJson } = require("../infrastructure/utils/io");
+const Logger = require("../infrastructure/utils/logger");
 
 const DISTRIBUTED_ITEM_WHITELIST = [];
 const ACTIVE_MAP_IDS = ["11", "12", "30"];
@@ -16,17 +17,16 @@ class StaticDataExtractor {
     static async extractAndSave() {
         Logger.info("Fetching and extracting DDragon Static Data (Items & Runes)...");
 
-        const realm = await (await fetch(DDRAGON.REALM_URL)).json();
+        const realm = await api.getRealm(DDRAGON.REALM_URL);
         const v = realm.v;
-        const base = `${DDRAGON.BASE_URL}/${v}/data/en_US`;
 
-        const itemsRaw = await (await fetch(`${base}/item.json`)).json();
-        const runesRaw = await (await fetch(`${base}/runesReforged.json`)).json();
+        const itemMap = await api.getItemList(v);
+        const runesRaw = await api.getRuneTrees(v);
 
         // ── Process Items (matching Kotlin logic) ───────────────────────
         const groupedItems = {};
 
-        for (const [id, dto] of Object.entries(itemsRaw.data)) {
+        for (const [id, dto] of Object.entries(itemMap)) {
             if (!dto.name || dto.name.trim() === "") continue;
 
             const isAlwaysAllowed = DISTRIBUTED_ITEM_WHITELIST.some((w) =>

@@ -2,14 +2,14 @@
  * Champion data service — fetches, processes, and validates all champion data.
  */
 
-const { api } = require("../api/ddragon");
-const { buildDetailEntry } = require("../mappers/champion-details");
-const { buildListEntry } = require("../mappers/champion-list");
-const { loadLocalMetadata } = require("../utils/metadata");
-const { readJson } = require("../utils/io");
-const { ProgressBar } = require("../utils/cli");
+const { api } = require("../infrastructure/api/ddragon");
+const { buildDetailEntry } = require("../domain/mappers/champion-details");
+const { buildListEntry } = require("../domain/mappers/champion-list");
+const { loadLocalMetadata } = require("../infrastructure/utils/metadata");
+const { readJson } = require("../infrastructure/utils/io");
+const { ProgressBar } = require("../presentation/cli-utils");
 const { STORAGE } = require("../../config/constants");
-const Logger = require("../utils/logger");
+const Logger = require("../infrastructure/utils/logger");
 
 const FETCH_CHUNK_SIZE = 20;
 

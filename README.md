@@ -32,46 +32,46 @@ You can also use the batch file on Windows:
 | `npm run crawl`    | Ranked match crawler with interactive menu              |
 | `npm run draft`    | Interactive draft simulator using crawled data          |
 
-## Crawler Menu
+## Master Control Panel
 
-When you run `npm run crawl`, you get an interactive menu:
+When you run `npm run crawl` or `.\run.bat`, you get the interactive Master Control Panel:
 
-```
-╔════════════════════════════════════════════════╗
-║       LoL Guide  ·  Data Crawler              ║
-╚════════════════════════════════════════════════╝
+```text
+  ╔══════════════════════════════════════════════════════╗
+  ║         LoL Guide  ·  Master Control Panel         ║
+  ╚══════════════════════════════════════════════════════╝
 
-  [1]  🔄 Solo Crawl        (all ranks, single machine)
-  [2]  👥 Team Crawl        (split ranks across laptops)
-  [3]  📦 Merge & Upload    (combine data + push to Firebase)
-  [4]  📊 Upload Only       (push existing data to Firebase)
-  [5]  🗄️  Static Data       (fetch items & runes mappings)
-```
+  Data Collection (For Everyone)
+    [1]  🔄 Start Crawling         (Fetch live match data)
+    [2]  📤 Export Data for Team   (Share your crawled matches with the Master)
 
-### Solo Crawl
-Crawls all 31 rank divisions (Iron IV → Challenger) on a single machine.
+  Data Processing (For Master Laptop)
+    [3]  📥 Import Team Data       (Load matches shared by a coworker)
+    [4]  📦 Aggregate Data         (Combine matches into champion stats)
+    [5]  🚀 Publish to App         (Upload aggregated stats to Firebase)
+    [6]  🗄️  Sync Static Assets    (Update base champions, items, runes)
 
-### Team Crawl (Distributed)
-Split the workload across multiple laptops. Each laptop crawls a different slice of ranks:
-
-```
-Laptop 1: npm run crawl → [2] → 3 laptops → laptop 1 → crawls Iron–Silver
-Laptop 2: npm run crawl → [2] → 3 laptops → laptop 2 → crawls Gold–Emerald
-Laptop 3: npm run crawl → [2] → 3 laptops → laptop 3 → crawls Diamond–Challenger
+    [0]  ❌ Exit
 ```
 
-All laptops share seen match IDs via Firebase to **prevent duplicate fetches**.
+### [1] Start Crawling
+Starts the data crawler. You can pick Solo Mode (crawl all 31 divisions) or Team Worker (split divisions). Laptops share a Firebase log to **prevent duplicate fetches**.
 
-### Merge & Upload
-After all laptops finish, copy their `data/` folders into one machine, then run option `[3]` to:
-1. Combine all rank data into a unified dataset
-2. Generate `CHAMPION_META.json`, `CHAMPION_RATING.json`, `CHAMPION_DRAFTING.json`
-3. Upload all three to Firebase
+### [2] Export & [3] Import
+`[2]` exports a worker's local database to the Desktop so they can share it (via Slack/Drive).
+The Master Laptop uses `[3]` to ingest those files without duplicating any matches.
+
+### [4] Aggregate Data
+Combines the raw SQLite Database into statistical models (`CHAMPION_META.json`, `CHAMPION_RATING.json`, `CHAMPION_DRAFTING.json`).
+
+### [5] Publish & [6] Sync
+`[5]` deploys these newly updated stat structures directly into Firestore.
+`[6]` patches your database with any newly released Riot static assets (champ icons, rune data, etc.).
 
 ### Crawler Controls (during crawl)
 | Key       | Action          |
 |-----------|-----------------|
-| `P` / `Space` | Pause / Resume |
+| `P` | Pause / Resume |
 | `R`       | Restart from Iron IV |
 | `Q` / `Ctrl+C` | Quit safely |
 
@@ -87,15 +87,16 @@ The crawler generates three output files:
 
 ## Recommended Workflow
 
-```
-Step 1:  npm run crawl → [1] Solo  or  [2] Team
-         (crawl ranked match data from Riot API)
+```text
+Step 1: Everyone runs [1] Start Crawling (Team Worker mode) in the Master Control Panel.
 
-Step 2:  npm run crawl → [3] Merge & Upload
-         (combine all rank data + push to Firebase)
+Step 2: Workers run [2] Export Data. They send their database to the Master.
 
-Step 3:  npm run sync
-         (sync static champion data WITH real rates/builds/runes from Step 2)
+Step 3: Master runs [3] Import Team Data on all worker files.
+
+Step 4: Master runs [4] Aggregate Data to compute final stats.
+
+Step 5: Master runs [5] Publish to App to send updates to Firebase.
 ```
 
 Running `npm run sync` after crawling will enrich `champion_details` in Firebase with real win/pick/ban rates, recommended builds, runes, skill order, and matchup data from the crawler.
@@ -105,39 +106,43 @@ Running `npm run sync` after crawling will enrich `champion_details` in Firebase
 ```
 lolguidescript/
 ├── src/
-│   ├── api/
-│   │   ├── ddragon.js              # Data Dragon HTTP client
-│   │   └── riot-client.js          # Riot API client (rate-limited, retry)
-│   ├── mappers/
-│   │   ├── champion-details.js     # Raw → detail entry (enriched with crawler data)
-│   │   ├── champion-list.js        # Detail → list entry
-│   │   ├── items.js                # Raw → domain items
-│   │   ├── runes.js                # Raw → domain rune trees
-│   │   └── spells.js               # Raw → domain summoner spells
-│   ├── services/
-│   │   ├── champions.js            # Fetch + process champions (loads CHAMPION_META)
-│   │   ├── items.js                # Fetch + process items
-│   │   ├── runes.js                # Fetch + process runes
-│   │   ├── spells.js               # Fetch + process summoner spells
-│   │   ├── analytics.js            # Match analysis & stat formatting
-│   │   ├── asset-manager.js        # DDragon asset fetch & cache
-│   │   ├── static-data.js          # Items & runes extraction (Kotlin-matching)
-│   │   ├── aggregator.js           # Global rank data merge (3 outputs)
-│   │   └── match-registry.js       # Firebase match dedup (arrayUnion)
-│   ├── output/
-│   │   ├── firebase.js             # Upload to Firestore (includes tier data)
-│   │   └── local-export.js         # Export to JSON files
-│   └── utils/
-│       ├── cli.js                  # Colors, menus, progress bar
-│       ├── metadata.js             # Local champion metadata
-│       ├── parser.js               # HTML → clean text
-│       ├── logger.js               # Colored timestamped logger
-│       ├── io.js                   # JSON file read/write helpers
-│       └── sleep.js                # Async delay utility
-├── scripts/
-│   ├── sync-master.js              # DDragon sync orchestrator
-│   ├── crawl.js                    # Ranked crawler with interactive menu
-│   └── draft.js                    # Interactive draft simulator
+│   ├── domain/                     # Enterprise Business Rules
+│   │   ├── mappers/                # Data transformation handlers
+│   │   │   ├── champion-details.js 
+│   │   │   ├── champion-list.js    
+│   │   │   ├── items.js            
+│   │   │   ├── runes.js            
+│   │   │   └── spells.js           
+│   │   └── parser.js               # HTML → clean text
+│   ├── application/                # Application Use Cases
+│   │   ├── champions.js            
+│   │   ├── items.js                
+│   │   ├── runes.js                
+│   │   ├── spells.js               
+│   │   ├── analytics.js            
+│   │   ├── asset-manager.js        
+│   │   ├── static-data.js          
+│   │   ├── aggregator.js           
+│   │   ├── crawler.js              # Ranked crawler use case
+│   │   └── sync-master.js          # DDragon sync orchestrator
+│   ├── infrastructure/             # Frameworks and External Drivers
+│   │   ├── api/
+│   │   │   ├── ddragon.js          
+│   │   │   ├── cdragon.js          
+│   │   │   └── riot-client.js      
+│   │   ├── database/
+│   │   │   ├── sqlite-client.js    
+│   │   │   └── firebase-firestore.js
+│   │   ├── output/
+│   │   │   ├── firebase-storage.js 
+│   │   │   └── local-export.js     
+│   │   └── utils/
+│   │       ├── io.js               
+│   │       ├── logger.js           
+│   │       ├── metadata.js         
+│   │       └── sleep.js            
+│   └── presentation/               # Interface Adapters
+│       └── cli-utils.js            # CLI ui logic
 ├── config/
 │   ├── firebase.js                 # Firebase Admin SDK setup
 │   ├── constants.js                # All config constants & rank hierarchy
@@ -148,7 +153,7 @@ lolguidescript/
 │   └── sync.yml                    # Scheduled CI sync to Firebase
 ├── exports/                        # Local JSON output (gitignored)
 ├── data/                           # Crawler output data (gitignored)
-├── index.js                        # Shim → scripts/sync-master.js
+├── index.js                        # CLI Entry Point
 ├── run.bat                         # Windows launcher
 └── package.json
 ```
@@ -161,18 +166,18 @@ lolguidescript/
   Data Dragon API
         │
         ▼
-    src/api/ddragon.js       ← HTTP calls
+    src/infrastructure/api/ddragon.js  ← HTTP calls
         │
         ▼
-    src/services/            ← Fetch + process (orchestration)
+    src/application/                   ← Fetch + process (orchestration)
         │
-        ├──► src/mappers/    ← Data transformation
+        ├──► src/domain/mappers/       ← Data transformation
         │
         ▼
-    src/output/              ← Firebase upload or local JSON export
+    src/infrastructure/output/         ← Firebase upload or local JSON export
 ```
 
-**Data flows top-down.** Services call the API, pass results through mappers, and hand off to output handlers. The `scripts/sync-master.js` orchestrator ties everything together.
+**Data flows top-down.** Application Use Cases call the API, pass results through domain mappers, and hand off to infrastructure output handlers. The `src/application/sync-master.js` orchestrator ties everything together.
 
 When processing champions, the service loads `CHAMPION_META.json` (if available) and passes real crawled stats into each champion's detail entry — replacing placeholder values with actual win/pick/ban rates, builds, runes, skill order, and matchup data.
 
@@ -182,26 +187,26 @@ When processing champions, the service loads `CHAMPION_META.json` (if available)
   Riot Ranked API
         │
         ▼
-    src/api/riot-client.js           ← Rate-limited API client
+    src/infrastructure/api/riot-client.js                ← Rate-limited API client
         │
-        ├──► src/services/asset-manager.js     ← DDragon asset cache
-        ├──► src/services/match-registry.js    ← Firebase match dedup
-        │
-        ▼
-    src/services/analytics.js        ← Match analysis engine
+        ├──► src/application/asset-manager.js            ← DDragon asset cache
+        ├──► src/infrastructure/database/firebase-firestore.js ← Firebase match dedup
         │
         ▼
-    src/services/aggregator.js       ← Global rank merge (3 outputs)
+    src/application/analytics.js                         ← Match analysis engine
+        │
+        ▼
+    src/application/aggregator.js                        ← Global rank merge (3 outputs)
         │
         ├──► data/CHAMPION_META.json
         ├──► data/CHAMPION_RATING.json
         ├──► data/CHAMPION_DRAFTING.json
         │
         ▼
-    src/output/firebase.js           ← Upload to Firestore
+    src/infrastructure/output/firebase-storage.js        ← Upload to Firestore
 ```
 
-The `scripts/crawl.js` orchestrator controls the crawl loop, CLI menu, team crawl partitioning, and state persistence. It composes RiotClient, AssetManager, AnalyticsEngine, GlobalAggregator, and MatchRegistry.
+The `src/application/crawler.js` orchestrator controls the crawl loop, CLI menu, team crawl partitioning, and state persistence. It composes RiotClient, AssetManager, AnalyticsEngine, GlobalAggregator, and MatchRegistry.
 
 ## Firestore Document Map
 
@@ -222,11 +227,11 @@ The `scripts/crawl.js` orchestrator controls the crawl loop, CLI menu, team craw
 
 To add a new data type (e.g., summoner spells):
 
-1. **API** — Add a method in `src/api/ddragon.js`
-2. **Mapper** — Create `src/mappers/summoner-spells.js`
-3. **Service** — Create `src/services/summoner-spells.js`
-4. **Output** — Add upload/export functions in `src/output/firebase.js` and `src/output/local-export.js`
-5. **Menu** — Add option in `src/utils/cli.js` and wire it up in `scripts/sync-master.js`
+1. **API** — Add a method in `src/infrastructure/api/ddragon.js`
+2. **Mapper** — Create `src/domain/mappers/summoner-spells.js`
+3. **Use Case** — Create `src/application/summoner-spells.js`
+4. **Output** — Add upload/export functions in `src/infrastructure/output/firebase-storage.js` and `src/infrastructure/output/local-export.js`
+5. **Menu** — Add option in `src/presentation/cli-utils.js` and wire it up in `src/application/sync-master.js`
 
 ## Environment Variables
 
@@ -239,10 +244,10 @@ To add a new data type (e.g., summoner spells):
 
 ## Key Files
 
-- **`scripts/sync-master.js`** — DDragon sync orchestrator (start reading here)
-- **`scripts/crawl.js`** — Ranked crawler with interactive 5-option menu
+- **`src/application/sync-master.js`** — DDragon sync orchestrator (start reading here)
+- **`src/application/crawler.js`** — Ranked crawler with interactive 5-option menu
 - **`scripts/draft.js`** — Interactive draft pick simulator
 - **`config/constants.js`** — All configuration constants in one place
-- **`src/services/match-registry.js`** — Firebase-based match dedup for distributed crawling
-- **`src/utils/cli.js`** — Terminal UI (menus, progress bar, colors)
+- **`src/infrastructure/database/firebase-firestore.js`** — Firebase-based match dedup for distributed crawling
+- **`src/presentation/cli-utils.js`** — Terminal UI (menus, progress bar, colors)
 - **`config/firebase.js`** — Firebase service account setup

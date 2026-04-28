@@ -53,6 +53,7 @@ const STORAGE = {
     CHAMPION_RATING: path.join(OUTPUT_ROOT, "champions_rating.json"),
     RATES_SUMMARY: path.join(OUTPUT_ROOT, "rates_summary.json"),
     CHAMPION_DRAFTING: path.join(OUTPUT_ROOT, "champions_drafting.json"),
+    CHAMPION_SCALING: path.join(OUTPUT_ROOT, "champions_scaling.json"),
     CRAWL_STATE: path.join(SYSTEM_ROOT, "crawler_state.json"),
     ITEMS_SUMMARY: path.join(OUTPUT_ROOT, "items_summary.json"),
     RUNES_SUMMARY: path.join(OUTPUT_ROOT, "runes_summary.json"),

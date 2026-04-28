@@ -2,9 +2,9 @@
  * Rune data service — fetches and processes rune data from Data Dragon.
  */
 
-const { api } = require("../api/ddragon");
-const { mapRuneTrees } = require("../mappers/runes");
-const { printSuccess } = require("../utils/cli");
+const { api } = require("../infrastructure/api/ddragon");
+const { mapRuneTrees } = require("../domain/mappers/runes");
+const { printSuccess } = require("../presentation/cli-utils");
 
 async function fetchAndProcessRunes(version) {
     const rawRunes = await api.getRuneTrees(version);
