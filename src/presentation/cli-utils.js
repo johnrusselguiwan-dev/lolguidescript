@@ -75,6 +75,16 @@ function showDestMenu() {
     console.log();
 }
 
+function showEnvMenu() {
+    console.log(`  ${c.bold}Which environment should be bumped?${c.reset}`);
+    console.log();
+    console.log(`    ${c.cyan}[1]${c.reset}  All Environments  ${c.dim}(Prod + Staging + Debug)${c.reset}`);
+    console.log(`    ${c.cyan}[2]${c.reset}  Prod Only`);
+    console.log(`    ${c.cyan}[3]${c.reset}  Staging Only`);
+    console.log(`    ${c.cyan}[4]${c.reset}  Debug Only`);
+    console.log();
+}
+
 // ── Progress Bar ────────────────────────────────────────────────────────────
 
 class ProgressBar {
@@ -163,4 +173,5 @@ module.exports = {
     printInfo,
     printAutoMode,
     printComplete,
+    showEnvMenu,
 };

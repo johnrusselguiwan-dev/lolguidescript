@@ -4,9 +4,10 @@ const { runMasterSync } = require("./src/application/sync-master");
 const GlobalAggregator = require("./src/application/aggregator");
 const ImportManager = require("./src/application/import-manager");
 const { uploadTierData } = require("./src/infrastructure/output/firebase-storage");
+const { previewIncrements, incrementVersionFields } = require("./src/infrastructure/output/remote-config");
 const { readJson } = require("./src/infrastructure/utils/io");
 const { STORAGE } = require("./config/constants");
-const { c } = require("./src/presentation/cli-utils");
+const { c, showEnvMenu } = require("./src/presentation/cli-utils");
 const Logger = require("./src/infrastructure/utils/logger");
 
 function ask(query) {
@@ -15,6 +16,36 @@ function ask(query) {
         rl.close();
         res(ans.trim());
     }));
+}
+
+/**
+ * Prompts the user to bump Remote Config version fields after a Firestore upload.
+ * @param {string[]} rcFields - The version fields to increment
+ * @param {string}   [patch]  - The patch version to set as latest_patch
+ */
+async function promptBumpVersions(rcFields, patch) {
+    if (!rcFields || rcFields.length === 0) return;
+
+    const options = patch && patch !== "unknown" ? { latestPatch: patch } : {};
+    const result = await previewIncrements(rcFields, options);
+    if (!result) return;
+
+    showEnvMenu();
+    const envChoice = (await ask("Enter choice (1-4, Default=1): ")).trim();
+
+    let environment = "ALL";
+    if (envChoice === "2") environment = "PROD";
+    else if (envChoice === "3") environment = "Staging";
+    else if (envChoice === "4") environment = "Debug";
+
+    options.environment = environment;
+
+    const ans = await ask(`Bump versions for ${c.yellow}${environment}${c.reset}? (y/N): `);
+    if (ans.toLowerCase() === "y" || ans.toLowerCase() === "yes") {
+        await incrementVersionFields(rcFields, options);
+    } else {
+        Logger.info("Skipped Remote Config version bump.");
+    }
 }
 
 async function main() {
@@ -86,7 +117,8 @@ async function main() {
                     if (!meta || !rating || !drafting) {
                         Logger.error("Failed to load local data. You must run [4] Aggregate Data first!");
                     } else {
-                        await uploadTierData(meta, rating, drafting, scaling || []);
+                        const uploadResult = await uploadTierData(meta, rating, drafting, scaling || []);
+                        await promptBumpVersions(uploadResult.rcFields, uploadResult.patch);
                     }
                 }
             }

@@ -13,16 +13,16 @@ const { fetchAndProcessItems } = require("./items");
 const { fetchAndProcessRunes } = require("./runes");
 const { fetchAndProcessSpells } = require("./spells");
 const { uploadChampions, uploadItems, uploadRunes, uploadSpells } = require("../infrastructure/output/firebase-storage");
+const { previewIncrements, incrementVersionFields } = require("../infrastructure/output/remote-config");
 const { exportChampions, exportItems, exportRunes, exportSpells } = require("../infrastructure/output/local-export");
 const {
     askQuestion,
     printHeader,
     showDataMenu,
     showDestMenu,
-    printPhase,
-    printAutoMode,
     printComplete,
     printError,
+    showEnvMenu,
 } = require("../presentation/cli-utils");
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -97,10 +97,58 @@ async function runMasterSync() {
 
             printPhase(2, "Uploading to Firebase");
 
-            if (championData) await uploadChampions(championData, globalVersion);
-            if (items) await uploadItems(items, globalVersion);
-            if (runeTrees) await uploadRunes(runeTrees, globalVersion);
-            if (spells) await uploadSpells(spells, globalVersion);
+            const allRcFields = [];
+            let uploadPatch = globalVersion;
+
+            if (championData) {
+                const result = await uploadChampions(championData, globalVersion);
+                if (result?.rcFields) allRcFields.push(...result.rcFields);
+                if (result?.patch) uploadPatch = result.patch;
+            }
+            if (items) {
+                const result = await uploadItems(items, globalVersion);
+                if (result?.rcFields) allRcFields.push(...result.rcFields);
+            }
+            if (runeTrees) {
+                const result = await uploadRunes(runeTrees, globalVersion);
+                if (result?.rcFields) allRcFields.push(...result.rcFields);
+            }
+            if (spells) {
+                const result = await uploadSpells(spells, globalVersion);
+                if (result?.rcFields) allRcFields.push(...result.rcFields);
+            }
+
+            // Bump Remote Config versions
+            if (allRcFields.length > 0) {
+                const uniqueFields = [...new Set(allRcFields)];
+                const rcOptions = uploadPatch ? { latestPatch: uploadPatch } : {};
+
+                if (isAuto) {
+                    // Auto-mode: bump without prompting
+                    await incrementVersionFields(uniqueFields, rcOptions);
+                } else {
+                    // Interactive: show preview and ask
+                    const preview = await previewIncrements(uniqueFields, rcOptions);
+                    if (preview) {
+                        showEnvMenu();
+                        const envChoice = (await askQuestion("Enter choice (1-4, Default=1): ")).trim();
+                        
+                        let environment = "ALL";
+                        if (envChoice === "2") environment = "PROD";
+                        else if (envChoice === "3") environment = "Staging";
+                        else if (envChoice === "4") environment = "Debug";
+
+                        rcOptions.environment = environment;
+
+                        const bumpAns = (await askQuestion(`Bump versions for ${c.yellow}${environment}${c.reset}? (y/N): `)).trim().toLowerCase();
+                        if (bumpAns === "y" || bumpAns === "yes") {
+                            await incrementVersionFields(uniqueFields, rcOptions);
+                        } else {
+                            console.log(`  ${c.dim}ℹ Skipped Remote Config version bump.${c.reset}`);
+                        }
+                    }
+                }
+            }
         }
 
         printComplete(globalVersion);

@@ -9,13 +9,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -26,15 +19,8 @@
     ],
     "region": "Ionia",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -48,13 +34,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -68,13 +47,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 2
     }
   },
   {
@@ -87,13 +59,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -106,13 +71,6 @@
     "price": {
       "blue_essence": 6300,
       "riot_points": 975
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -126,13 +84,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -145,13 +96,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -165,13 +109,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -184,13 +121,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -204,13 +134,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -223,13 +146,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -243,13 +159,6 @@
     "price": {
       "blue_essence": 6300,
       "riot_points": 975
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -262,13 +171,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -279,15 +181,8 @@
     ],
     "region": "Runeterra",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 3
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -300,13 +195,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -319,13 +207,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 2,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -340,13 +221,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -357,15 +231,8 @@
     ],
     "region": "Freljord",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 2,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -378,13 +245,6 @@
     "price": {
       "blue_essence": 6300,
       "riot_points": 975
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 3,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -395,15 +255,8 @@
     ],
     "region": "Piltover",
     "price": {
-      "blue_essence": 450,
-      "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -416,13 +269,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -436,13 +282,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -456,13 +295,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -474,15 +306,8 @@
     ],
     "region": "Bandle City",
     "price": {
-      "blue_essence": 1350,
-      "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 1
+      "blue_essence": 3150,
+      "riot_points": 790
     }
   },
   {
@@ -495,13 +320,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -513,15 +331,8 @@
     ],
     "region": "Targon",
     "price": {
-      "blue_essence": 450,
-      "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -534,13 +345,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -551,15 +355,8 @@
     ],
     "region": "Noxus",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -571,15 +368,8 @@
     ],
     "region": "Zaun",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -592,13 +382,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -611,13 +394,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -628,15 +404,8 @@
     ],
     "region": "Piltover",
     "price": {
-      "blue_essence": 1350,
-      "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -649,13 +418,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -668,13 +430,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -687,13 +442,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -707,13 +455,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -727,13 +468,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -746,13 +480,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -765,13 +492,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -786,13 +506,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -805,13 +518,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -825,13 +531,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -844,13 +543,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -865,13 +557,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -885,13 +570,6 @@
     "price": {
       "blue_essence": 6300,
       "riot_points": 975
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -902,15 +580,8 @@
     ],
     "region": "Bilgewater",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -924,13 +595,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 2
     }
   },
   {
@@ -943,13 +607,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 3
     }
   },
   {
@@ -962,13 +619,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 3
     }
   },
   {
@@ -981,13 +631,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -1001,13 +644,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -1021,13 +657,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -1038,15 +667,8 @@
     ],
     "region": "Ionia",
     "price": {
-      "blue_essence": 4800,
+      "blue_essence": 2222,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1057,15 +679,8 @@
     ],
     "region": "Zaun",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
+      "blue_essence": 450,
+      "riot_points": 260
     }
   },
   {
@@ -1076,15 +691,8 @@
     ],
     "region": "Shurima",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 2
+      "blue_essence": 6300,
+      "riot_points": 975
     }
   },
   {
@@ -1095,15 +703,8 @@
     ],
     "region": "The Void",
     "price": {
-      "blue_essence": 1350,
-      "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 0,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -1114,15 +715,8 @@
     ],
     "region": "Shadow Isles",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 2
+      "blue_essence": 3150,
+      "riot_points": 790
     }
   },
   {
@@ -1136,13 +730,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1156,13 +743,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1175,13 +755,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -1194,13 +767,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -1213,14 +779,7 @@
     "region": "Targon",
     "price": {
       "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 3
+      "riot_points": 260
     }
   },
   {
@@ -1231,15 +790,8 @@
     ],
     "region": "Ionia",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -1253,13 +805,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1272,13 +817,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -1291,13 +829,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 2
     }
   },
   {
@@ -1310,13 +841,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -1330,13 +854,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1349,13 +866,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -1366,15 +876,8 @@
     ],
     "region": "Ionia",
     "price": {
-      "blue_essence": 450,
-      "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 1350,
+      "riot_points": 585
     }
   },
   {
@@ -1387,13 +890,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1406,13 +902,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -1425,13 +914,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -1445,13 +927,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -1464,13 +939,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 3
     }
   },
   {
@@ -1484,13 +952,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1505,13 +966,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1524,13 +978,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1545,13 +992,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1564,13 +1004,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -1582,15 +1015,8 @@
     ],
     "region": "Noxus",
     "price": {
-      "blue_essence": 6300,
+      "blue_essence": 7800,
       "riot_points": 975
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1601,15 +1027,8 @@
     ],
     "region": "Ixtal",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 3
+      "blue_essence": 6300,
+      "riot_points": 975
     }
   },
   {
@@ -1622,13 +1041,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1641,13 +1053,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1662,13 +1067,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1681,13 +1079,6 @@
     "price": {
       "blue_essence": 6300,
       "riot_points": 975
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -1698,15 +1089,8 @@
     ],
     "region": "Runeterra",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -1719,13 +1103,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1738,13 +1115,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1758,13 +1128,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1777,13 +1140,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 2
     }
   },
   {
@@ -1794,15 +1150,8 @@
     ],
     "region": "Bilgewater",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 2
+      "blue_essence": 6300,
+      "riot_points": 975
     }
   },
   {
@@ -1815,13 +1164,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -1834,13 +1176,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1854,13 +1189,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -1873,13 +1201,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1892,13 +1213,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -1913,13 +1227,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -1934,13 +1241,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -1952,15 +1252,8 @@
     ],
     "region": "Bilgewater",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -1974,13 +1267,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -1993,13 +1279,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -2012,13 +1291,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 2,
-      "crowdControl": 3,
-      "mobility": 3,
-      "utility": 3
     }
   },
   {
@@ -2029,15 +1301,8 @@
     ],
     "region": "Shurima",
     "price": {
-      "blue_essence": 450,
-      "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 1
+      "blue_essence": 1350,
+      "riot_points": 585
     }
   },
   {
@@ -2050,13 +1315,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -2070,13 +1328,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -2087,15 +1338,8 @@
     ],
     "region": "Zaun",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
+      "blue_essence": 6300,
+      "riot_points": 975
     }
   },
   {
@@ -2108,13 +1352,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2128,13 +1365,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2147,13 +1377,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
     }
   },
   {
@@ -2167,13 +1390,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -2186,14 +1402,7 @@
     "region": "Runeterra",
     "price": {
       "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 2
+      "riot_points": 260
     }
   },
   {
@@ -2204,15 +1413,8 @@
     ],
     "region": "Noxus",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -2226,13 +1428,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2244,15 +1439,8 @@
     ],
     "region": "Shadow Isles",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 3
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -2267,13 +1455,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -2285,15 +1466,8 @@
     ],
     "region": "Ionia",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
+      "blue_essence": 1350,
+      "riot_points": 585
     }
   },
   {
@@ -2307,13 +1481,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -2327,13 +1494,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 3
     }
   },
   {
@@ -2346,13 +1506,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2364,14 +1517,7 @@
     "region": "Zaun",
     "price": {
       "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
+      "riot_points": 260
     }
   },
   {
@@ -2384,13 +1530,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -2403,13 +1542,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -2423,13 +1555,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2443,13 +1568,6 @@
     "price": {
       "blue_essence": 6300,
       "riot_points": 975
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -2462,13 +1580,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -2481,13 +1592,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 3
     }
   },
   {
@@ -2500,15 +1604,8 @@
     ],
     "region": "Noxus",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
+      "blue_essence": 3150,
+      "riot_points": 790
     }
   },
   {
@@ -2520,15 +1617,8 @@
     ],
     "region": "Demacia",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -2541,13 +1631,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -2561,13 +1644,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 3
     }
   },
   {
@@ -2581,13 +1657,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 3
     }
   },
   {
@@ -2601,13 +1670,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2621,13 +1683,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 3
     }
   },
   {
@@ -2640,13 +1695,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -2657,15 +1705,8 @@
     ],
     "region": "Shadow Isles",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 2,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 3
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -2679,13 +1720,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2699,13 +1733,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -2718,13 +1745,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2736,15 +1756,8 @@
     ],
     "region": "Bilgewater",
     "price": {
-      "blue_essence": 1350,
+      "blue_essence": 4800,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 2
     }
   },
   {
@@ -2758,13 +1771,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2778,13 +1784,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2797,13 +1796,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -2815,15 +1807,8 @@
     ],
     "region": "Ionia",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -2837,13 +1822,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2857,13 +1835,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -2875,15 +1846,8 @@
     ],
     "region": "The Void",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
+      "blue_essence": 1570,
+      "riot_points": 790
     }
   },
   {
@@ -2896,13 +1860,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2913,15 +1870,8 @@
     ],
     "region": "Piltover",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 1
+      "blue_essence": 1350,
+      "riot_points": 585
     }
   },
   {
@@ -2934,13 +1884,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -2953,13 +1896,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -2971,15 +1907,8 @@
     ],
     "region": "Noxus",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 1,
-      "mobility": 1,
-      "utility": 1
+      "blue_essence": 3150,
+      "riot_points": 790
     }
   },
   {
@@ -2991,15 +1920,8 @@
     ],
     "region": "Freljord",
     "price": {
-      "blue_essence": 450,
-      "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
+      "blue_essence": 1350,
+      "riot_points": 585
     }
   },
   {
@@ -3013,13 +1935,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -3033,13 +1948,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -3052,13 +1960,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 2,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
     }
   },
   {
@@ -3070,15 +1971,8 @@
     ],
     "region": "Shurima",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 1
+      "blue_essence": 1350,
+      "riot_points": 585
     }
   },
   {
@@ -3091,13 +1985,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -3111,13 +1998,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 2
     }
   },
   {
@@ -3129,15 +2009,8 @@
     ],
     "region": "Ionia",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -3150,13 +2023,6 @@
     "price": {
       "blue_essence": 3150,
       "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 1,
-      "utility": 2
     }
   },
   {
@@ -3169,13 +2035,6 @@
     "price": {
       "blue_essence": 450,
       "riot_points": 260
-    },
-    "playstyle": {
-      "damage": 1,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 3
     }
   },
   {
@@ -3188,13 +2047,6 @@
     "price": {
       "blue_essence": 6300,
       "riot_points": 975
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 2,
-      "utility": 0
     }
   },
   {
@@ -3208,13 +2060,6 @@
     "price": {
       "blue_essence": 6300,
       "riot_points": 975
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 2,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -3228,13 +2073,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 3,
-      "crowdControl": 3,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -3245,15 +2083,8 @@
     ],
     "region": "Ionia",
     "price": {
-      "blue_essence": 1350,
-      "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 1,
-      "mobility": 3,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   },
   {
@@ -3264,15 +2095,8 @@
     ],
     "region": "Zaun",
     "price": {
-      "blue_essence": 4800,
-      "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 3,
-      "utility": 0
+      "blue_essence": 6300,
+      "riot_points": 975
     }
   },
   {
@@ -3286,13 +2110,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -3306,13 +2123,6 @@
     "price": {
       "blue_essence": 1350,
       "riot_points": 585
-    },
-    "playstyle": {
-      "damage": 2,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 3
     }
   },
   {
@@ -3325,13 +2135,6 @@
     "price": {
       "blue_essence": 4800,
       "riot_points": 880
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 2,
-      "mobility": 2,
-      "utility": 1
     }
   },
   {
@@ -3343,15 +2146,8 @@
     ],
     "region": "Ixtal",
     "price": {
-      "blue_essence": 3150,
-      "riot_points": 790
-    },
-    "playstyle": {
-      "damage": 3,
-      "durability": 1,
-      "crowdControl": 3,
-      "mobility": 1,
-      "utility": 1
+      "blue_essence": 4800,
+      "riot_points": 880
     }
   }
 ]
