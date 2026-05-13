@@ -16,6 +16,7 @@ const { uploadChampions, uploadItems, uploadRunes, uploadSpells } = require("../
 const { previewIncrements, incrementVersionFields } = require("../infrastructure/output/remote-config");
 const { exportChampions, exportItems, exportRunes, exportSpells } = require("../infrastructure/output/local-export");
 const {
+    c,
     askQuestion,
     printHeader,
     showDataMenu,
@@ -23,6 +24,8 @@ const {
     printComplete,
     printError,
     showEnvMenu,
+    printPhase,
+    printAutoMode
 } = require("../presentation/cli-utils");
 
 // ─────────────────────────────────────────────────────────────────────────────

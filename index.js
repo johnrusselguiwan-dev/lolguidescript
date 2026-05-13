@@ -66,12 +66,13 @@ async function main() {
         console.log(`    ${c.cyan}[4]${c.reset}  📦 Aggregate Data         ${c.dim}(Combine matches into champion stats)${c.reset}`);
         console.log(`    ${c.cyan}[5]${c.reset}  🚀 Publish to App         ${c.dim}(Upload aggregated stats to Firebase)${c.reset}`);
         console.log(`    ${c.cyan}[6]${c.reset}  🗄️  Sync Static Assets    ${c.dim}(Update base champions, items, runes)${c.reset}`);
+        console.log(`    ${c.cyan}[7]${c.reset}  💠 Start Hextech Dashboard${c.dim}(React-based League UI)${c.reset}`);
         console.log();
 
         console.log(`    ${c.red}[0]${c.reset}  ❌ Exit`);
         console.log();
 
-        const choice = await ask("Enter choice (0-6): ");
+        const choice = await ask("Enter choice (0-7): ");
         console.clear();
 
         async function confirmAction(warningText) {
@@ -126,6 +127,29 @@ async function main() {
                 if (await confirmAction("This will fetch the newest champion pictures, item stats, and runes from Riot's Data Dragon.")) {
                     await runMasterSync();
                 }
+            }
+            else if (choice === "7") {
+                const { startServer } = require("./src/presentation/web-server");
+                await startServer(); // Start API backend
+                
+                console.log(`\n  ${c.green}Starting Hextech React Dashboard...${c.reset}\n`);
+                const { spawn, exec } = require('child_process');
+                const path = require('path');
+                
+                // Spawn Vite dev server
+                const viteProcess = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['run', 'dev'], {
+                    cwd: path.join(__dirname, 'hextech-dashboard'),
+                    stdio: ['ignore', 'inherit', 'inherit'],
+                    shell: true
+                });
+                
+                // Open browser after a slight delay
+                setTimeout(() => {
+                    try {
+                        const startCmd = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';
+                        exec(`${startCmd} http://localhost:5173`);
+                    } catch (e) {}
+                }, 2500);
             }
             else if (choice === "0") {
                 console.log(`\n  ${c.green}Safely exiting... Bye!${c.reset}\n`);

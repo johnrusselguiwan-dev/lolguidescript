@@ -18,8 +18,8 @@ const Database = require("../infrastructure/database/sqlite-client");
 const { uploadTierData } = require("../infrastructure/output/firebase-storage");
 const { readJson, writeJson } = require("../infrastructure/utils/io");
 const Logger = require("../infrastructure/utils/logger");
-
-const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+const sleep = require("../infrastructure/utils/sleep");
+const { api: ddragonApi } = require("../infrastructure/api/ddragon");
 
 class Crawler {
     constructor() {
@@ -113,8 +113,7 @@ class Crawler {
 
         // Fetch current patch for filtering
         try {
-            const { api } = require("../infrastructure/api/ddragon");
-            const realm = await api.getRealm(DDRAGON.REALM_URL);
+            const realm = await ddragonApi.getRealm(DDRAGON.REALM_URL);
             this.currentPatch = realm.v.split(".").slice(0, 2).join("."); // e.g. "16.8"
             Logger.info(`Current Match Patch: ${this.currentPatch}`);
         } catch (e) {
@@ -238,7 +237,7 @@ class Crawler {
                 Logger.warn(`No new matches added this cycle. Current total: ${finalCount}`);
             } else {
                 this.matchesFetchedInSession += added;
-                Logger.success(`Added ${added} new match(es). Total: ${finalCount}`);
+                Logger.success(`Successfully fetched ${added} new match(es) for ${rankStr}. Total: ${finalCount}`);
             }
 
             await writeJson(STORAGE.CRAWL_STATE, state);

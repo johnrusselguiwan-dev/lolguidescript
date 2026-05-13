@@ -3,7 +3,7 @@
  */
 
 const { db, admin } = require("../../../config/firebase");
-const { printSuccess } = require("../../presentation/cli-utils");
+const Logger = require("../utils/logger");
 
 // Maps each upload type to the Remote Config version fields it should bump
 const RC_FIELD_MAP = {
@@ -34,7 +34,7 @@ async function uploadChampions(championData, patchVersion) {
     });
 
     await batch.commit();
-    printSuccess("Champions uploaded to Firebase");
+    Logger.success("Champions uploaded to Firebase");
     return { rcFields: RC_FIELD_MAP.champions, patch: patchVersion };
 }
 
@@ -55,7 +55,7 @@ async function uploadItems(items, patchVersion) {
     );
 
     await batch.commit();
-    printSuccess(`${items.length} items uploaded to Firebase`);
+    Logger.success(`${items.length} items uploaded to Firebase`);
     return { rcFields: RC_FIELD_MAP.items, patch: patchVersion };
 }
 
@@ -76,7 +76,7 @@ async function uploadRunes(runeTrees, patchVersion) {
     );
 
     await batch.commit();
-    printSuccess(`${runeTrees.length} rune trees uploaded to Firebase`);
+    Logger.success(`${runeTrees.length} rune trees uploaded to Firebase`);
     return { rcFields: RC_FIELD_MAP.runes, patch: patchVersion };
 }
 
@@ -97,7 +97,7 @@ async function uploadSpells(spells, patchVersion) {
     );
 
     await batch.commit();
-    printSuccess(`${spells.length} summoner spells uploaded to Firebase`);
+    Logger.success(`${spells.length} summoner spells uploaded to Firebase`);
     return { rcFields: RC_FIELD_MAP.spells, patch: patchVersion };
 }
 
@@ -138,7 +138,7 @@ async function uploadTierData(meta, rating, drafting, scaling) {
     );
 
     await batch.commit();
-    printSuccess(`Champion meta, rating, drafting & scaling uploaded to Firebase (Patch: ${dataPatch}${isFallback ? " [FALLBACK]" : ""})`);
+    Logger.success(`Champion meta, rating, drafting & scaling uploaded to Firebase (Patch: ${dataPatch}${isFallback ? " [FALLBACK]" : ""})`);
     return { rcFields: RC_FIELD_MAP.tierData, patch: dataPatch };
 }
 
