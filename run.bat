@@ -19,7 +19,7 @@ echo.
 
 echo [SETUP] Checking dashboard dependencies...
 cd hextech-dashboard
-call npm install --no-audit --no-fund --quiet
+call npm install --legacy-peer-deps --no-audit --no-fund --quiet
 cd ..
 echo.
 
