@@ -5,8 +5,13 @@
 
 const API_BASE = '/api';
 
-export async function apiPost(endpoint) {
-    const res = await fetch(`${API_BASE}${endpoint}`, { method: 'POST' });
+export async function apiPost(endpoint, body = null) {
+    const options = { method: 'POST' };
+    if (body) {
+        options.headers = { 'Content-Type': 'application/json' };
+        options.body = JSON.stringify(body);
+    }
+    const res = await fetch(`${API_BASE}${endpoint}`, options);
     const data = await res.json();
     return { ok: res.ok, data };
 }

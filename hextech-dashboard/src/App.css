@@ -276,3 +276,180 @@ header h1 {
 .log-entry.info { color: #0ac8b9; }
 .log-entry.success { color: #10B981; }
 .log-entry.error { color: #e22c2c; }
+
+/* Crawler Config */
+.crawler-config {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(120, 90, 40, 0.4);
+  animation: fadeIn 0.3s ease;
+}
+
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.config-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--hex-gold);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.config-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hex-select {
+  background: rgba(1, 10, 19, 0.9);
+  border: 1px solid var(--hex-border);
+  color: var(--hex-gold-hover);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c8aa6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.hex-select:hover {
+  border-color: var(--hex-gold);
+  box-shadow: 0 0 8px rgba(200, 170, 110, 0.3);
+}
+
+.hex-select:focus {
+  border-color: var(--hex-blue);
+  box-shadow: 0 0 12px rgba(10, 200, 185, 0.3);
+}
+
+.hex-select option {
+  background: #0a1628;
+  color: #f0e6d2;
+}
+
+.rank-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.rank-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.rank-label {
+  font-size: 0.7rem;
+  color: #a09b8c;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.rank-arrow {
+  color: var(--hex-gold);
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+
+.tier-quick-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.quick-label {
+  font-size: 0.75rem;
+  color: #a09b8c;
+  margin-right: 4px;
+}
+
+.tier-chip {
+  background: rgba(200, 170, 110, 0.1);
+  border: 1px solid rgba(120, 90, 40, 0.5);
+  color: var(--hex-gold);
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tier-chip:hover {
+  background: rgba(200, 170, 110, 0.25);
+  border-color: var(--hex-gold);
+  color: var(--hex-gold-hover);
+  transform: translateY(-1px);
+}
+
+.config-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: linear-gradient(90deg, rgba(200, 170, 110, 0.1), transparent);
+  border-left: 3px solid var(--hex-gold);
+  font-size: 0.85rem;
+  color: var(--hex-gold-hover);
+}
+
+.summary-icon {
+  font-size: 1rem;
+}
+
+.config-alert {
+  margin-top: 4px;
+  padding: 8px 12px;
+  background-color: rgba(226, 44, 44, 0.15);
+  border: 1px solid rgba(226, 44, 44, 0.4);
+  border-left: 3px solid #e22c2c;
+  color: #ffcccc;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+/* Action Card Config (Processing Panel) */
+.action-card-config {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.config-label-sm {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--hex-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.hex-select-sm {
+  padding: 7px 10px;
+  font-size: 0.8rem;
+  padding-right: 28px;
+}

@@ -5,6 +5,8 @@
  * Patch-aware: detects current patch, uses fallback if insufficient data,
  * auto-purges old patches once the new patch has enough data.
  * 
+ * Region-aware: can aggregate globally or for a specific region.
+ * 
  * Now includes INTEGRATED IMPORT — optionally merges the 'Bin' before starting.
  */
 
@@ -70,14 +72,21 @@ class GlobalAggregator {
      * Main entry point for aggregation.
      * 
      * @param {boolean} autoImport - If true, syncs data from 'data/import/' first.
+     * @param {string|null} regionFilter - If set, only aggregate matches from this region.
+     *                                     null or "all" = aggregate all regions (global).
      */
-    static async mergeAll(autoImport = true) {
+    static async mergeAll(autoImport = true, regionFilter = null) {
         // 1. Integrated Import from Bin (Smart Merge)
         if (autoImport) {
             await ImportManager.runImport();
         }
 
-        Logger.info("Running Global Aggregation from SQLite database...");
+        // Normalize region filter
+        const isRegionFiltered = regionFilter && regionFilter !== "all";
+        const regionLabel = isRegionFiltered ? regionFilter : "Global (All Regions)";
+        const regionSuffix = isRegionFiltered ? `_${regionFilter.toLowerCase()}` : "";
+
+        Logger.info(`Running ${regionLabel} Aggregation from SQLite database...`);
 
         // 2. Connect to DB
         await Database.connect();
@@ -90,17 +99,18 @@ class GlobalAggregator {
             Logger.warn("No patch version available. Aggregating all data.");
         }
 
-        Logger.info(`Aggregating data for patch: ${activePatch || "ALL"}${isFallback ? " (FALLBACK)" : ""}`);
+        Logger.info(`Aggregating data for patch: ${activePatch || "ALL"}${isFallback ? " (FALLBACK)" : ""} | Region: ${regionLabel}`);
 
         const stats = AnalyticsEngine.initStats();
         let totalRanked = 0;
         const assets = await AssetManager.getAssets();
 
-        // 4. Process each rank from the Database (no patch filtering)
+        // 4. Process each rank from the Database
         for (const rank of RANK_HIERARCHY) {
-            // We fetch ALL matches available in the DB for this rank.
-            // The DB itself (auto-purge) limits this to the last 2 patches.
-            const matches = await Database.getMatchesForRank(rank.tier, rank.division);
+            // Use region-filtered or global query based on selection
+            const matches = isRegionFiltered
+                ? await Database.getMatchesForRankAndRegion(rank.tier, rank.division, regionFilter)
+                : await Database.getMatchesForRank(rank.tier, rank.division);
 
             if (matches.length > 0) {
                 Logger.info(`Processing ${rank.tier} ${rank.division} (${matches.length} matches)...`);
@@ -117,6 +127,8 @@ class GlobalAggregator {
         if (totalRanked > 0) {
             const globalRanking = AnalyticsEngine.finalize(stats, totalRanked, assets);
 
+            const patchLabel = activePatch ? `${activePatch} (+Fallback)` : "ALL";
+
             // CHAMPION_META — full data (with patch info)
             const metaData = globalRanking.map((ch) => {
                 const slimCh = { ...ch };
@@ -129,7 +141,8 @@ class GlobalAggregator {
 
                 return {
                     ...slimCh,
-                    patch: activePatch ? `${activePatch} (+Fallback)` : "ALL",
+                    patch: patchLabel,
+                    region: regionLabel,
                     isFallback,
                 };
             });
@@ -150,7 +163,8 @@ class GlobalAggregator {
                         : "",
                     lane: ch.lanes && ch.lanes.length > 0 ? ch.lanes : ["Unknown"],
                     role: assets.champData[ch.id] ? assets.champData[ch.id].tags : ["Unknown"],
-                    patch: activePatch ? `${activePatch} (+Fallback)` : "ALL",
+                    patch: patchLabel,
+                    region: regionLabel,
                     isFallback,
                 };
             });
@@ -175,11 +189,12 @@ class GlobalAggregator {
             await writeJson(STORAGE.CHAMPION_SCALING, scalingData, true);
 
             Logger.success(
-                `Champion data updated! Patch: ${activePatch}${isFallback ? " (fallback)" : ""} | Total matches analyzed: ${totalRanked}`
+                `Champion data updated! Region: ${regionLabel} | Patch: ${activePatch}${isFallback ? " (fallback)" : ""} | Total matches analyzed: ${totalRanked}`
             );
 
             // 6. Auto-purge old patches if we're using current patch (not fallback)
-            if (!isFallback && currentPatch) {
+            //    Only do this for global aggregation — don't purge during region-specific runs
+            if (!isFallback && currentPatch && !isRegionFiltered) {
                 const patches = await Database.getDistinctPatches();
                 const patchNames = patches.map(p => p.patch);
 
@@ -203,7 +218,7 @@ class GlobalAggregator {
                 }
             }
         } else {
-            Logger.warn("No data found in database to aggregate.");
+            Logger.warn(`No data found in database to aggregate for region: ${regionLabel}.`);
         }
     }
 }

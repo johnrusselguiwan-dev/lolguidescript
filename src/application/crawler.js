@@ -6,7 +6,9 @@ const {
     CRAWLER,
     RANK_HIERARCHY,
     STORAGE,
-    DDRAGON
+    DDRAGON,
+    getAllPlatforms,
+    getRegionPlatforms
 } = require("../../config/constants");
 const RiotClient = require("../infrastructure/api/riot-client");
 const AssetManager = require("./asset-manager");
@@ -35,8 +37,22 @@ class Crawler {
         // Current patch (fetched at start)
         this.currentPatch = null;
 
+        // Region selection — null means "all regions"
+        this.selectedRegion = null;
+
         this.shortcutsEnabled = false;
         this.setupKeyboardListener();
+    }
+
+    /**
+     * Get the platform list based on selected region.
+     * Returns [{ platform, matchRegion, regionName }]
+     */
+    getActivePlatforms() {
+        if (this.selectedRegion && this.selectedRegion !== "all") {
+            return getRegionPlatforms(this.selectedRegion);
+        }
+        return getAllPlatforms();
     }
 
     setupKeyboardListener() {
@@ -75,6 +91,9 @@ class Crawler {
         if (process.stdin.isTTY) process.stdin.setRawMode(false);
     }
 
+    /**
+     * Interactive CLI start — prompts user for crawl mode, region, and rank range.
+     */
     async start() {
         await Database.connect();
 
@@ -87,14 +106,6 @@ class Crawler {
             const config = await this.askSoloConfig();
             rankStart = config.startIndex;
             rankEnd = config.endIndex;
-
-            const startText = RANK_HIERARCHY[rankStart].tier + (RANK_HIERARCHY[rankStart].division ? " " + RANK_HIERARCHY[rankStart].division : "");
-            const endText = RANK_HIERARCHY[rankEnd - 1].tier + (RANK_HIERARCHY[rankEnd - 1].division ? " " + RANK_HIERARCHY[rankEnd - 1].division : "");
-
-            if (!(await this.askConfirmation(`You are about to start a Solo Crawl from ${startText} to ${endText}.\n  Platforms: ${API.PLATFORMS.join(", ")} | Queues: ${API.QUEUES.map(q => q.name).join(", ")}`))) {
-                Logger.info("Operation cancelled.");
-                return;
-            }
         } else if (mode === "2") {
             const config = await this.askTeamConfig();
             rankStart = config.startIndex;
@@ -104,20 +115,70 @@ class Crawler {
             return;
         }
 
-        await this.run(rankStart, rankEnd);
+        // Region selection
+        await this.askRegionConfig();
+
+        // Patch filter selection
+        const patchMode = await this.askQuestion("Patch Filter: [1] Strict (Current Patch Only) or [2] Lenient (Allow Previous Patch)? ");
+        const strictPatch = patchMode !== "2";
+
+        const startText = RANK_HIERARCHY[rankStart].tier + (RANK_HIERARCHY[rankStart].division ? " " + RANK_HIERARCHY[rankStart].division : "");
+        const endText = RANK_HIERARCHY[rankEnd - 1].tier + (RANK_HIERARCHY[rankEnd - 1].division ? " " + RANK_HIERARCHY[rankEnd - 1].division : "");
+        const platforms = this.getActivePlatforms();
+        const regionLabel = this.selectedRegion && this.selectedRegion !== "all"
+            ? this.selectedRegion
+            : "All Regions (Global)";
+
+        if (!(await this.askConfirmation(
+            `You are about to start a Crawl from ${startText} to ${endText}.\n` +
+            `  Region: ${regionLabel}\n` +
+            `  Patch Filter: ${strictPatch ? "Strict (Current Only)" : "Lenient (Current + Previous)"}\n` +
+            `  Platforms: ${platforms.map(p => p.platform).join(", ")} | Queues: ${API.QUEUES.map(q => q.name).join(", ")}`
+        ))) {
+            Logger.info("Operation cancelled.");
+            return;
+        }
+
+        await this.run(rankStart, rankEnd, strictPatch);
     }
 
-    async run(rankStart, rankEnd) {
-        Logger.info(`Initializing crawl session (Ranks ${rankStart} to ${rankEnd - 1})...`);
-        Logger.info(`Platforms: ${API.PLATFORMS.join(", ")} | Queues: ${API.QUEUES.map(q => q.name).join(", ")}`);
+    /**
+     * Non-interactive start from the Hextech Dashboard API.
+     * @param {number} rankStart — starting rank index in RANK_HIERARCHY
+     * @param {number} rankEnd — ending rank index (exclusive)
+     * @param {string} regionFilter — region name or "all"
+     * @param {boolean} strictPatch — if true, only fetch current patch
+     */
+    async startFromWeb(rankStart, rankEnd, regionFilter = "all", strictPatch = true) {
+        await Database.connect();
+        this.selectedRegion = regionFilter;
+        await this.run(rankStart, rankEnd, strictPatch);
+    }
 
-        // Fetch current patch for filtering
+    async run(rankStart, rankEnd, strictPatch = true) {
+        this.strictPatch = strictPatch;
+        const platforms = this.getActivePlatforms();
+        const regionLabel = this.selectedRegion && this.selectedRegion !== "all"
+            ? this.selectedRegion
+            : "All Regions (Global)";
+
+        Logger.info(`Initializing crawl session (Ranks ${rankStart} to ${rankEnd - 1})...`);
+        Logger.info(`Region: ${regionLabel} | Platforms: ${platforms.map(p => p.platform).join(", ")} | Queues: ${API.QUEUES.map(q => q.name).join(", ")}`);
+
+        // Fetch current and previous patches for filtering
         try {
             const realm = await ddragonApi.getRealm(DDRAGON.REALM_URL);
             this.currentPatch = realm.v.split(".").slice(0, 2).join("."); // e.g. "16.8"
-            Logger.info(`Current Match Patch: ${this.currentPatch}`);
+            
+            const recentPatches = await ddragonApi.getRecentPatches();
+            // The previous patch is the first one in the list that isn't the current patch
+            this.previousPatch = recentPatches.find(p => p !== this.currentPatch) || null;
+            
+            Logger.info(`Current Match Patch: ${this.currentPatch} | Previous: ${this.previousPatch || 'Unknown'} | Strict Mode: ${this.strictPatch ? 'ON' : 'OFF'}`);
         } catch (e) {
-            Logger.warn("Failed to fetch current patch version. Patch filtering disabled.");
+            Logger.warn("Failed to fetch patch versions. Patch filtering disabled.");
+            this.currentPatch = null;
+            this.previousPatch = null;
         }
 
         // Check if patch changed since last crawl — reset state if so
@@ -271,12 +332,16 @@ class Crawler {
         let shouldSkipRank = false;
         let anyPlayersFound = false;
 
+        // Build the active platform list based on selected region
+        const allPlatforms = this.getActivePlatforms();
+
         try {
             // Pick current platform and queue from rotation
-            const platform = API.PLATFORMS[pState.platformIndex % API.PLATFORMS.length];
+            const platformEntry = allPlatforms[pState.platformIndex % allPlatforms.length];
+            const { platform, matchRegion, regionName } = platformEntry;
             const queue = API.QUEUES[pState.queueIndex % API.QUEUES.length];
 
-            Logger.info(`  [${platform.toUpperCase()}] [${queue.name}] Page ${pState.page}`);
+            Logger.info(`  [${platform.toUpperCase()}] [${regionName}] [${queue.name}] Page ${pState.page}`);
 
             const players = await this.client.getPlayers(rankDef, pState.page, platform, queue.name);
 
@@ -292,10 +357,10 @@ class Crawler {
                     pState.emptyPageCounter = 0;
 
                     // If we've cycled through all combos, skip the rank
-                    const totalCombos = API.PLATFORMS.length * API.QUEUES.length;
-                    const currentCombo = (pState.platformIndex % API.PLATFORMS.length) * API.QUEUES.length
+                    const totalCombos = allPlatforms.length * API.QUEUES.length;
+                    const currentCombo = (pState.platformIndex % allPlatforms.length) * API.QUEUES.length
                         + (pState.queueIndex % API.QUEUES.length);
-                    if (pState.platformIndex >= API.PLATFORMS.length) {
+                    if (pState.platformIndex >= allPlatforms.length) {
                         pState.platformIndex = 0;
                         pState.queueIndex = 0;
                     }
@@ -312,33 +377,39 @@ class Crawler {
             for (const player of players) {
                 if (this.isPaused || this.isRestarting) break;
                 const fourteenDaysAgoMs = Date.now() - (14 * 24 * 60 * 60 * 1000);
-                const matches = await this.client.getMatchIds(player.puuid, { startTime: fourteenDaysAgoMs });
+                const matches = await this.client.getMatchIds(player.puuid, matchRegion, { startTime: fourteenDaysAgoMs });
                 for (const mid of matches) {
                     if (this.isPaused || this.isRestarting) break;
 
                     const seenLocallyOrCloud = await MatchRegistry.isSeen(mid);
                     if (seenLocallyOrCloud) continue;
 
-                    const detail = await this.client.getMatchDetail(mid);
+                    const detail = await this.client.getMatchDetail(mid, matchRegion);
                     if (!detail) continue;
 
-                    if (this.currentPatch && CRAWLER.STRICT_PATCH_FILTER) {
+                    if (this.currentPatch) {
                         const matchPatch = detail.info.gameVersion.split(".").slice(0, 2).join(".");
-                        if (matchPatch !== this.currentPatch) {
-                            Logger.info(`  ➜ Match ${mid} is from old patch ${matchPatch}.(current: ${this.currentPatch}) Stopping fetch for this player.`);
+                        const isCurrent = matchPatch === this.currentPatch;
+                        const isPrevious = matchPatch === this.previousPatch;
+                        
+                        if (this.strictPatch && !isCurrent) {
+                            Logger.info(`  ➜ Match ${mid} is from old patch ${matchPatch}. (Strict mode: ON) Stopping fetch for this player.`);
+                            break;
+                        } else if (!this.strictPatch && !isCurrent && !isPrevious) {
+                            Logger.info(`  ➜ Match ${mid} is from obsolete patch ${matchPatch}. (Allowed: ${this.currentPatch}, ${this.previousPatch}). Stopping fetch for this player.`);
                             break;
                         }
                     }
 
                     if (!API.QUEUE_IDS.includes(detail.info.queueId)) continue;
 
-                    const timeline = await this.client.getMatchTimeline(mid);
+                    const timeline = await this.client.getMatchTimeline(mid, matchRegion);
                     if (!timeline) continue;
 
                     // SAVE TO SQL
                     detail.tier = rankDef.tier;
                     detail.division = rankDef.division;
-                    const saved = await Database.saveMatch(detail, timeline, true);
+                    const saved = await Database.saveMatch(detail, timeline, true, regionName);
 
                     if (saved) {
                         newMatchIds.push(mid);
@@ -356,7 +427,7 @@ class Crawler {
                 pState.queueIndex++;
                 if (pState.queueIndex % API.QUEUES.length === 0) {
                     pState.platformIndex++;
-                    if (pState.platformIndex >= API.PLATFORMS.length) {
+                    if (pState.platformIndex >= allPlatforms.length) {
                         pState.platformIndex = 0;
                     }
                 }
@@ -374,7 +445,7 @@ class Crawler {
                 pState.queueIndex++;
                 if (pState.queueIndex % API.QUEUES.length === 0) {
                     pState.platformIndex++;
-                    if (pState.platformIndex >= API.PLATFORMS.length) {
+                    if (pState.platformIndex >= allPlatforms.length) {
                         shouldSkipRank = true;
                         pState.platformIndex = 0;
                         pState.queueIndex = 0;
@@ -393,6 +464,31 @@ class Crawler {
         }
 
         return { newMatchIds, shouldSkipRank };
+    }
+
+    /**
+     * Prompt user to select which region(s) to crawl.
+     */
+    async askRegionConfig() {
+        console.log("\n  --- Region Selection ---");
+        console.log("  [0] All Regions (Global)");
+        API.REGIONS.forEach((r, i) => {
+            console.log(`  [${i + 1}] ${r.name} (${r.platforms.join(", ")})`);
+        });
+
+        const choice = await this.askQuestion("Select region (0 for all): ");
+        const idx = parseInt(choice);
+
+        if (idx === 0 || isNaN(idx)) {
+            this.selectedRegion = "all";
+            Logger.info("Region: All Regions (Global)");
+        } else if (idx >= 1 && idx <= API.REGIONS.length) {
+            this.selectedRegion = API.REGIONS[idx - 1].name;
+            Logger.info(`Region: ${this.selectedRegion}`);
+        } else {
+            Logger.warn("Invalid region. Defaulting to All Regions.");
+            this.selectedRegion = "all";
+        }
     }
 
     async askSoloConfig() {

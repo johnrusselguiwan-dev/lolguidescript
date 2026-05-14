@@ -6,7 +6,7 @@ const ImportManager = require("./src/application/import-manager");
 const { uploadTierData } = require("./src/infrastructure/output/firebase-storage");
 const { previewIncrements, incrementVersionFields } = require("./src/infrastructure/output/remote-config");
 const { readJson } = require("./src/infrastructure/utils/io");
-const { STORAGE } = require("./config/constants");
+const { STORAGE, API } = require("./config/constants");
 const { c, showEnvMenu } = require("./src/presentation/cli-utils");
 const Logger = require("./src/infrastructure/utils/logger");
 
@@ -16,6 +16,27 @@ function ask(query) {
         rl.close();
         res(ans.trim());
     }));
+}
+
+/**
+ * Prompts the user to select a region for aggregation/publishing.
+ * @returns {Promise<string>} Region name or "all" for global.
+ */
+async function askRegion() {
+    console.log(`\n  ${c.bold}Region Selection${c.reset}`);
+    console.log(`    ${c.cyan}[0]${c.reset} 🌍 Global (All Regions)`);
+    API.REGIONS.forEach((r, i) => {
+        console.log(`    ${c.cyan}[${i + 1}]${c.reset} ${r.name} (${r.platforms.join(", ")})`);
+    });
+    const choice = await ask("Select region (0 for Global): ");
+    const idx = parseInt(choice);
+    if (idx >= 1 && idx <= API.REGIONS.length) {
+        const region = API.REGIONS[idx - 1].name;
+        Logger.info(`Selected region: ${region}`);
+        return region;
+    }
+    Logger.info("Selected region: Global (All Regions)");
+    return "all";
 }
 
 /**
@@ -104,11 +125,13 @@ async function main() {
             }
             else if (choice === "4") {
                 if (await confirmAction("This will calculate the final win rates, builds, and matchup stats from all the raw matches in your database. This may take a minute.")) {
-                    await GlobalAggregator.mergeAll(false);
+                    const region = await askRegion();
+                    await GlobalAggregator.mergeAll(false, region);
                 }
             }
             else if (choice === "5") {
                 if (await confirmAction("This will UPLOAD your final stats to Firebase. This updates the live data for your mobile app users!")) {
+                    const region = await askRegion();
                     Logger.info("Reading local aggregated data for upload...");
                     const meta = await readJson(STORAGE.CHAMPION_META);
                     const rating = await readJson(STORAGE.CHAMPION_RATING);
@@ -118,7 +141,7 @@ async function main() {
                     if (!meta || !rating || !drafting) {
                         Logger.error("Failed to load local data. You must run [4] Aggregate Data first!");
                     } else {
-                        const uploadResult = await uploadTierData(meta, rating, drafting, scaling || []);
+                        const uploadResult = await uploadTierData(meta, rating, drafting, scaling || [], region);
                         await promptBumpVersions(uploadResult.rcFields, uploadResult.patch);
                     }
                 }

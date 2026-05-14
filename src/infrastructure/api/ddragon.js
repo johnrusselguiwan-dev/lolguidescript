@@ -16,6 +16,18 @@ const api = {
         return res.data[0];
     },
 
+    /** 
+     * Returns an array of unique Major.Minor patches in descending chronological order.
+     * e.g. ["16.10", "16.9", "16.8"] 
+     */
+    getRecentPatches: async () => {
+        const res = await axios.get("https://ddragon.leagueoflegends.com/api/versions.json");
+        const versions = res.data;
+        // Parse out unique Major.Minor versions, preserving order
+        const uniquePatches = [...new Set(versions.map(v => v.split('.').slice(0, 2).join('.')))];
+        return uniquePatches;
+    },
+
     /** Returns the champion list object keyed by champion ID */
     getChampionList: async (version) => {
         const res = await axios.get(`${BASE_URL}/${version}/data/${LANGUAGE}/champion.json`);

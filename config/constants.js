@@ -10,8 +10,30 @@ const path = require("path");
 // ── API settings ────────────────────────────────────────────────────────────
 
 const API = {
-    PLATFORMS: ["sg2", "tw2", "vn2"],       // All SEA platforms to crawl for player discovery
-    MATCH_REGION: "sea",                     // Shared match-v5 endpoint for all SEA platforms
+    // Multi-region config — source of truth for all available regions
+    REGIONS: [
+        {
+            name: "SEA",
+            matchRegion: "sea",
+            platforms: ["sg2", "vn2", "tw2", "oc1"],
+        },
+        {
+            name: "Asia",
+            matchRegion: "asia",
+            platforms: ["kr", "jp1"],
+        },
+        {
+            name: "Americas",
+            matchRegion: "americas",
+            platforms: ["na1", "br1", "la1", "la2"],
+        },
+        {
+            name: "Europe",
+            matchRegion: "europe",
+            platforms: ["euw1", "eun1", "tr1", "ru"],
+        },
+    ],
+
     QUEUES: [
         { name: "RANKED_SOLO_5x5", id: 420 },
         { name: "RANKED_FLEX_SR",  id: 440 },
@@ -22,6 +44,29 @@ const API = {
     RETRY_ATTEMPTS: 3,
 };
 
+// ── Platform helpers ────────────────────────────────────────────────────────
+
+/**
+ * Flatten all regions into a single array of { platform, matchRegion, regionName }.
+ * This replaces all legacy API.PLATFORMS usage.
+ */
+function getAllPlatforms() {
+    return API.REGIONS.flatMap(r =>
+        r.platforms.map(p => ({ platform: p, matchRegion: r.matchRegion, regionName: r.name }))
+    );
+}
+
+/**
+ * Get platforms for a specific region by name (e.g. "SEA", "Asia").
+ * Returns the same shape as getAllPlatforms() but filtered.
+ * @param {string} regionName — one of API.REGIONS[].name
+ */
+function getRegionPlatforms(regionName) {
+    const region = API.REGIONS.find(r => r.name === regionName);
+    if (!region) return getAllPlatforms(); // fallback to all if invalid
+    return region.platforms.map(p => ({ platform: p, matchRegion: region.matchRegion, regionName: region.name }));
+}
+
 // ── Crawler tuning ──────────────────────────────────────────────────────────
 
 const CRAWLER = {
@@ -30,7 +75,6 @@ const CRAWLER = {
     MATCHES_PER_PLAYER: 10,
     PAUSE_MS_BETWEEN_CYCLES: 30 * 1000,
     MAX_EMPTY_PAGES_BEFORE_SKIP: 5,
-    STRICT_PATCH_FILTER: true,
     MIN_MATCHES_FOR_NEW_PATCH: 500,          // Threshold before switching from fallback patch
     ALLOWED_PATCHES: 2,                      // Keep at most current + 1 fallback
 };
@@ -81,4 +125,4 @@ const RANK_HIERARCHY = [
     { tier: "CHALLENGER", division: "I", isApex: true },
 ];
 
-module.exports = { API, CRAWLER, STORAGE, DDRAGON, RANK_HIERARCHY };
+module.exports = { API, CRAWLER, STORAGE, DDRAGON, RANK_HIERARCHY, getAllPlatforms, getRegionPlatforms };

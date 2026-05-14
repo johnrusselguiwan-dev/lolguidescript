@@ -51,6 +51,7 @@ class Database {
                 tier TEXT,
                 division TEXT,
                 patch TEXT,
+                region TEXT DEFAULT 'sea',
                 timestamp INTEGER,
                 data TEXT
             )`,
@@ -113,6 +114,15 @@ class Database {
             await this.run("CREATE INDEX IF NOT EXISTS idx_matches_patch ON matches(patch)");
             await this.run("CREATE INDEX IF NOT EXISTS idx_matches_tier_patch ON matches(tier, division, patch)");
         }
+
+        // Migration: add region column
+        const hasRegion = columns.some(c => c.name === "region");
+        if (!hasRegion) {
+            Logger.info("Running migration: Adding 'region' column to matches table...");
+            await this.run("ALTER TABLE matches ADD COLUMN region TEXT DEFAULT 'sea'");
+            await this.run("CREATE INDEX IF NOT EXISTS idx_matches_region ON matches(region)");
+            Logger.success("Region column added successfully.");
+        }
     }
 
     // ── Core Helpers ────────────────────────────────────────────────────
@@ -158,8 +168,12 @@ class Database {
     /**
      * Save a match and its timeline.
      * Deduplicates automatically. Stores the patch extracted from gameVersion.
+     * @param {Object} matchDetail — full match data from Riot API
+     * @param {Object} timeline — timeline data for the match
+     * @param {boolean} stripTimeline — strip timeline to only SKILL_LEVEL_UP events
+     * @param {string} region — the region name this match was crawled from (e.g. "SEA", "Asia")
      */
-    async saveMatch(matchDetail, timeline, stripTimeline = true) {
+    async saveMatch(matchDetail, timeline, stripTimeline = true, region = 'sea') {
         const matchId = matchDetail.metadata.matchId;
         const tier = matchDetail.tier || "UNKNOWN";
         const division = matchDetail.division || "UNKNOWN";
@@ -183,8 +197,8 @@ class Database {
 
         try {
             await this.run(
-                "INSERT OR IGNORE INTO matches (matchId, tier, division, patch, timestamp, data) VALUES (?, ?, ?, ?, ?, ?)",
-                [matchId, tier, division, patch, ts, JSON.stringify(matchDetail)]
+                "INSERT OR IGNORE INTO matches (matchId, tier, division, patch, region, timestamp, data) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [matchId, tier, division, patch, region, ts, JSON.stringify(matchDetail)]
             );
             
             if (savedTimeline) {
@@ -219,6 +233,20 @@ class Database {
         const rows = await this.all(
             "SELECT data FROM matches WHERE tier = ? AND division = ?",
             [tier, division]
+        );
+        return rows.map(r => JSON.parse(r.data));
+    }
+
+    /**
+     * Get matches for a specific rank filtered by region.
+     * @param {string} tier
+     * @param {string} division
+     * @param {string} region — region name (e.g. "SEA", "Asia", "Americas", "Europe")
+     */
+    async getMatchesForRankAndRegion(tier, division, region) {
+        const rows = await this.all(
+            "SELECT data FROM matches WHERE tier = ? AND division = ? AND region = ?",
+            [tier, division, region]
         );
         return rows.map(r => JSON.parse(r.data));
     }

@@ -16,7 +16,7 @@ const { uploadTierData } = require('../infrastructure/output/firebase-storage');
 const { incrementVersionFields } = require('../infrastructure/output/remote-config');
 const { readJson } = require('../infrastructure/utils/io');
 const Database = require('../infrastructure/database/sqlite-client');
-const { STORAGE, RANK_HIERARCHY } = require('../../config/constants');
+const { STORAGE, RANK_HIERARCHY, API, getAllPlatforms } = require('../../config/constants');
 const Logger = require('../infrastructure/utils/logger');
 
 const router = express.Router();
@@ -40,6 +40,16 @@ router.get('/status', async (req, res) => {
 
 router.get('/logs', (req, res) => {
     res.json(Logger.getLogs());
+});
+
+// ── Config (for Dashboard UI) ────────────────────────────────────────────────
+
+router.get('/config/regions', (req, res) => {
+    res.json({
+        regions: API.REGIONS,
+        ranks: RANK_HIERARCHY,
+        allPlatforms: getAllPlatforms()
+    });
 });
 
 // ── Settings ─────────────────────────────────────────────────────────────────
@@ -82,17 +92,27 @@ router.post('/action/crawl/start', async (req, res) => {
     }
 
     try {
+        const { rankStart = 0, rankEnd = RANK_HIERARCHY.length, region = 'all', strictPatch = true } = req.body || {};
+
+        // Validate rank bounds
+        const start = Math.max(0, Math.min(rankStart, RANK_HIERARCHY.length - 1));
+        const end = Math.max(start + 1, Math.min(rankEnd, RANK_HIERARCHY.length));
+
         await Database.connect();
         activeCrawler = new Crawler();
         // Don't await here so it runs in background
-        activeCrawler.run(0, RANK_HIERARCHY.length).then(() => {
+        activeCrawler.startFromWeb(start, end, region, strictPatch).then(() => {
             activeCrawler = null;
         }).catch(err => {
             Logger.error("Crawler failed: " + err.message);
             activeCrawler = null;
         });
         
-        res.json({ message: "Crawler started" });
+        const startRank = `${RANK_HIERARCHY[start].tier} ${RANK_HIERARCHY[start].division}`;
+        const endRank = `${RANK_HIERARCHY[end - 1].tier} ${RANK_HIERARCHY[end - 1].division}`;
+        const regionLabel = region === 'all' ? 'All Regions' : region;
+
+        res.json({ message: `Crawler started: ${startRank} → ${endRank} | Region: ${regionLabel} | Patch: ${strictPatch ? 'Strict' : 'Lenient'}` });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -112,8 +132,11 @@ router.post('/action/crawl/stop', async (req, res) => {
 
 router.post('/action/aggregate', async (req, res) => {
     try {
-        await GlobalAggregator.mergeAll(false);
-        res.json({ message: "Aggregation complete" });
+        const { region = 'all' } = req.body || {};
+        const regionLabel = region === 'all' ? 'Global' : region;
+        Logger.info(`Aggregation requested for region: ${regionLabel}`);
+        await GlobalAggregator.mergeAll(false, region);
+        res.json({ message: `Aggregation complete (${regionLabel})` });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -121,6 +144,9 @@ router.post('/action/aggregate', async (req, res) => {
 
 router.post('/action/publish', async (req, res) => {
     try {
+        const { region = 'all' } = req.body || {};
+        const regionLabel = region === 'all' ? 'Global' : region;
+
         const meta = await readJson(STORAGE.CHAMPION_META);
         const rating = await readJson(STORAGE.CHAMPION_RATING);
         const drafting = await readJson(STORAGE.CHAMPION_DRAFTING);
@@ -130,7 +156,7 @@ router.post('/action/publish', async (req, res) => {
             return res.status(400).json({ error: "Missing local data. Aggregate first." });
         }
 
-        const uploadResult = await uploadTierData(meta, rating, drafting, scaling || []);
+        const uploadResult = await uploadTierData(meta, rating, drafting, scaling || [], region);
         
         // Auto bump version for ALL environments
         if (uploadResult && uploadResult.rcFields && uploadResult.rcFields.length > 0) {
@@ -140,11 +166,12 @@ router.post('/action/publish', async (req, res) => {
             });
         }
 
-        res.json({ message: "Publish complete", result: uploadResult });
+        res.json({ message: `Publish complete (${regionLabel})`, result: uploadResult });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
 });
+
 
 router.post('/action/sync-assets', (req, res) => {
     const syncProcess = spawn('node', [path.join(__dirname, '../application/sync-master.js'), '--auto']);

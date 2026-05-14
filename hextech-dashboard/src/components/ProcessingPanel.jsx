@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from 'react-hextech';
-import { apiPost } from '../hooks/useApi';
+import { apiPost, apiGet } from '../hooks/useApi';
 
 function ProcessingPanel({ addLog }) {
+    const [regions, setRegions] = useState([]);
+    const [aggregateRegion, setAggregateRegion] = useState('all');
+    const [publishRegion, setPublishRegion] = useState('all');
+
+    // Load regions from backend
+    useEffect(() => {
+        const loadConfig = async () => {
+            try {
+                const { ok, data } = await apiGet('/config/regions');
+                if (ok) {
+                    setRegions(data.regions || []);
+                }
+            } catch (err) {
+                console.error('Failed to load config:', err);
+            }
+        };
+        loadConfig();
+    }, []);
+
     const handleAggregate = async () => {
-        addLog('Starting data aggregation...', 'info');
+        const regionLabel = aggregateRegion === 'all' ? 'Global' : aggregateRegion;
+        addLog(`Starting data aggregation for ${regionLabel}...`, 'info');
         try {
-            const { ok, data } = await apiPost('/action/aggregate');
+            const { ok, data } = await apiPost('/action/aggregate', { region: aggregateRegion });
             addLog(ok ? data.message : data.error, ok ? 'success' : 'error');
         } catch (err) {
             addLog(`Error: ${err.message}`, 'error');
@@ -14,9 +34,10 @@ function ProcessingPanel({ addLog }) {
     };
 
     const handlePublish = async () => {
-        addLog('Starting publish to Firebase...', 'info');
+        const regionLabel = publishRegion === 'all' ? 'Global' : publishRegion;
+        addLog(`Starting publish to Firebase for ${regionLabel}...`, 'info');
         try {
-            const { ok, data } = await apiPost('/action/publish');
+            const { ok, data } = await apiPost('/action/publish', { region: publishRegion });
             addLog(ok ? data.message : data.error, ok ? 'success' : 'error');
         } catch (err) {
             addLog(`Error: ${err.message}`, 'error');
@@ -33,6 +54,15 @@ function ProcessingPanel({ addLog }) {
         }
     };
 
+    const RegionSelector = ({ value, onChange, id }) => (
+        <select className="hex-select hex-select-sm" value={value} onChange={e => onChange(e.target.value)} id={id}>
+            <option value="all">🌍 Global (All Regions)</option>
+            {regions.map(r => (
+                <option key={r.name} value={r.name}>{r.name}</option>
+            ))}
+        </select>
+    );
+
     return (
         <div className="tab-content" id="tab-processing">
             <div className="grid-cards">
@@ -40,7 +70,15 @@ function ProcessingPanel({ addLog }) {
                     <div className="icon">📦</div>
                     <h3>Aggregate Data</h3>
                     <p>Calculate win rates and builds from local matches</p>
-                    <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+                    <div className="action-card-config">
+                        <label className="config-label-sm">Region</label>
+                        <RegionSelector
+                            value={aggregateRegion}
+                            onChange={setAggregateRegion}
+                            id="select-aggregate-region"
+                        />
+                    </div>
+                    <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
                         <Button onClick={handleAggregate}>Run Aggregation</Button>
                     </div>
                 </div>
@@ -49,7 +87,15 @@ function ProcessingPanel({ addLog }) {
                     <div className="icon">🚀</div>
                     <h3>Publish to App</h3>
                     <p>Upload aggregated stats to Firebase</p>
-                    <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+                    <div className="action-card-config">
+                        <label className="config-label-sm">Region</label>
+                        <RegionSelector
+                            value={publishRegion}
+                            onChange={setPublishRegion}
+                            id="select-publish-region"
+                        />
+                    </div>
+                    <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
                         <Button onClick={handlePublish}>Publish Data</Button>
                     </div>
                 </div>

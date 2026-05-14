@@ -6,7 +6,7 @@
  * exceeding Riot's rate limits, and exponential back-off handles 429s.
  */
 
-const { API, CRAWLER } = require("../../../config/constants");
+const { API, CRAWLER, getAllPlatforms } = require("../../../config/constants");
 const Logger = require("../utils/logger");
 const sleep = require("../utils/sleep");
 
@@ -119,10 +119,10 @@ class RiotClient {
      * Get ranked players for a specific rank from a specific platform and queue.
      * @param {Object} rankDef — { tier, division, isApex }
      * @param {number} page — page number for paginated results
-     * @param {string} platform — platform routing value (e.g. "sg2", "tw2", "vn2")
+     * @param {string} platform — platform routing value (e.g. "sg2", "kr", "na1")
      * @param {string} queueName — queue name (e.g. "RANKED_SOLO_5x5", "RANKED_FLEX_SR")
      */
-    async getPlayers(rankDef, page, platform = API.PLATFORMS[0], queueName = API.QUEUES[0].name) {
+    async getPlayers(rankDef, page, platform, queueName = API.QUEUES[0].name) {
         if (rankDef.isApex) {
             const apexMap = {
                 MASTER: "masterleagues",
@@ -148,9 +148,10 @@ class RiotClient {
     /**
      * Get match IDs for a player.
      * @param {string} puuid — player's PUUID
+     * @param {string} matchRegion — regional routing (e.g. "sea", "asia", "americas", "europe")
      * @param {Object} options — { start, count, startTime, endTime, queue }
      */
-    async getMatchIds(puuid, options = {}) {
+    async getMatchIds(puuid, matchRegion, options = {}) {
         const {
             start = 0,
             count = CRAWLER.MATCHES_PER_PLAYER,
@@ -159,7 +160,7 @@ class RiotClient {
             queue
         } = options;
 
-        let url = `https://${API.MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}`;
+        let url = `https://${matchRegion}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}`;
         if (queue) url += `&queue=${queue}`;
         if (startTime) url += `&startTime=${Math.floor(startTime / 1000)}`;
         if (endTime) url += `&endTime=${Math.floor(endTime / 1000)}`;
@@ -167,21 +168,33 @@ class RiotClient {
         return await this.fetch(url);
     }
 
-    async getSummonerBySummonerId(summonerId) {
+    /**
+     * @param {string} summonerId
+     * @param {string} platform — platform routing (e.g. "sg2", "kr", "na1")
+     */
+    async getSummonerBySummonerId(summonerId, platform) {
         return await this.fetch(
-            `https://${API.PLATFORMS[0]}.api.riotgames.com/lol/summoner/v4/summoners/${summonerId}`
+            `https://${platform}.api.riotgames.com/lol/summoner/v4/summoners/${summonerId}`
         );
     }
 
-    async getMatchDetail(id) {
+    /**
+     * @param {string} id — match ID
+     * @param {string} matchRegion — regional routing (e.g. "sea", "asia", "americas", "europe")
+     */
+    async getMatchDetail(id, matchRegion) {
         return await this.fetch(
-            `https://${API.MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/${id}`
+            `https://${matchRegion}.api.riotgames.com/lol/match/v5/matches/${id}`
         );
     }
 
-    async getMatchTimeline(id) {
+    /**
+     * @param {string} id — match ID
+     * @param {string} matchRegion — regional routing (e.g. "sea", "asia", "americas", "europe")
+     */
+    async getMatchTimeline(id, matchRegion) {
         return await this.fetch(
-            `https://${API.MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/${id}/timeline`
+            `https://${matchRegion}.api.riotgames.com/lol/match/v5/matches/${id}/timeline`
         );
     }
 }

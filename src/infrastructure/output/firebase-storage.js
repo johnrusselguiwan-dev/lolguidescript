@@ -101,28 +101,41 @@ async function uploadSpells(spells, patchVersion) {
     return { rcFields: RC_FIELD_MAP.spells, patch: patchVersion };
 }
 
-async function uploadTierData(meta, rating, drafting, scaling) {
+/**
+ * Upload champion tier data to Firebase.
+ * @param {Array} meta - Champion meta data
+ * @param {Array} rating - Champion rating data
+ * @param {Array} drafting - Champion drafting/matchup data
+ * @param {Array} scaling - Champion scaling/power spike data
+ * @param {string|null} region - Region filter (e.g. "SEA", "Asia"). null = global.
+ */
+async function uploadTierData(meta, rating, drafting, scaling, region = null) {
     // Extract patch info from the data (if available)
     const sampleEntry = (meta && meta.length > 0) ? meta[0] : null;
     const dataPatch = sampleEntry?.patch || "unknown";
     const isFallback = sampleEntry?.isFallback || false;
 
+    // Region suffix for document names (e.g. "_sea", "_asia", or "" for global)
+    const isRegionFiltered = region && region !== "all";
+    const suffix = isRegionFiltered ? `_${region.toLowerCase()}` : "";
+    const regionLabel = isRegionFiltered ? region : "Global";
+
     const batch = db.batch();
 
-    batch.set(db.collection("data").doc("champion_meta"), {
+    batch.set(db.collection("data").doc(`champion_meta${suffix}`), {
         json: JSON.stringify(meta),
     });
 
-    batch.set(db.collection("data").doc("champion_rating"), {
+    batch.set(db.collection("data").doc(`champion_rating${suffix}`), {
         json: JSON.stringify(rating),
     });
 
-    batch.set(db.collection("data").doc("champion_drafting"), {
+    batch.set(db.collection("data").doc(`champion_drafting${suffix}`), {
         json: JSON.stringify(drafting),
     });
 
     if (scaling && Object.keys(scaling).length > 0) {
-        batch.set(db.collection("data").doc("champion_scaling"), {
+        batch.set(db.collection("data").doc(`champion_scaling${suffix}`), {
             json: JSON.stringify(scaling),
         });
     }
@@ -132,14 +145,15 @@ async function uploadTierData(meta, rating, drafting, scaling) {
         {
             dataPatch,
             isFallback,
+            [`lastUpdated${suffix}`]: admin.firestore.FieldValue.serverTimestamp(),
             lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
         },
         { merge: true }
     );
 
     await batch.commit();
-    Logger.success(`Champion meta, rating, drafting & scaling uploaded to Firebase (Patch: ${dataPatch}${isFallback ? " [FALLBACK]" : ""})`);
-    return { rcFields: RC_FIELD_MAP.tierData, patch: dataPatch };
+    Logger.success(`Champion data uploaded to Firebase [${regionLabel}] (Patch: ${dataPatch}${isFallback ? " [FALLBACK]" : ""})`);
+    return { rcFields: RC_FIELD_MAP.tierData, patch: dataPatch, region: regionLabel };
 }
 
 module.exports = { uploadChampions, uploadItems, uploadRunes, uploadSpells, uploadTierData, RC_FIELD_MAP };
