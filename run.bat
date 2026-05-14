@@ -13,11 +13,9 @@ IF %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-IF NOT EXIST "node_modules\" (
-    echo [SETUP] Installing dependencies for first time...
-    call npm install
-    echo.
-)
+echo [SETUP] Checking dependencies...
+call npm install --no-audit --no-fund --quiet
+echo.
 
 echo [OK] Starting LoL Guide...
 echo.
