@@ -686,7 +686,7 @@ header h1 {
 
 .team-data-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 24px;
 }
 
@@ -815,6 +815,7 @@ header h1 {
 
 .file-name {
   flex: 1;
+  min-width: 0;
   font-size: 0.85rem;
   color: var(--hex-gold-hover);
   overflow: hidden;

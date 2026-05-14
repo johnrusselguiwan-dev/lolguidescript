@@ -85,88 +85,95 @@ class ImportManager {
 
         await Database.connect();
 
-        return new Promise((resolve, reject) => {
-            const incomingDb = new sqlite3.Database(incomingDbPath, sqlite3.OPEN_READONLY, async (err) => {
-                if (err) {
-                    Logger.error("Failed to open incoming DB: " + err.message);
-                    return resolve(null);
-                }
-
-                try {
-                    Logger.info("Reading matches from incoming database...");
-
-                    // Fetch all matches from incoming DB
-                    const matches = await new Promise((res, rej) => {
-                        incomingDb.all("SELECT * FROM matches", (e, rows) => {
-                            if (e) rej(e);
-                            else res(rows);
-                        });
-                    });
-
-                    // Fetch all timelines from incoming DB
-                    const timelines = await new Promise((res, rej) => {
-                        incomingDb.all("SELECT * FROM timelines", (e, rows) => {
-                            if (e) rej(e);
-                            else res(rows);
-                        });
-                    });
-
-                    if (matches.length === 0) {
-                        Logger.warn("Incoming database has no matches.");
-                        incomingDb.close(() => resolve({ newMatches: 0, totalIncoming: 0 }));
-                        return;
-                    }
-
-                    Logger.info(`Found ${matches.length} matches. Merging into local database...`);
-
-                    // Create lookup map for timelines
-                    const tlMap = {};
-                    for (const tl of timelines) {
-                        tlMap[tl.matchId] = tl.data;
-                    }
-
-                    await Database.run("BEGIN TRANSACTION");
-
-                    let newMatches = 0;
-
-                    for (const m of matches) {
-                        // Check if we already have it
-                        const exists = await Database.isSeen(m.matchId);
-                        if (!exists) {
-                            try {
-                                const detail = JSON.parse(m.data);
-                                detail.tier = m.tier;
-                                detail.division = m.division;
-
-                                const tlData = tlMap[m.matchId] ? JSON.parse(tlMap[m.matchId]) : null;
-
-                                const saved = await Database.saveMatch(detail, tlData, false, m.region || 'sea');
-                                if (saved) {
-                                    newMatches++;
-                                }
-                            } catch (e) {
-                                // Skip malformed
-                            }
-                        }
-                    }
-
-                    await Database.run("COMMIT");
-
-                    if (newMatches > 0) {
-                        Logger.success(`Successfully merged ${newMatches} new matches from ${path.basename(incomingDbPath)}`);
-                    } else {
-                        Logger.info(`All matches from ${path.basename(incomingDbPath)} are already in your local database.`);
-                    }
-
-                    incomingDb.close(() => resolve({ newMatches, totalIncoming: matches.length }));
-
-                } catch (e) {
-                    await Database.run("ROLLBACK").catch(() => {});
-                    Logger.error("Error during import: " + e.message);
-                    incomingDb.close(() => resolve(null));
-                }
+        try {
+            // Read incoming DB metadata safely first
+            const incomingDb = new sqlite3.Database(incomingDbPath, sqlite3.OPEN_READONLY);
+            const totalIncoming = await new Promise((res, rej) => {
+                incomingDb.get("SELECT COUNT(*) as c FROM matches", (err, row) => {
+                    if (err) rej(err);
+                    else res(row ? row.c : 0);
+                });
             });
-        });
+
+            if (totalIncoming === 0) {
+                Logger.warn("Incoming database has no matches.");
+                incomingDb.close();
+                return { newMatches: 0, totalIncoming: 0 };
+            }
+
+            // Get columns to handle schema differences safely
+            const incomingCols = await new Promise((res, rej) => {
+                incomingDb.all("PRAGMA table_info(matches)", (err, rows) => {
+                    if (err) rej(err);
+                    else res(rows.map(r => r.name));
+                });
+            });
+            
+            // Close readonly connection before ATTACH to avoid locking issues
+            await new Promise(res => incomingDb.close(res));
+
+            Logger.info(`Found ${totalIncoming} matches. Merging via ATTACH DATABASE...`);
+
+            // Attach to local DB
+            await Database.run(`ATTACH DATABASE ? AS incoming`, [incomingDbPath]);
+
+            // Get local columns
+            const localColsRows = await Database.all("PRAGMA table_info(matches)");
+            const localCols = localColsRows.map(r => r.name);
+
+            // Construct SELECT safely (use defaults if incoming is missing columns like 'region')
+            const selectCols = localCols.map(col => {
+                if (incomingCols.includes(col)) {
+                    return `incoming.matches.${col}`;
+                } else {
+                    if (col === 'region') return "'sea' as region";
+                    if (col === 'patch') return "NULL as patch";
+                    return "NULL";
+                }
+            }).join(", ");
+
+            // Count before merge
+            const countBeforeRow = await Database.get("SELECT COUNT(*) as c FROM matches");
+            const countBefore = countBeforeRow ? countBeforeRow.c : 0;
+
+            await Database.run("BEGIN TRANSACTION");
+            
+            // 1. Bulk merge matches
+            await Database.run(`
+                INSERT OR IGNORE INTO matches (${localCols.join(", ")})
+                SELECT ${selectCols} FROM incoming.matches
+            `);
+            
+            // 2. Bulk merge timelines
+            await Database.run(`
+                INSERT OR IGNORE INTO timelines (matchId, data)
+                SELECT matchId, data FROM incoming.timelines
+            `);
+
+            await Database.run("COMMIT");
+
+            // Count after merge
+            const countAfterRow = await Database.get("SELECT COUNT(*) as c FROM matches");
+            const countAfter = countAfterRow ? countAfterRow.c : 0;
+            const newMatches = countAfter - countBefore;
+
+            // Detach incoming database
+            await Database.run(`DETACH DATABASE incoming`);
+
+            if (newMatches > 0) {
+                Logger.success(`Successfully merged ${newMatches} new matches from ${path.basename(incomingDbPath)}`);
+            } else {
+                Logger.info(`All matches from ${path.basename(incomingDbPath)} are already in your local database.`);
+            }
+
+            return { newMatches, totalIncoming };
+
+        } catch (e) {
+            await Database.run("ROLLBACK").catch(() => {});
+            await Database.run(`DETACH DATABASE incoming`).catch(() => {});
+            Logger.error("Error during import: " + e.message);
+            return null;
+        }
     }
 
     /**
