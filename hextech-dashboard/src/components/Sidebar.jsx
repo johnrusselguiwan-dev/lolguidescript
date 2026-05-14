@@ -11,13 +11,19 @@ function Sidebar({ activeTab, setActiveTab }) {
                     className={activeTab === 'collection' ? 'active' : ''}
                     onClick={() => setActiveTab('collection')}
                 >
-                    Data Collection
+                    ⚡ Data Collection
+                </button>
+                <button
+                    className={activeTab === 'teamdata' ? 'active' : ''}
+                    onClick={() => setActiveTab('teamdata')}
+                >
+                    👥 Team Data
                 </button>
                 <button
                     className={activeTab === 'processing' ? 'active' : ''}
                     onClick={() => setActiveTab('processing')}
                 >
-                    Data Processing
+                    📦 Data Processing
                 </button>
             </nav>
         </aside>

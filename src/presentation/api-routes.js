@@ -3,15 +3,18 @@
  * by the Hextech React Dashboard.
  *
  * Handles crawler control, data aggregation, publishing, asset sync,
- * system logs, and API key management.
+ * system logs, API key management, and team data export/import.
  */
 
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const fsPromises = require('fs/promises');
+const multer = require('multer');
 const { spawn } = require('child_process');
 const Crawler = require('../application/crawler');
 const GlobalAggregator = require('../application/aggregator');
+const ImportManager = require('../application/import-manager');
 const { uploadTierData } = require('../infrastructure/output/firebase-storage');
 const { incrementVersionFields } = require('../infrastructure/output/remote-config');
 const { readJson } = require('../infrastructure/utils/io');
@@ -23,6 +26,34 @@ const router = express.Router();
 
 // Keep track of crawler state
 let activeCrawler = null;
+
+// ── Multer config for .db file uploads ───────────────────────────────────────
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            fs.mkdirSync(STORAGE.IMPORT, { recursive: true });
+            cb(null, STORAGE.IMPORT);
+        },
+        filename: (req, file, cb) => {
+            // Preserve original filename, but ensure .db extension
+            const name = file.originalname.endsWith('.db')
+                ? file.originalname
+                : `${file.originalname}.db`;
+            cb(null, name);
+        }
+    }),
+    fileFilter: (req, file, cb) => {
+        if (file.originalname.endsWith('.db')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only .db files are accepted'), false);
+        }
+    },
+    limits: {
+        fileSize: 5 * 1024 * 1024 * 1024 // 5GB max
+    }
+});
 
 // ── Status & Logs ────────────────────────────────────────────────────────────
 
@@ -193,6 +224,140 @@ router.post('/action/sync-assets', (req, res) => {
     });
 
     res.json({ message: "Asset sync started in background" });
+});
+
+// ── Team Data: Export & Import ───────────────────────────────────────────────
+
+/**
+ * GET /data/db-stats — Database statistics for the Team Data panel
+ */
+router.get('/data/db-stats', async (req, res) => {
+    try {
+        await Database.connect();
+        const patches = await Database.getDistinctPatches();
+
+        // Total match count
+        const totalRow = await Database.get("SELECT COUNT(*) as count FROM matches");
+        const totalMatches = totalRow ? totalRow.count : 0;
+
+        // Per-region counts
+        const regionCounts = await Database.all(
+            "SELECT region, COUNT(*) as count FROM matches GROUP BY region ORDER BY count DESC"
+        );
+
+        // DB file size
+        let sizeMB = "0";
+        try {
+            const stats = await fsPromises.stat(STORAGE.DATABASE);
+            sizeMB = (stats.size / (1024 * 1024)).toFixed(2);
+        } catch (_) {}
+
+        res.json({
+            totalMatches,
+            sizeMB,
+            patches: patches || [],
+            regions: regionCounts || []
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+/**
+ * POST /data/export — Export current crawler.db to data/exports/
+ */
+router.post('/data/export', async (req, res) => {
+    try {
+        Logger.info("Export requested via Dashboard...");
+        const result = await ImportManager.exportToFolder(STORAGE.EXPORTS);
+        if (result) {
+            res.json({
+                message: `Export complete: ${result.fileName} (${result.sizeMB} MB)`,
+                fileName: result.fileName,
+                sizeMB: result.sizeMB,
+                downloadUrl: `/api/data/exports/${result.fileName}`
+            });
+        } else {
+            res.status(500).json({ error: "Export failed. Check logs." });
+        }
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+/**
+ * GET /data/export/list — List previously exported files
+ */
+router.get('/data/export/list', async (req, res) => {
+    try {
+        const files = await ImportManager.listExports();
+        res.json({ files });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+/**
+ * GET /data/import/list — List .db files in the import bin
+ */
+router.get('/data/import/list', async (req, res) => {
+    try {
+        const files = await ImportManager.listImportBin();
+        res.json({ files });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+/**
+ * POST /data/import/upload — Upload a .db file to the import bin
+ */
+router.post('/data/import/upload', upload.single('dbFile'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "No .db file uploaded" });
+    }
+
+    const sizeMB = (req.file.size / (1024 * 1024)).toFixed(2);
+    Logger.success(`File uploaded to import bin: ${req.file.originalname} (${sizeMB} MB)`);
+
+    res.json({
+        message: `Uploaded ${req.file.originalname} (${sizeMB} MB) to import bin`,
+        fileName: req.file.filename,
+        sizeMB
+    });
+});
+
+/**
+ * POST /data/import/run — Batch merge all .db files in the import bin
+ */
+router.post('/data/import/run', async (req, res) => {
+    try {
+        const { deleteAfterImport = true } = req.body || {};
+        Logger.info("Batch import requested via Dashboard...");
+        const result = await ImportManager.batchImportFromBin(deleteAfterImport);
+        res.json({
+            message: `Merged ${result.totalNew} new matches from ${result.results.length} file(s)`,
+            ...result
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+/**
+ * DELETE /data/import/:filename — Remove a file from the import bin
+ */
+router.delete('/data/import/:filename', async (req, res) => {
+    try {
+        const ok = await ImportManager.removeFromBin(req.params.filename);
+        if (ok) {
+            res.json({ message: `Removed ${req.params.filename}` });
+        } else {
+            res.status(500).json({ error: `Failed to remove ${req.params.filename}` });
+        }
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 module.exports = router;

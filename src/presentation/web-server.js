@@ -6,12 +6,18 @@
  */
 
 const express = require('express');
+const path = require('path');
+const { STORAGE } = require('../../config/constants');
 const apiRoutes = require('./api-routes');
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+
+// Serve exported .db files as static downloads
+app.use('/api/data/exports', express.static(STORAGE.EXPORTS));
+
 app.use('/api', apiRoutes);
 
 function startServer() {

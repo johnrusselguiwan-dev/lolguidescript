@@ -86,11 +86,13 @@ const DATABASE_ROOT = path.join(DATA_ROOT, "database");
 const OUTPUT_ROOT = path.join(DATA_ROOT, "outputs");
 const SYSTEM_ROOT = path.join(DATA_ROOT, "system");
 const IMPORT_ROOT = path.join(DATA_ROOT, "import");
+const EXPORTS_ROOT = path.join(DATA_ROOT, "exports");
 
 const STORAGE = {
     ROOT: DATABASE_ROOT,
     ASSETS: path.join(DATA_ROOT, "assets"),
     IMPORT: IMPORT_ROOT,
+    EXPORTS: EXPORTS_ROOT,
     DATABASE: path.join(DATA_ROOT, "system", "crawler.db"),
     GLOBAL_SEEN: path.join(SYSTEM_ROOT, "seen_matches.json"),
     CHAMPION_META: path.join(OUTPUT_ROOT, "champions_meta.json"),

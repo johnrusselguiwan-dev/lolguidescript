@@ -5,6 +5,7 @@ import './App.css';
 import Sidebar from './components/Sidebar';
 import ApiKeyForm from './components/ApiKeyForm';
 import CrawlerPanel from './components/CrawlerPanel';
+import TeamDataPanel from './components/TeamDataPanel';
 import ProcessingPanel from './components/ProcessingPanel';
 import LogViewer from './components/LogViewer';
 import { apiGet } from './hooks/useApi';
@@ -60,6 +61,10 @@ function App() {
             <ApiKeyForm />
             <CrawlerPanel isRunning={isRunning} status={status} addLog={addLog} />
           </div>
+        )}
+
+        {activeTab === 'teamdata' && (
+          <TeamDataPanel addLog={addLog} />
         )}
 
         {activeTab === 'processing' && (

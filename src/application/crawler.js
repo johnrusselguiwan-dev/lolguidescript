@@ -278,10 +278,8 @@ class Crawler {
             const result = await this.runCycle(rankDef, rankDir, targetLength);
             const { newMatchIds, shouldSkipRank } = result;
 
-            // Sync new matches to Firebase cloud registry
-            if (newMatchIds.length > 0) {
-                await MatchRegistry.markSeen(newMatchIds);
-            }
+            // Match dedup is handled locally via SQLite INSERT OR IGNORE.
+            // Region-based work splitting ensures zero cross-worker overlap.
 
             if (shouldSkipRank) {
                 Logger.warn(`Rank ${rankStr} seems depleted across all platforms. Skipping to next rank.`);
