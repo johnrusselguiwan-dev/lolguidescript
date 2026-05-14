@@ -54,15 +54,6 @@ function ProcessingPanel({ addLog }) {
         }
     };
 
-    const RegionSelector = ({ value, onChange, id }) => (
-        <select className="hex-select hex-select-sm" value={value} onChange={e => onChange(e.target.value)} id={id}>
-            <option value="all">🌍 Global (All Regions)</option>
-            {regions.map(r => (
-                <option key={r.name} value={r.name}>{r.name}</option>
-            ))}
-        </select>
-    );
-
     return (
         <div className="tab-content" id="tab-processing">
             <div className="grid-cards">
@@ -72,11 +63,17 @@ function ProcessingPanel({ addLog }) {
                     <p>Calculate win rates and builds from local matches</p>
                     <div className="action-card-config">
                         <label className="config-label-sm">Region</label>
-                        <RegionSelector
-                            value={aggregateRegion}
-                            onChange={setAggregateRegion}
+                        <select 
+                            className="hex-select hex-select-sm" 
+                            value={aggregateRegion} 
+                            onChange={e => setAggregateRegion(e.target.value)} 
                             id="select-aggregate-region"
-                        />
+                        >
+                            <option value="all">🌍 Global (All Regions)</option>
+                            {regions.map(r => (
+                                <option key={r.name} value={r.name}>{r.name}</option>
+                            ))}
+                        </select>
                     </div>
                     <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
                         <Button onClick={handleAggregate}>Run Aggregation</Button>
@@ -89,11 +86,17 @@ function ProcessingPanel({ addLog }) {
                     <p>Upload aggregated stats to Firebase</p>
                     <div className="action-card-config">
                         <label className="config-label-sm">Region</label>
-                        <RegionSelector
-                            value={publishRegion}
-                            onChange={setPublishRegion}
+                        <select 
+                            className="hex-select hex-select-sm" 
+                            value={publishRegion} 
+                            onChange={e => setPublishRegion(e.target.value)} 
                             id="select-publish-region"
-                        />
+                        >
+                            <option value="all">🌍 Global (All Regions)</option>
+                            {regions.map(r => (
+                                <option key={r.name} value={r.name}>{r.name}</option>
+                            ))}
+                        </select>
                     </div>
                     <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
                         <Button onClick={handlePublish}>Publish Data</Button>

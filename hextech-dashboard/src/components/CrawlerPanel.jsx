@@ -8,10 +8,13 @@ function CrawlerPanel({ isRunning, status, addLog }) {
     const [ranks, setRanks] = useState([]);
 
     // User selections
-    const [selectedRegion, setSelectedRegion] = useState('all');
+    const [selectedRegion, setSelectedRegion] = useState(() => localStorage.getItem('crawlerRegion') || 'all');
     const [rankStart, setRankStart] = useState(0);
     const [rankEnd, setRankEnd] = useState(0);
-    const [strictPatch, setStrictPatch] = useState(true);
+    const [strictPatch, setStrictPatch] = useState(() => {
+        const stored = localStorage.getItem('crawlerStrictPatch');
+        return stored !== null ? stored === 'true' : true;
+    });
 
     // Fetch available regions and ranks from backend
     useEffect(() => {
@@ -21,7 +24,18 @@ function CrawlerPanel({ isRunning, status, addLog }) {
                 if (ok) {
                     setRegions(data.regions || []);
                     setRanks(data.ranks || []);
-                    setRankEnd(data.ranks?.length || 0);
+                    
+                    // Load saved rank indices
+                    const totalRanks = data.ranks?.length || 0;
+                    const savedStart = localStorage.getItem('crawlerRankStart');
+                    const savedEnd = localStorage.getItem('crawlerRankEnd');
+                    
+                    if (savedStart !== null && savedEnd !== null) {
+                        setRankStart(Math.min(parseInt(savedStart), Math.max(0, totalRanks - 1)));
+                        setRankEnd(Math.min(parseInt(savedEnd), totalRanks));
+                    } else {
+                        setRankEnd(totalRanks);
+                    }
                 }
             } catch (err) {
                 console.error('Failed to load config:', err);
@@ -29,6 +43,14 @@ function CrawlerPanel({ isRunning, status, addLog }) {
         };
         loadConfig();
     }, []);
+
+    // Save selections to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem('crawlerRegion', selectedRegion);
+        localStorage.setItem('crawlerStrictPatch', strictPatch);
+        localStorage.setItem('crawlerRankStart', rankStart);
+        localStorage.setItem('crawlerRankEnd', rankEnd);
+    }, [selectedRegion, strictPatch, rankStart, rankEnd]);
 
     const handleCrawl = async () => {
         if (isRunning) {
@@ -102,7 +124,10 @@ function CrawlerPanel({ isRunning, status, addLog }) {
             {!isRunning && (
                 <div className="crawler-config">
                     <div className="config-section">
-                        <label className="config-label">Region</label>
+                        <label className="config-label">
+                            Region
+                            <span className="info-icon" title="Select the server region to fetch match data from.">i</span>
+                        </label>
                         <div className="config-row">
                             <select
                                 id="select-region"
@@ -121,7 +146,10 @@ function CrawlerPanel({ isRunning, status, addLog }) {
                     </div>
 
                     <div className="config-section">
-                        <label className="config-label">Rank Range</label>
+                        <label className="config-label">
+                            Rank Range
+                            <span className="info-icon" title="The skill tiers and divisions to fetch data for.">i</span>
+                        </label>
                         <div className="config-row rank-row">
                             <div className="rank-select-group">
                                 <span className="rank-label">From</span>
@@ -183,17 +211,31 @@ function CrawlerPanel({ isRunning, status, addLog }) {
                     </div>
 
                     <div className="config-section">
-                        <label className="config-label">Patch Filter</label>
-                        <div className="config-row">
-                            <select
-                                id="select-patch-filter"
-                                className="hex-select"
-                                value={strictPatch ? 'strict' : 'lenient'}
-                                onChange={(e) => setStrictPatch(e.target.value === 'strict')}
-                            >
-                                <option value="strict">Strict (Current Patch Only)</option>
-                                <option value="lenient">Lenient (Allow Previous Patch)</option>
-                            </select>
+                        <label className="config-label">
+                            Patch Filter
+                            <span className="info-icon" title="Strict mode only fetches matches from the current patch. Lenient mode allows matches from the previous patch as well.">i</span>
+                        </label>
+                        <div className="hex-radio-group">
+                            <label className={`hex-radio ${strictPatch ? 'active' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="patchFilter"
+                                    checked={strictPatch === true}
+                                    onChange={() => setStrictPatch(true)}
+                                />
+                                <span className="radio-custom"></span>
+                                Strict (Current Patch Only)
+                            </label>
+                            <label className={`hex-radio ${!strictPatch ? 'active' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="patchFilter"
+                                    checked={strictPatch === false}
+                                    onChange={() => setStrictPatch(false)}
+                                />
+                                <span className="radio-custom"></span>
+                                Lenient (Allow Previous Patch)
+                            </label>
                         </div>
                         {!strictPatch && (
                             <div className="config-alert">
@@ -221,10 +263,19 @@ function CrawlerPanel({ isRunning, status, addLog }) {
             <div className="progress-section">
                 <div className="progress-header">
                     <span>{getRankText()}</span>
-                    <span>{status ? `${status.currentMatches || 0} / 100` : '0 / 100'}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span>{status ? `${status.currentMatches || 0} / 100` : '0 / 100'}</span>
+                        <span className="info-icon" style={{ marginLeft: 0 }} title="Current crawling progress and rank being fetched.">i</span>
+                    </span>
                 </div>
                 <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: getProgressWidth() }}></div>
+                    <div className="progress-fill" style={{ width: getProgressWidth() }}>
+                        {status && status.currentMatches > 0 && (
+                            <div className="poro-runner-container">
+                                <img src="/poro-running.png" alt="Running Poro" className="poro-runner" />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

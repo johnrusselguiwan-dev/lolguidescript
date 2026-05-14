@@ -301,7 +301,7 @@ class Crawler {
 
             await writeJson(STORAGE.CRAWL_STATE, state);
 
-            Logger.info(`Resting for ${CRAWLER.PAUSE_MS_BETWEEN_CYCLES / 1000}s... (Press P to pause, R to restart, Q to quit)`);
+            Logger.info(`Resting for ${CRAWLER.PAUSE_MS_BETWEEN_CYCLES / 1000}s...`);
             await this.interruptibleSleep(CRAWLER.PAUSE_MS_BETWEEN_CYCLES);
         }
 

@@ -36,8 +36,6 @@ class ImportManager {
     static async exportToFolder(destDir) {
         try {
             await Database.connect();
-            Logger.info("Optimizing database before export...");
-            await Database.vacuum();
 
             // Ensure destination directory exists
             await fs.mkdir(destDir, { recursive: true });
@@ -46,12 +44,9 @@ class ImportManager {
             const exportFileName = `worker_export_${dateStr}.db`;
             const exportPath = path.join(destDir, exportFileName);
 
-            Logger.info(`Copying database to ${exportPath}...`);
-
-            // Close DB briefly to ensure safe copy
-            Database.close();
-            await fs.copyFile(STORAGE.DATABASE, exportPath);
-            await Database.connect(); // Reconnect
+            // Use "VACUUM INTO" to create an optimized copy without closing the main handle.
+            // This prevents background crawler crashes during export.
+            await Database.vacuumInto(exportPath);
 
             const stats = await fs.stat(exportPath);
             const sizeMB = (stats.size / (1024 * 1024)).toFixed(2);
@@ -118,8 +113,8 @@ class ImportManager {
 
                     if (matches.length === 0) {
                         Logger.warn("Incoming database has no matches.");
-                        incomingDb.close();
-                        return resolve({ newMatches: 0, totalIncoming: 0 });
+                        incomingDb.close(() => resolve({ newMatches: 0, totalIncoming: 0 }));
+                        return;
                     }
 
                     Logger.info(`Found ${matches.length} matches. Merging into local database...`);
@@ -163,14 +158,12 @@ class ImportManager {
                         Logger.info(`All matches from ${path.basename(incomingDbPath)} are already in your local database.`);
                     }
 
-                    resolve({ newMatches, totalIncoming: matches.length });
+                    incomingDb.close(() => resolve({ newMatches, totalIncoming: matches.length }));
 
                 } catch (e) {
                     await Database.run("ROLLBACK").catch(() => {});
                     Logger.error("Error during import: " + e.message);
-                    resolve(null);
-                } finally {
-                    incomingDb.close();
+                    incomingDb.close(() => resolve(null));
                 }
             });
         });

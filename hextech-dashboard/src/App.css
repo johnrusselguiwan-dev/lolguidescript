@@ -133,8 +133,15 @@ header h1 {
   height: 8px;
   border-radius: 50%;
 }
-.dot.online { background: #0ac8b9; box-shadow: 0 0 8px #0ac8b9; }
-.dot.offline { background: #e22c2c; }
+
+.dot.online {
+  background: #0ac8b9;
+  box-shadow: 0 0 8px #0ac8b9;
+}
+
+.dot.offline {
+  background: #e22c2c;
+}
 
 /* Tabs */
 .tab-content {
@@ -142,8 +149,15 @@ header h1 {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Cards */
@@ -151,7 +165,7 @@ header h1 {
   background: rgba(30, 35, 40, 0.85);
   backdrop-filter: blur(16px);
   border: 1px solid var(--hex-border);
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 15px rgba(200,170,110,0.1);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(200, 170, 110, 0.1);
 }
 
 .card {
@@ -214,7 +228,7 @@ header h1 {
 
 /* Progress Bar */
 .progress-section {
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   padding: 16px;
   border: 1px solid rgba(120, 90, 40, 0.5);
 }
@@ -229,17 +243,50 @@ header h1 {
 }
 
 .progress-bar {
-  height: 8px;
+  height: 12px;
+  /* Made slightly thicker so poro fits better */
   background: #010a13;
   border: 1px solid #463714;
-  overflow: hidden;
+  border-radius: 6px;
+  /* Removed overflow: hidden so the Poro can stick out */
 }
 
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, #c8aa6e, #f0e6d2);
   transition: width 0.3s ease;
-  box-shadow: 0 0 10px rgba(200,170,110,0.5);
+  box-shadow: 0 0 10px rgba(200, 170, 110, 0.5);
+  position: relative;
+  border-radius: 6px;
+}
+
+/* Poro Runner Animation */
+.poro-runner-container {
+  position: absolute;
+  top: 50%;
+  right: -14px;
+  /* Offset to attach exactly to the leading edge */
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  z-index: 10;
+}
+
+.poro-runner {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: poroRun 0.4s infinite alternate;
+}
+
+@keyframes poroRun {
+  0% {
+    transform: translateY(0) scaleY(1);
+  }
+
+  100% {
+    transform: translateY(-4px) scaleY(1.1);
+  }
 }
 
 /* Logger */
@@ -256,7 +303,9 @@ header h1 {
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--hex-gold);
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
 }
 
 .logger-body {
@@ -271,11 +320,42 @@ header h1 {
 
 .log-entry {
   color: #a09b8c;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 }
 
-.log-entry.info { color: #0ac8b9; }
-.log-entry.success { color: #10B981; }
-.log-entry.error { color: #e22c2c; }
+.poro-error-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+  animation: poroWobble 2s infinite ease-in-out;
+}
+
+@keyframes poroWobble {
+
+  0%,
+  100% {
+    transform: rotate(-10deg);
+  }
+
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+.log-entry.info {
+  color: #0ac8b9;
+}
+
+.log-entry.success {
+  color: #10B981;
+}
+
+.log-entry.error {
+  color: #e22c2c;
+}
 
 /* Crawler Config */
 .crawler-config {
@@ -296,6 +376,8 @@ header h1 {
 }
 
 .config-label {
+  display: flex;
+  align-items: center;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--hex-gold);
@@ -429,6 +511,94 @@ header h1 {
   color: #ffcccc;
   font-size: 0.8rem;
   line-height: 1.4;
+}
+
+/* Info Icon */
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(160, 155, 140, 0.6);
+  border-radius: 50%;
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: bold;
+  color: #a09b8c;
+  cursor: help;
+  transition: all 0.2s ease;
+  margin-left: auto;
+  /* Pushes to the rightmost side in flex containers */
+}
+
+.info-icon:hover {
+  color: var(--hex-blue);
+  border-color: var(--hex-blue);
+  box-shadow: 0 0 8px rgba(10, 200, 185, 0.4);
+}
+
+/* Hextech Radio Buttons */
+.hex-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.hex-radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #a09b8c;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.hex-radio:hover {
+  color: var(--hex-gold-hover);
+}
+
+.hex-radio.active {
+  color: #f0e6d2;
+  font-weight: 500;
+}
+
+.hex-radio input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(160, 155, 140, 0.6);
+  border-radius: 50%;
+  background-color: rgba(30, 35, 40, 0.8);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+.hex-radio.active .radio-custom {
+  border-color: var(--hex-blue);
+  background-color: rgba(10, 200, 185, 0.15);
+  box-shadow: 0 0 8px rgba(10, 200, 185, 0.3);
+}
+
+.hex-radio.active .radio-custom::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--hex-blue);
+  box-shadow: 0 0 6px var(--hex-blue);
 }
 
 /* Action Card Config (Processing Panel) */
@@ -768,4 +938,3 @@ header h1 {
   color: #10B981;
   font-weight: 600;
 }
-

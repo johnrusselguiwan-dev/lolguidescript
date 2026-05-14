@@ -364,6 +364,15 @@ class Database {
         Logger.success("VACUUM complete.");
     }
 
+    /**
+     * Copy and optimize the database into a new file without closing the main handle.
+     * This allows the crawler to keep running while the database is being exported.
+     */
+    async vacuumInto(destPath) {
+        Logger.info(`Exporting optimized copy to ${destPath}...`);
+        await this.run("VACUUM INTO ?", [destPath]);
+    }
+
     close() {
         if (this.db) this.db.close();
     }
