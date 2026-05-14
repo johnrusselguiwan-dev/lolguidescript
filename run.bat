@@ -13,8 +13,14 @@ IF %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-echo [SETUP] Checking dependencies...
+echo [SETUP] Checking backend dependencies...
 call npm install --no-audit --no-fund --quiet
+echo.
+
+echo [SETUP] Checking dashboard dependencies...
+cd hextech-dashboard
+call npm install --no-audit --no-fund --quiet
+cd ..
 echo.
 
 echo [OK] Starting LoL Guide...
