@@ -11,6 +11,17 @@ const cdragon = {
     getSpells: async () => {
         const res = await axios.get(`${BASE_URL}/13.24/plugins/rcp-be-lol-game-data/global/default/v1/summoner-spells.json`);
         return res.data;
+    },
+
+    /** Returns the full community dragon champion detail (useful for playstyleInfo) */
+    getChampionDetail: async (id) => {
+        try {
+            const res = await axios.get(`${BASE_URL}/latest/plugins/rcp-be-lol-game-data/global/default/v1/champions/${id}.json`);
+            return res.data;
+        } catch (error) {
+            console.error(`[CDragon API Error] Failed to fetch champion ${id}:`, error.message);
+            return null;
+        }
     }
 };
 

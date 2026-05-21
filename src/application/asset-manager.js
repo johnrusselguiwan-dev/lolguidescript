@@ -52,6 +52,28 @@ class AssetManager {
             return data;
         };
 
+        const fetchCDragonPlaystyles = async (champsData) => {
+            const cachePath = path.join(STORAGE.ASSETS, `cdragon_playstyles_${v}.json`);
+            let data = await readJson(cachePath);
+            if (!data) {
+                Logger.info(`Downloading CDragon playstyles for patch ${v}...`);
+                const { cdragon } = require("../infrastructure/api/cdragon");
+                data = {};
+                const champKeys = Object.values(champsData).map(c => c.key);
+                for (let i = 0; i < champKeys.length; i += 20) {
+                    const chunk = champKeys.slice(i, i + 20);
+                    await Promise.all(chunk.map(async (key) => {
+                        const res = await cdragon.getChampionDetail(key);
+                        if (res && res.playstyleInfo) {
+                            data[key] = res.playstyleInfo;
+                        }
+                    }));
+                }
+                await writeJson(cachePath, data);
+            }
+            return data;
+        };
+
         let champs, items, spells, runes;
         try {
             [champs, items, spells, runes] = await Promise.all([
@@ -79,6 +101,9 @@ class AssetManager {
             );
         });
 
+        // Also fetch CDragon playstyle stats for the analytics engine
+        const playstyles = await fetchCDragonPlaystyles(champs.data);
+
         this.cached = {
             champMap,
             itemData: items.data,
@@ -86,6 +111,7 @@ class AssetManager {
             perkMap,
             styleMap,
             champData: champs.data,
+            playstyles,
             ddragonVersion: v,
         };
 

@@ -301,6 +301,22 @@ class ImportManager {
             return false;
         }
     }
+
+    /**
+     * Remove a file from the exports folder.
+     * @param {string} fileName
+     */
+    static async removeFromExports(fileName) {
+        const filePath = path.join(STORAGE.EXPORTS, fileName);
+        try {
+            await fs.unlink(filePath);
+            Logger.info(`Removed export ${fileName} from exports folder.`);
+            return true;
+        } catch (e) {
+            Logger.error(`Failed to remove export ${fileName}: ${e.message}`);
+            return false;
+        }
+    }
 }
 
 module.exports = ImportManager;

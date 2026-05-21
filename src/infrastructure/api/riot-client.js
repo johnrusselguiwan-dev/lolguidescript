@@ -103,6 +103,24 @@ class RiotClient {
                     throw new Error(`HTTP ${res.status}: ${errorBody}`);
                 }
 
+                // Proactive Rate Limiting
+                const limitCount = res.headers.get("x-app-rate-limit-count");
+                const limit = res.headers.get("x-app-rate-limit");
+                if (limitCount && limit) {
+                    const counts = limitCount.split(',');
+                    const limits = limit.split(',');
+                    for (let j = 0; j < counts.length && j < limits.length; j++) {
+                        const current = parseInt(counts[j].split(':')[0]);
+                        const max = parseInt(limits[j].split(':')[0]);
+                        // If within 5 requests of the limit, add a preemptive sleep to avoid 429
+                        if (current >= max - 5) {
+                            Logger.warn(`Proactive Rate Limit triggered (${current}/${max}). Resting 2000ms...`);
+                            await sleep(2000);
+                            break;
+                        }
+                    }
+                }
+
                 return await res.json();
             } catch (err) {
                 if (err.message === "API_KEY_INVALID" || err.message === "BLACKLISTED") throw err;

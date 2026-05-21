@@ -28,6 +28,8 @@ class Crawler {
         this.client = new RiotClient(process.env.RIOT_API_KEY);
         this.isPaused = false;
         this.isRestarting = false;
+        this.isStopped = false;
+        this.etaStr = "N/A";
 
         // Session tracking for ETA
         this.sessionStartTime = null;
@@ -42,6 +44,11 @@ class Crawler {
 
         this.shortcutsEnabled = false;
         this.setupKeyboardListener();
+    }
+
+    stop() {
+        this.isStopped = true;
+        Logger.info("Crawler graceful stop requested...");
     }
 
     /**
@@ -213,7 +220,7 @@ class Crawler {
         }
 
         // ── Crawl loop ──────────────────────────────────────────────────
-        while (state.rankIndex < rankEnd) {
+        while (state.rankIndex < rankEnd && !this.isStopped) {
             if (this.isRestarting) {
                 state.rankIndex = rankStart;
                 state.currentMatches = 0;
@@ -265,6 +272,7 @@ class Crawler {
                 const etaMins = Math.floor((etaMs % 3600000) / 60000);
                 etaStr = `~${etaHours}h ${etaMins}m`;
             }
+            this.etaStr = etaStr;
 
             const percent = (state.currentMatches / CRAWLER.TARGET_MATCHES_PER_RANK) * 100;
             const bar = this.getProgressBar(percent);
@@ -373,11 +381,11 @@ class Crawler {
             anyPlayersFound = true;
 
             for (const player of players) {
-                if (this.isPaused || this.isRestarting) break;
+                if (this.isPaused || this.isRestarting || this.isStopped) break;
                 const fourteenDaysAgoMs = Date.now() - (14 * 24 * 60 * 60 * 1000);
                 const matches = await this.client.getMatchIds(player.puuid, matchRegion, { startTime: fourteenDaysAgoMs });
                 for (const mid of matches) {
-                    if (this.isPaused || this.isRestarting) break;
+                    if (this.isPaused || this.isRestarting || this.isStopped) break;
 
                     const seenLocallyOrCloud = await MatchRegistry.isSeen(mid);
                     if (seenLocallyOrCloud) continue;
@@ -555,6 +563,7 @@ class Crawler {
     async interruptibleSleep(ms) {
         const start = Date.now();
         while (Date.now() - start < ms) {
+            if (this.isStopped) break;
             if (this.isPaused) { await sleep(500); continue; }
             await sleep(500);
         }

@@ -59,6 +59,7 @@ class AnalyticsEngine {
                         counters: {},
                         synergies: {},
                         lanes: {},
+                        laneStats: {},
                         scaling: {
                             "15": { games: 0, wins: 0, count: 0 },
                             "20": { games: 0, wins: 0, count: 0 },
@@ -115,6 +116,10 @@ class AnalyticsEngine {
                     "3175": "3020"  // Spellslinger's Shoes -> Sorcerer's Shoes
                 };
 
+                const lane = (p.teamPosition && p.teamPosition !== "INVALID" && p.teamPosition !== "") ? p.teamPosition : "UNKNOWN";
+                if (!s.laneStats[lane]) s.laneStats[lane] = { items: {}, games: 0 };
+                s.laneStats[lane].games += weight;
+
                 [p.item0, p.item1, p.item2, p.item3, p.item4, p.item5].forEach((id) => {
                     let normalizedId = id ? String(id) : null;
                     if (normalizedId && BOOT_DOWNGRADE_MAP[normalizedId]) {
@@ -122,6 +127,7 @@ class AnalyticsEngine {
                     }
                     if (normalizedId && assets.itemData[normalizedId] && this.isCompletedItem(assets.itemData[normalizedId])) {
                         s.items[normalizedId] = (s.items[normalizedId] || 0) + weight;
+                        s.laneStats[lane].items[normalizedId] = (s.laneStats[lane].items[normalizedId] || 0) + weight;
                     }
                 });
 
@@ -138,7 +144,7 @@ class AnalyticsEngine {
                 // Skill order
                 const tl = timelines[m.metadata.matchId];
                 if (tl) {
-                    const seq = this.parseSkills(tl, p.participantId);
+                    const seq = this.parseSkills(tl, p.participantId, p.championId);
                     if (seq) s.skills[seq] = (s.skills[seq] || 0) + weight;
                 }
             }
@@ -174,7 +180,8 @@ class AnalyticsEngine {
         return true;
     }
 
-    static parseSkills(timeline, pid) {
+    static parseSkills(timeline, pid, championId) {
+        if (championId === 523) return null; // Aphelios doesn't level skills normally
         const s = [];
         const m = { 1: "Q", 2: "W", 3: "E", 4: "R" };
         timeline.info.frames.forEach((f) =>
@@ -254,43 +261,64 @@ class AnalyticsEngine {
                     BOTTOM: "Bottom Lane",
                     UTILITY: "Support",
                 };
-                const lanesArray = Object.entries(s.lanes)
+                const lanesKeys = Object.entries(s.lanes)
                     .sort((a, b) => b[1] - a[1])
-                    .map((l) => LANE_LABELS[l[0]] || l[0]);
-
-                const rawItems = Object.entries(s.items).sort((a, b) => b[1] - a[1]);
+                    .map((l) => l[0]);
+                const lanesArray = lanesKeys.map(l => LANE_LABELS[l] || l);
                 
-                // Separate boots and legendary items
-                const isBoots = (itemId) => Object.values(assets.itemData[itemId]?.tags || {}).includes("Boots");
-                const allBoots = rawItems.filter(i => isBoots(i[0])).map(i => assets.itemData[i[0]]?.name).filter(Boolean);
-                const nonBoots = rawItems.filter(i => !isBoots(i[0])).map(i => assets.itemData[i[0]]?.name).filter(Boolean);
+                const primaryLane = lanesKeys[0] || "UNKNOWN";
                 
-                const bootsName = allBoots[0] || null;
+                let secondaryLane = null;
+                if (lanesKeys.length > 1) {
+                    const secondaryLaneCount = s.lanes[lanesKeys[1]];
+                    if (secondaryLaneCount / Math.max(s.games, 1) > 0.10) {
+                        secondaryLane = lanesKeys[1];
+                    }
+                }
 
-                let nonBootsIdx = 0;
-                let bootsIdx = 1;
-
-                const makeBuild = () => {
-                    const items = nonBoots.slice(nonBootsIdx, nonBootsIdx + 5);
-                    nonBootsIdx += 5;
+                const createBuildFromItems = (itemDict, variation = 0) => {
+                    const rawItems = Object.entries(itemDict || {}).sort((a, b) => b[1] - a[1]);
+                    const isBoots = (itemId) => Object.values(assets.itemData[itemId]?.tags || {}).includes("Boots");
+                    const allBoots = rawItems.filter(i => isBoots(i[0])).map(i => assets.itemData[i[0]]?.name).filter(Boolean);
+                    const nonBoots = rawItems.filter(i => !isBoots(i[0])).map(i => assets.itemData[i[0]]?.name).filter(Boolean);
                     
-                    const spareItems = [];
-                    // Allow at most 1 spare boots item per build
-                    if (bootsIdx < allBoots.length) {
-                        spareItems.push(allBoots[bootsIdx]);
-                        bootsIdx++;
+                    let bootsName = allBoots[0] || null;
+                    let items = [];
+                    let spareItems = [];
+
+                    if (variation === 0) {
+                        items = nonBoots.slice(0, 5);
+                        spareItems = nonBoots.slice(5, 7);
+                        if (allBoots[1]) spareItems.push(allBoots[1]);
+                    } else if (variation === 1) {
+                        bootsName = allBoots[1] || allBoots[0] || null;
+                        items = [nonBoots[0], nonBoots[1], nonBoots[2], nonBoots[5] || nonBoots[3], nonBoots[6] || nonBoots[4]].filter(Boolean);
+                        spareItems = nonBoots.filter(i => !items.includes(i)).slice(0, 2);
+                        if (allBoots[0] && allBoots[0] !== bootsName) spareItems.push(allBoots[0]);
+                    } else {
+                        bootsName = allBoots[0] || null;
+                        items = [nonBoots[0], nonBoots[3], nonBoots[4], nonBoots[7] || nonBoots[5], nonBoots[8] || nonBoots[6]].filter(Boolean);
+                        spareItems = nonBoots.filter(i => !items.includes(i)).slice(0, 2);
+                        if (allBoots[1]) spareItems.push(allBoots[1]);
                     }
-                    // Fill the rest with legendary items
-                    if (nonBootsIdx < nonBoots.length) {
-                        spareItems.push(nonBoots[nonBootsIdx]);
-                        nonBootsIdx++;
+
+                    while (items.length < 5 && spareItems.length > 0) {
+                        items.push(spareItems.shift());
                     }
-                    if (spareItems.length < 2 && nonBootsIdx < nonBoots.length) {
-                        spareItems.push(nonBoots[nonBootsIdx]);
-                        nonBootsIdx++;
-                    }
+
                     return { boots: bootsName, items, spareItems };
                 };
+
+                const build1 = createBuildFromItems(s.laneStats[primaryLane]?.items || s.items, 0);
+                const build2 = secondaryLane 
+                    ? createBuildFromItems(s.laneStats[secondaryLane]?.items, 0)
+                    : createBuildFromItems(s.laneStats[primaryLane]?.items || s.items, 1);
+                const build3 = secondaryLane
+                    ? createBuildFromItems(s.laneStats[primaryLane]?.items || s.items, 1)
+                    : createBuildFromItems(s.laneStats[primaryLane]?.items || s.items, 2);
+
+                const cKey = String(s.id); // Get the numerical key like "266" for Aatrox
+                const playstyle = (assets.playstyles && assets.playstyles[cKey]) ? assets.playstyles[cKey] : {};
 
                 return {
                     id: hero,
@@ -303,12 +331,17 @@ class AnalyticsEngine {
                     pickRate: +pickRate.toFixed(2),
                     banRate: +banRate.toFixed(2),
                     games: s.games,
+                    playstyleDamage: playstyle.damage !== undefined ? playstyle.damage : 2,
+                    playstyleDurability: playstyle.durability !== undefined ? playstyle.durability : 2,
+                    playstyleCrowdControl: playstyle.crowdControl !== undefined ? playstyle.crowdControl : 1,
+                    playstyleMobility: playstyle.mobility !== undefined ? playstyle.mobility : 1,
+                    playstyleUtility: playstyle.utility !== undefined ? playstyle.utility : 1,
                     lanes: lanesArray,
-                    builds: [makeBuild(), makeBuild(), makeBuild()],
+                    builds: [build1, build2, build3],
                     loadout: {
                         spells: getTop(s.spells),
                         runes: getTop(s.runes),
-                        skills: this.parseSkillSequence(getTop(s.skills)),
+                        skills: this.parseSkillSequence(this.getConsensusSkillSequence(s.skills)),
                     },
                     drafting: {
                         strongAgainst: Object.fromEntries(
@@ -337,6 +370,45 @@ class AnalyticsEngine {
                 };
             })
             .sort((a, b) => b.score - a.score);
+    }
+
+    /**
+     * Builds a consensus skill sequence by finding the most frequent skill chosen at each level.
+     * This prevents truncated skill sequences caused by games ending at different levels.
+     */
+    static getConsensusSkillSequence(skillsMap) {
+        let levelCounts = Array.from({ length: 18 }, () => ({ Q: 0, W: 0, E: 0, R: 0 }));
+        let totalGamesAtLevel = Array.from({ length: 18 }, () => 0);
+        
+        for (const [seqStr, weight] of Object.entries(skillsMap)) {
+            if (!seqStr || seqStr === "N/A") continue;
+            const skills = seqStr.split('->');
+            for (let i = 0; i < skills.length; i++) {
+                if (i >= 18) break;
+                const sk = skills[i];
+                if (levelCounts[i][sk] !== undefined) {
+                    levelCounts[i][sk] += weight;
+                    totalGamesAtLevel[i] += weight;
+                }
+            }
+        }
+        
+        const consensus = [];
+        for (let i = 0; i < 18; i++) {
+            if (totalGamesAtLevel[i] === 0) break;
+            
+            let maxSkill = '?';
+            let maxWeight = -1;
+            for (const [sk, weight] of Object.entries(levelCounts[i])) {
+                if (weight > maxWeight) {
+                    maxWeight = weight;
+                    maxSkill = sk;
+                }
+            }
+            consensus.push(maxSkill);
+        }
+        
+        return consensus.length > 0 ? consensus.join('->') : "N/A";
     }
 
     /**

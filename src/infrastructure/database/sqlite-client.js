@@ -187,7 +187,12 @@ class Database {
         if (stripTimeline && timeline && timeline.info) {
             savedTimeline = JSON.parse(JSON.stringify(timeline)); // clone
             savedTimeline.info.frames = timeline.info.frames.map(f => ({
-                events: (f.events || []).filter(e => e.type === "SKILL_LEVEL_UP")
+                events: (f.events || []).filter(e => 
+                    e.type === "SKILL_LEVEL_UP" || 
+                    e.type === "CHAMPION_KILL" || 
+                    e.type === "BUILDING_KILL" || 
+                    e.type === "ELITE_MONSTER_KILL"
+                )
             }));
             // Remove huge metadata/participant fields if not needed
             delete savedTimeline.metadata;

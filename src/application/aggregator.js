@@ -220,6 +220,12 @@ class GlobalAggregator {
         } else {
             Logger.warn(`No data found in database to aggregate for region: ${regionLabel}.`);
         }
+
+        return {
+            patch: activePatch,
+            isFallback: isFallback,
+            matches: totalRanked
+        };
     }
 }
 

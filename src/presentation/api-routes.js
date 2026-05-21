@@ -62,6 +62,7 @@ router.get('/status', async (req, res) => {
         const state = await readJson(STORAGE.CRAWL_STATE, {});
         res.json({
             isRunning: !!activeCrawler,
+            eta: activeCrawler ? activeCrawler.etaStr : "N/A",
             state: state
         });
     } catch (e) {
@@ -151,9 +152,9 @@ router.post('/action/crawl/start', async (req, res) => {
 
 router.post('/action/crawl/stop', async (req, res) => {
     if (activeCrawler) {
-        activeCrawler.isPaused = true;
+        activeCrawler.stop();
         activeCrawler = null; 
-        res.json({ message: "Crawler stopped/detached" });
+        res.json({ message: "Crawler stopped gracefully" });
     } else {
         res.status(400).json({ error: "Crawler is not running" });
     }
@@ -166,8 +167,10 @@ router.post('/action/aggregate', async (req, res) => {
         const { region = 'all' } = req.body || {};
         const regionLabel = region === 'all' ? 'Global' : region;
         Logger.info(`Aggregation requested for region: ${regionLabel}`);
-        await GlobalAggregator.mergeAll(false, region);
-        res.json({ message: `Aggregation complete (${regionLabel})` });
+        const result = await GlobalAggregator.mergeAll(false, region);
+        let msg = `Aggregation complete (${regionLabel}). Patch: ${result.patch}`;
+        if (result.isFallback) msg += " [FALLBACK PATCH USED]";
+        res.json({ message: msg, result });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -188,16 +191,20 @@ router.post('/action/publish', async (req, res) => {
         }
 
         const uploadResult = await uploadTierData(meta, rating, drafting, scaling || [], region);
-        
-        // Auto bump version for ALL environments
-        if (uploadResult && uploadResult.rcFields && uploadResult.rcFields.length > 0) {
-            await incrementVersionFields(uploadResult.rcFields, { 
-                latestPatch: uploadResult.patch, 
-                environment: "ALL" 
-            });
-        }
-
         res.json({ message: `Publish complete (${regionLabel})`, result: uploadResult });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+router.post('/action/bump-version', async (req, res) => {
+    try {
+        const { rcFields, patch, environment = 'ALL' } = req.body || {};
+        if (!rcFields || rcFields.length === 0) {
+            return res.status(400).json({ error: "Missing rcFields" });
+        }
+        await incrementVersionFields(rcFields, { latestPatch: patch, environment });
+        res.json({ message: `Remote config bumped for ${environment} environment` });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -354,6 +361,22 @@ router.delete('/data/import/:filename', async (req, res) => {
             res.json({ message: `Removed ${req.params.filename}` });
         } else {
             res.status(500).json({ error: `Failed to remove ${req.params.filename}` });
+        }
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+/**
+ * DELETE /data/export/:filename — Remove an exported file from the exports folder
+ */
+router.delete('/data/export/:filename', async (req, res) => {
+    try {
+        const ok = await ImportManager.removeFromExports(req.params.filename);
+        if (ok) {
+            res.json({ message: `Removed export ${req.params.filename}` });
+        } else {
+            res.status(500).json({ error: `Failed to remove export ${req.params.filename}` });
         }
     } catch (e) {
         res.status(500).json({ error: e.message });

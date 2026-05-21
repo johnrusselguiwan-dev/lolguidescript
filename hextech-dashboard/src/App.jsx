@@ -28,7 +28,7 @@ function App() {
         const statusRes = await apiGet('/status');
         if (statusRes.ok) {
           setIsRunning(statusRes.data.isRunning);
-          setStatus(statusRes.data.state);
+          setStatus({ ...statusRes.data.state, eta: statusRes.data.eta });
         }
 
         const logRes = await apiGet('/logs');

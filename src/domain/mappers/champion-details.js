@@ -29,7 +29,7 @@ const transformIcons = {
     ]
 };
 
-function buildDetailEntry(raw, meta, version) {
+function buildDetailEntry(raw, meta, version, cdragonRaw) {
     const id = raw.id;
     const isShapeshifter = ["Nidalee", "Jayce", "Elise", "Gnar"].includes(id);
 
@@ -62,6 +62,8 @@ function buildDetailEntry(raw, meta, version) {
         }
     });
 
+    const playstyle = (cdragonRaw && cdragonRaw.playstyleInfo) ? cdragonRaw.playstyleInfo : (meta.playstyle || {});
+
     const detailEntry = {
         id: raw.id,
         championId: parseInt(raw.key, 10),
@@ -80,11 +82,11 @@ function buildDetailEntry(raw, meta, version) {
         defense: raw.info.defense,
         magic: raw.info.magic,
         difficulty: raw.info.difficulty,
-        playstyleDamage: meta.playstyle ? meta.playstyle.damage : 2,
-        playstyleDurability: meta.playstyle ? meta.playstyle.durability : 2,
-        playstyleCrowdControl: meta.playstyle ? meta.playstyle.crowdControl : 1,
-        playstyleMobility: meta.playstyle ? meta.playstyle.mobility : 1,
-        playstyleUtility: meta.playstyle ? meta.playstyle.utility : 1,
+        playstyleDamage: playstyle.damage !== undefined ? playstyle.damage : 2,
+        playstyleDurability: playstyle.durability !== undefined ? playstyle.durability : 2,
+        playstyleCrowdControl: playstyle.crowdControl !== undefined ? playstyle.crowdControl : 1,
+        playstyleMobility: playstyle.mobility !== undefined ? playstyle.mobility : 1,
+        playstyleUtility: playstyle.utility !== undefined ? playstyle.utility : 1,
         hp: raw.stats.hp,
         mp: raw.stats.mp,
         attackDamage: raw.stats.attackdamage,

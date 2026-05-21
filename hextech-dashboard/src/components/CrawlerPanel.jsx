@@ -264,6 +264,11 @@ function CrawlerPanel({ isRunning, status, addLog }) {
                 <div className="progress-header">
                     <span>{getRankText()}</span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {status && status.eta && status.eta !== "N/A" && (
+                            <span className="eta-badge" style={{ background: 'rgba(200,155,60,0.2)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.85em', color: '#c89b3c', border: '1px solid #c89b3c' }}>
+                                ETA: {status.eta}
+                            </span>
+                        )}
                         <span>{status ? `${status.currentMatches || 0} / 100` : '0 / 100'}</span>
                         <span className="info-icon" style={{ marginLeft: 0 }} title="Current crawling progress and rank being fetched.">i</span>
                     </span>

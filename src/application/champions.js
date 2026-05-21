@@ -3,6 +3,7 @@
  */
 
 const { api } = require("../infrastructure/api/ddragon");
+const { cdragon } = require("../infrastructure/api/cdragon");
 const { buildDetailEntry } = require("../domain/mappers/champion-details");
 const { buildListEntry } = require("../domain/mappers/champion-list");
 const { loadLocalMetadata } = require("../infrastructure/utils/metadata");
@@ -26,9 +27,10 @@ async function fetchAndProcessChampions(version) {
 
         const chunkPromises = chunkKeys.map(async (id) => {
             const raw = await api.getChampionDetail(version, id);
+            const cdragonRaw = await cdragon.getChampionDetail(raw.key);
             const meta = metaMap[raw.key] || { lanes: ["Unknown"], region: "Runeterra" };
 
-            const detailEntry = buildDetailEntry(raw, meta, version);
+            const detailEntry = buildDetailEntry(raw, meta, version, cdragonRaw);
             const listEntry = buildListEntry(detailEntry);
 
             detailEntry.patchVersion = version;

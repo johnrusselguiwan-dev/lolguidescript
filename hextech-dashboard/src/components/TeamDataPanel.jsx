@@ -156,11 +156,47 @@ function TeamDataPanel({ addLog }) {
     const handleRemoveFile = async (fileName) => {
         try {
             const res = await fetch(`/api/data/import/${encodeURIComponent(fileName)}`, { method: 'DELETE' });
-            const data = await res.json();
-            addLog(data.message || `Removed ${fileName}`, 'info');
-            loadImportBin();
+            const contentType = res.headers.get("content-type");
+            let errorMsg = "";
+            if (contentType && contentType.includes("application/json")) {
+                const data = await res.json();
+                if (res.ok) {
+                    addLog(data.message || `Removed ${fileName}`, 'info');
+                    loadImportBin();
+                    return;
+                }
+                errorMsg = data.error || data.message;
+            } else {
+                const text = await res.text();
+                errorMsg = text.replace(/<[^>]*>/g, '').trim().substring(0, 100);
+            }
+            throw new Error(errorMsg || `Server returned status ${res.status}`);
         } catch (e) {
-            addLog(`Failed to remove ${fileName}`, 'error');
+            addLog(`Failed to remove ${fileName}: ${e.message}`, 'error');
+        }
+    };
+
+    const handleRemoveExport = async (fileName) => {
+        try {
+            const res = await fetch(`/api/data/export/${encodeURIComponent(fileName)}`, { method: 'DELETE' });
+            const contentType = res.headers.get("content-type");
+            let errorMsg = "";
+            if (contentType && contentType.includes("application/json")) {
+                const data = await res.json();
+                if (res.ok) {
+                    addLog(data.message || `Removed export ${fileName}`, 'info');
+                    loadExports();
+                    loadDbStats();
+                    return;
+                }
+                errorMsg = data.error || data.message;
+            } else {
+                const text = await res.text();
+                errorMsg = text.replace(/<[^>]*>/g, '').trim().substring(0, 100);
+            }
+            throw new Error(errorMsg || `Server returned status ${res.status}`);
+        } catch (e) {
+            addLog(`Failed to remove export ${fileName}: ${e.message}`, 'error');
         }
     };
 
@@ -250,9 +286,17 @@ function TeamDataPanel({ addLog }) {
                                             href={`/api/data/exports/${f.fileName}`}
                                             download
                                             className="download-link-sm"
+                                            title="Download export"
                                         >
                                             ⬇
                                         </a>
+                                        <button
+                                            className="file-remove"
+                                            onClick={(e) => { e.stopPropagation(); handleRemoveExport(f.fileName); }}
+                                            title="Remove export"
+                                        >
+                                            ✕
+                                        </button>
                                     </div>
                                 ))}
                             </div>
