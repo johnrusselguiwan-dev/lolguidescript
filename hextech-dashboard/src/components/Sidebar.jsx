@@ -1,4 +1,5 @@
 import React from 'react';
+import PatchCountdown from './PatchCountdown';
 
 function Sidebar({ activeTab, setActiveTab }) {
     return (
@@ -26,6 +27,7 @@ function Sidebar({ activeTab, setActiveTab }) {
                     📦 Data Processing
                 </button>
             </nav>
+            <PatchCountdown />
         </aside>
     );
 }
