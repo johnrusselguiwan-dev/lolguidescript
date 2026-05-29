@@ -55,7 +55,7 @@ body {
 }
 
 #root {
-  width: 1126px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -166,3 +166,158 @@ code {
   50% { left: 25%; width: 50%; }
   100% { left: 100%; width: 50%; }
 }
+
+/* Analytics Panel & Hex Table */
+.analytics-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.analytics-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 24px;
+  gap: 16px;
+}
+
+.hex-input {
+  background: rgba(9, 20, 28, 0.6);
+  border: 1px solid #c89b3c;
+  color: #f0e6d2;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 14px;
+  outline: none;
+  min-width: 250px;
+  transition: all 0.2s;
+}
+
+.hex-input:focus {
+  border-color: #f0e6d2;
+  box-shadow: 0 0 8px rgba(200, 155, 60, 0.4);
+}
+
+.analytics-meta {
+  color: #a09b8c;
+  font-size: 14px;
+}
+
+.analytics-meta strong {
+  color: #c89b3c;
+}
+
+.table-container {
+  overflow-y: auto;
+  flex: 1;
+  border-top: 1px solid rgba(200, 155, 60, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.hex-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.hex-table th {
+  background: rgba(9, 20, 28, 0.8);
+  color: #c89b3c;
+  padding: 12px 16px;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 2px solid #c89b3c;
+  user-select: none;
+}
+
+.hex-table th.sortable {
+  cursor: pointer;
+}
+
+.hex-table th.sortable:hover {
+  background: rgba(200, 155, 60, 0.1);
+  color: #f0e6d2;
+}
+
+.hex-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(200, 155, 60, 0.1);
+  color: #a09b8c;
+  font-size: 15px;
+}
+
+.hex-table tbody tr:hover td {
+  background: rgba(200, 155, 60, 0.05);
+  color: #f0e6d2;
+}
+
+.champ-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.champ-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #c89b3c;
+}
+
+.champ-name {
+  font-weight: bold;
+  color: #f0e6d2;
+}
+
+.score-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.score-badge.s-tier {
+  background: rgba(200, 155, 60, 0.2);
+  color: #f0e6d2;
+  border: 1px solid #c89b3c;
+}
+
+.score-badge.a-tier {
+  color: #c89b3c;
+}
+
+.score-badge.b-tier {
+  color: #a09b8c;
+}
+
+.positive-rate {
+  color: #0397ab !important;
+  font-weight: bold;
+}
+
+.negative-rate {
+  color: #c64242 !important;
+}
+
+.role-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.role-tag {
+  background: rgba(9, 20, 28, 0.6);
+  border: 1px solid rgba(200, 155, 60, 0.3);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #a09b8c;
+}
+

@@ -7,6 +7,7 @@ import ApiKeyForm from './components/ApiKeyForm';
 import CrawlerPanel from './components/CrawlerPanel';
 import TeamDataPanel from './components/TeamDataPanel';
 import ProcessingPanel from './components/ProcessingPanel';
+import AnalyticsPanel from './components/AnalyticsPanel';
 import LogViewer from './components/LogViewer';
 import { apiGet } from './hooks/useApi';
 
@@ -14,6 +15,12 @@ function App() {
   const [activeTab, setActiveTab] = useState('collection');
   const [isRunning, setIsRunning] = useState(false);
   const [status, setStatus] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isMerging, setIsMerging] = useState(false);
+  const [isAggregating, setIsAggregating] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [sidebarNotification, setSidebarNotification] = useState(null);
   const [logs, setLogs] = useState([{ msg: "Dashboard initialized. Welcome.", type: "info" }]);
 
   /** Client-side log entry for immediate feedback before server confirms */
@@ -45,7 +52,17 @@ function App() {
 
   return (
     <div className="dashboard">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        isUploading={isUploading} 
+        isMerging={isMerging}
+        isAggregating={isAggregating}
+        isPublishing={isPublishing}
+        isSyncing={isSyncing}
+        sidebarNotification={sidebarNotification}
+        setSidebarNotification={setSidebarNotification}
+      />
 
       <main className="content">
         <header>
@@ -64,14 +81,33 @@ function App() {
         )}
 
         {activeTab === 'teamdata' && (
-          <TeamDataPanel addLog={addLog} />
+          <TeamDataPanel 
+            addLog={addLog} 
+            isUploading={isUploading} 
+            setIsUploading={setIsUploading} 
+            isMerging={isMerging} 
+            setIsMerging={setIsMerging} 
+          />
         )}
 
         {activeTab === 'processing' && (
-          <ProcessingPanel addLog={addLog} />
+          <ProcessingPanel 
+            addLog={addLog}
+            isAggregating={isAggregating}
+            setIsAggregating={setIsAggregating}
+            isPublishing={isPublishing}
+            setIsPublishing={setIsPublishing}
+            isSyncing={isSyncing}
+            setIsSyncing={setIsSyncing}
+            setSidebarNotification={setSidebarNotification}
+          />
         )}
 
-        <LogViewer logs={logs} />
+        {activeTab === 'analytics' && (
+          <AnalyticsPanel addLog={addLog} isAggregating={isAggregating} />
+        )}
+
+        {activeTab !== 'analytics' && <LogViewer logs={logs} />}
       </main>
     </div>
   );

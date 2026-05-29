@@ -211,29 +211,48 @@ router.post('/action/bump-version', async (req, res) => {
 });
 
 
-router.post('/action/sync-assets', (req, res) => {
-    const syncProcess = spawn('node', [path.join(__dirname, '../application/sync-master.js'), '--auto']);
+router.post('/action/sync-assets', async (req, res) => {
+    try {
+        await new Promise((resolve, reject) => {
+            const syncProcess = spawn('node', [path.join(__dirname, '../application/sync-master.js'), '--auto']);
 
-    syncProcess.stdout.on('data', (data) => {
-        Logger.info(`Sync: ${data.toString().trim()}`);
-    });
+            syncProcess.stdout.on('data', (data) => {
+                Logger.info(`Sync: ${data.toString().trim()}`);
+            });
 
-    syncProcess.stderr.on('data', (data) => {
-        Logger.error(`Sync error: ${data.toString().trim()}`);
-    });
+            syncProcess.stderr.on('data', (data) => {
+                Logger.error(`Sync error: ${data.toString().trim()}`);
+            });
 
-    syncProcess.on('close', (code) => {
-        if (code === 0) {
-            Logger.success("Asset sync completed.");
-        } else {
-            Logger.warn(`Asset sync exited with code ${code}`);
-        }
-    });
-
-    res.json({ message: "Asset sync started in background" });
+            syncProcess.on('close', (code) => {
+                if (code === 0) {
+                    Logger.success("Asset sync completed.");
+                    resolve();
+                } else {
+                    Logger.warn(`Asset sync exited with code ${code}`);
+                    reject(new Error(`Sync failed with code ${code}`));
+                }
+            });
+        });
+        res.json({ message: "Asset sync completed successfully" });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
-// ── Team Data: Export & Import ───────────────────────────────────────────────
+// ── Team Data & Analytics ────────────────────────────────────────────────────
+
+/**
+ * GET /data/analytics/summary — Returns the latest aggregated champion stats
+ */
+router.get('/data/analytics/summary', async (req, res) => {
+    try {
+        const rating = await readJson(STORAGE.RATES_SUMMARY);
+        res.json({ data: rating || [] });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
 
 /**
  * GET /data/db-stats — Database statistics for the Team Data panel

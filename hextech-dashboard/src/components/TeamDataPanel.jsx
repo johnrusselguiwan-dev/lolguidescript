@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from 'react-hextech';
 import { apiGet, apiPost } from '../hooks/useApi';
 
-function TeamDataPanel({ addLog }) {
+function TeamDataPanel({ addLog, isUploading, setIsUploading, isMerging, setIsMerging }) {
     // DB Stats
     const [dbStats, setDbStats] = useState(null);
 
@@ -13,8 +13,6 @@ function TeamDataPanel({ addLog }) {
 
     // Import state
     const [importFiles, setImportFiles] = useState([]);
-    const [isUploading, setIsUploading] = useState(false);
-    const [isMerging, setIsMerging] = useState(false);
     const [mergeResult, setMergeResult] = useState(null);
     const [isDragOver, setIsDragOver] = useState(false);
 
@@ -414,18 +412,6 @@ function TeamDataPanel({ addLog }) {
                     </div>
                 </div>
             </div>
-
-            {/* Floating Progress */}
-            {(isUploading || isMerging) && (
-                <div className="import-progress-float">
-                    <div className="import-progress-text">
-                        {isUploading ? '⏳ Uploading Files...' : '🔄 Merging Data...'}
-                    </div>
-                    <div className="import-progress-bar">
-                        <div className="import-progress-fill"></div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

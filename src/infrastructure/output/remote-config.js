@@ -131,7 +131,7 @@ async function incrementVersionFields(fieldNames, options = {}) {
         // ── Apply to each conditional value (Debug, Staging) ─────────────
         if (param.conditionalValues) {
             for (const [conditionName, condValue] of Object.entries(param.conditionalValues)) {
-                if (targetEnv === "ALL" || targetEnv === conditionName) {
+                if (targetEnv === "ALL" || targetEnv.toUpperCase() === conditionName.toUpperCase()) {
                     const config = JSON.parse(condValue.value);
                     applyIncrements(config, conditionName);
                     condValue.value = JSON.stringify(config, null, 2);
