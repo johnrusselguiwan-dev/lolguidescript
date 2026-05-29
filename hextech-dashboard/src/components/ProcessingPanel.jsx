@@ -8,6 +8,11 @@ function ProcessingPanel({ addLog }) {
     const [publishRegion, setPublishRegion] = useState('all');
     const [fallbackWarning, setFallbackWarning] = useState(false);
     
+    // Loading States
+    const [isAggregating, setIsAggregating] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
+
     // Modal State
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', action: null });
     const [bumpModal, setBumpModal] = useState({ isOpen: false, rcFields: [], patch: '', environment: 'ALL' });
@@ -28,6 +33,15 @@ function ProcessingPanel({ addLog }) {
     }, []);
 
     const handleAggregate = async () => {
+        if (isAggregating || isPublishing || isSyncing) {
+            setModal({
+                isOpen: true,
+                title: 'Action Blocked',
+                message: 'Another process is currently running. Please wait for it to finish before starting a new one.',
+                action: null
+            });
+            return;
+        }
         const regionLabel = aggregateRegion === 'all' ? 'Global' : aggregateRegion;
         setModal({
             isOpen: true,
@@ -35,6 +49,7 @@ function ProcessingPanel({ addLog }) {
             message: `Are you sure you want to aggregate data for ${regionLabel}?\n\nThis process may take a few minutes depending on the database size.`,
             action: async () => {
                 setModal({ isOpen: false, title: '', message: '', action: null });
+                setIsAggregating(true);
                 addLog(`Starting data aggregation for ${regionLabel}...`, 'info');
                 try {
                     const { ok, data } = await apiPost('/action/aggregate', { region: aggregateRegion });
@@ -43,11 +58,21 @@ function ProcessingPanel({ addLog }) {
                 } catch (err) {
                     addLog(`Error: ${err.message}`, 'error');
                 }
+                setIsAggregating(false);
             }
         });
     };
 
     const handlePublish = async () => {
+        if (isAggregating || isPublishing || isSyncing) {
+            setModal({
+                isOpen: true,
+                title: 'Action Blocked',
+                message: 'Another process is currently running. Please wait for it to finish before starting a new one.',
+                action: null
+            });
+            return;
+        }
         const regionLabel = publishRegion === 'all' ? 'Global' : publishRegion;
         setModal({
             isOpen: true,
@@ -55,6 +80,7 @@ function ProcessingPanel({ addLog }) {
             message: `Are you sure you want to publish data for ${regionLabel} to Firebase?\n\nThis will overwrite live data in the application.`,
             action: async () => {
                 setModal({ isOpen: false, title: '', message: '', action: null });
+                setIsPublishing(true);
                 addLog(`Starting publish to Firebase for ${regionLabel}...`, 'info');
                 try {
                     const { ok, data } = await apiPost('/action/publish', { region: publishRegion });
@@ -71,17 +97,28 @@ function ProcessingPanel({ addLog }) {
                 } catch (err) {
                     addLog(`Error: ${err.message}`, 'error');
                 }
+                setIsPublishing(false);
             }
         });
     };
 
     const handleSync = async () => {
+        if (isAggregating || isPublishing || isSyncing) {
+            setModal({
+                isOpen: true,
+                title: 'Action Blocked',
+                message: 'Another process is currently running. Please wait for it to finish before starting a new one.',
+                action: null
+            });
+            return;
+        }
         setModal({
             isOpen: true,
             title: 'Confirm Asset Sync',
             message: `Are you sure you want to trigger a background asset sync?\n\nThis will fetch the latest champions, items, and runes from Riot's servers.`,
             action: async () => {
                 setModal({ isOpen: false, title: '', message: '', action: null });
+                setIsSyncing(true);
                 addLog('Triggering background asset sync...', 'info');
                 try {
                     const { ok, data } = await apiPost('/action/sync-assets');
@@ -89,6 +126,7 @@ function ProcessingPanel({ addLog }) {
                 } catch (err) {
                     addLog(`Error: ${err.message}`, 'error');
                 }
+                setIsSyncing(false);
             }
         });
     };
@@ -160,11 +198,13 @@ function ProcessingPanel({ addLog }) {
                         </p>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                             <Button onClick={() => setModal({ isOpen: false, title: '', message: '', action: null })} style={{ background: 'transparent', border: '1px solid #a09b8c', color: '#a09b8c' }}>
-                                Cancel
+                                {modal.action ? 'Cancel' : 'Close'}
                             </Button>
-                            <Button onClick={modal.action}>
-                                Confirm
-                            </Button>
+                            {modal.action && (
+                                <Button onClick={modal.action}>
+                                    Confirm
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -195,7 +235,9 @@ function ProcessingPanel({ addLog }) {
                         </select>
                     </div>
                     <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
-                        <Button onClick={handleAggregate}>Run Aggregation</Button>
+                        <Button onClick={handleAggregate} disabled={isAggregating}>
+                            {isAggregating ? '⏳ Aggregating...' : 'Run Aggregation'}
+                        </Button>
                     </div>
                 </div>
 
@@ -218,7 +260,9 @@ function ProcessingPanel({ addLog }) {
                         </select>
                     </div>
                     <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
-                        <Button onClick={handlePublish}>Publish Data</Button>
+                        <Button onClick={handlePublish} disabled={isPublishing}>
+                            {isPublishing ? '⏳ Publishing...' : 'Publish Data'}
+                        </Button>
                     </div>
                 </div>
 
@@ -227,7 +271,9 @@ function ProcessingPanel({ addLog }) {
                     <h3>Sync Assets</h3>
                     <p>Fetch newest champions, items, and runes</p>
                     <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
-                        <Button onClick={handleSync}>Sync Now</Button>
+                        <Button onClick={handleSync} disabled={isSyncing}>
+                            {isSyncing ? '⏳ Syncing...' : 'Sync Now'}
+                        </Button>
                     </div>
                 </div>
             </div>

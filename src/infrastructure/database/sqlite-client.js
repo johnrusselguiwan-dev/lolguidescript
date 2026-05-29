@@ -62,6 +62,10 @@ class Database {
             `CREATE TABLE IF NOT EXISTS seen_matches (
                 matchId TEXT PRIMARY KEY
             )`,
+            `CREATE TABLE IF NOT EXISTS imported_files (
+                fileName TEXT PRIMARY KEY,
+                importedAt INTEGER
+            )`,
             // Indices for faster aggregation
             `CREATE INDEX IF NOT EXISTS idx_matches_tier ON matches(tier, division)`
         ];

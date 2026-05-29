@@ -2,13 +2,85 @@
  * Riot API client — rate-limited, auto-retrying HTTP wrapper for the
  * League of Legends ranked data endpoints.
  *
- * Uses the native `fetch` API (Node 18+). A per-cycle budget prevents
- * exceeding Riot's rate limits, and exponential back-off handles 429s.
+ * Uses the native `fetch` API (Node 18+). A sliding-window rate limiter
+ * gates every request BEFORE it is sent, ensuring Riot's limits are
+ * never exceeded. Emergency 429 back-off is kept as a safety net.
  */
 
 const { API, CRAWLER, getAllPlatforms } = require("../../../config/constants");
 const Logger = require("../utils/logger");
 const sleep = require("../utils/sleep");
+
+// ── Sliding Window Rate Limiter ────────────────────────────────────────────
+// Tracks request timestamps in two sliding windows matching Riot's dev-key
+// limits (20 req/1s and 100 req/2min). Blocks BEFORE sending if a window
+// is near capacity. This prevents 429s entirely under normal operation.
+
+class SlidingWindowLimiter {
+    constructor() {
+        // Riot Development Key limits:
+        //   - 20 requests per 1 second
+        //   - 100 requests per 2 minutes (120 seconds)
+        this.windows = [
+            { maxRequests: 20, intervalMs: 1000, safeMax: 18, timestamps: [], label: "1s" },
+            { maxRequests: 100, intervalMs: 120000, safeMax: 90, timestamps: [], label: "2min" },
+        ];
+    }
+
+    /**
+     * Block until a request slot is available in ALL windows.
+     * Call this BEFORE every API request.
+     */
+    async waitForSlot() {
+        while (true) {
+            const now = Date.now();
+            let allClear = true;
+            let longestWait = 0;
+            let blockingWindow = null;
+
+            for (const w of this.windows) {
+                // Purge timestamps outside the window
+                w.timestamps = w.timestamps.filter(t => now - t < w.intervalMs);
+
+                if (w.timestamps.length >= w.safeMax) {
+                    allClear = false;
+                    // Calculate how long until the oldest request expires from this window
+                    const oldest = w.timestamps[0];
+                    const waitMs = (oldest + w.intervalMs) - now + 100; // +100ms buffer
+                    if (waitMs > longestWait) {
+                        longestWait = waitMs;
+                        blockingWindow = w;
+                    }
+                }
+            }
+
+            if (allClear) {
+                // Record this request in all windows
+                const ts = Date.now();
+                for (const w of this.windows) {
+                    w.timestamps.push(ts);
+                }
+                return;
+            }
+
+            // Wait for the blocking window to free up
+            const waitSec = (longestWait / 1000).toFixed(1);
+            Logger.info(`⏱ Rate limiter: ${blockingWindow.timestamps.length}/${blockingWindow.safeMax} in ${blockingWindow.label} window. Waiting ${waitSec}s...`);
+            await sleep(Math.max(longestWait, 500));
+        }
+    }
+
+    /**
+     * Get current usage stats for logging/debugging.
+     */
+    getUsage() {
+        const now = Date.now();
+        return this.windows.map(w => {
+            const active = w.timestamps.filter(t => now - t < w.intervalMs).length;
+            return `${active}/${w.safeMax} (${w.label})`;
+        }).join(" | ");
+    }
+}
 
 class RiotClient {
     constructor(apiKey) {
@@ -20,32 +92,25 @@ class RiotClient {
             process.exit(1);
         }
         this.apiKey = apiKey;
-        this.used = 0;
-        this.lastCallTime = 0;
+        this.limiter = new SlidingWindowLimiter();
+        this.requestCount = 0; // lifetime counter for logging only
     }
 
     /**
-     * Core fetch with rate-limit pacing, retry, and budget enforcement.
+     * Core fetch with sliding-window rate limiting, retry, and error handling.
      * @param {string} url — full API URL
      * @returns {Promise<any>} parsed JSON response
      */
     async fetch(url) {
-        if (this.used >= API.MAX_REQUESTS_PER_CYCLE) {
-            throw new Error("BUDGET_EXHAUSTED");
-        }
+        // Wait for a slot in all rate-limit windows BEFORE sending
+        await this.limiter.waitForSlot();
 
-        const elapsed = Date.now() - this.lastCallTime;
-        if (elapsed < API.SAFE_DELAY_MS) {
-            await sleep(API.SAFE_DELAY_MS - elapsed);
-        }
-
-        this.lastCallTime = Date.now();
-        this.used++;
+        this.requestCount++;
 
         // Log the actual API request
         const isMatch = url.includes("/matches/");
         const label = isMatch ? url.split("/").pop() : url;
-        Logger.request(this.used, `Fetching ${label}`);
+        Logger.request(this.requestCount, `Fetching ${label}`);
 
         for (let i = 0; i < API.RETRY_ATTEMPTS; i++) {
             try {
@@ -54,8 +119,10 @@ class RiotClient {
                 });
 
                 if (res.status === 429) {
-                    const wait = (Number(res.headers.get("Retry-After")) || 5) * 1000;
-                    Logger.warn(`API Rate Limit. Resting ${wait}ms...`);
+                    // Emergency fallback — should never happen with the sliding window,
+                    // but kept as a safety net.
+                    const wait = (Number(res.headers.get("Retry-After")) || 10) * 1000;
+                    Logger.warn(`⚠ Emergency 429! Riot says wait ${wait}ms. This should not happen — check limiter config.`);
                     await sleep(wait);
                     continue;
                 }
@@ -101,24 +168,6 @@ class RiotClient {
                     }
 
                     throw new Error(`HTTP ${res.status}: ${errorBody}`);
-                }
-
-                // Proactive Rate Limiting
-                const limitCount = res.headers.get("x-app-rate-limit-count");
-                const limit = res.headers.get("x-app-rate-limit");
-                if (limitCount && limit) {
-                    const counts = limitCount.split(',');
-                    const limits = limit.split(',');
-                    for (let j = 0; j < counts.length && j < limits.length; j++) {
-                        const current = parseInt(counts[j].split(':')[0]);
-                        const max = parseInt(limits[j].split(':')[0]);
-                        // If within 5 requests of the limit, add a preemptive sleep to avoid 429
-                        if (current >= max - 5) {
-                            Logger.warn(`Proactive Rate Limit triggered (${current}/${max}). Resting 2000ms...`);
-                            await sleep(2000);
-                            break;
-                        }
-                    }
                 }
 
                 return await res.json();

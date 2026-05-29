@@ -249,12 +249,11 @@ class Crawler {
             }
 
             if (state.currentMatches >= CRAWLER.TARGET_MATCHES_PER_RANK) {
-                Logger.success(`Target hit for ${rankStr}! Transitioning to next rank.`);
+                Logger.success(`Target hit for ${rankStr}! Transitioning to next rank. (Aggregation deferred to end)`);
                 state.rankIndex++;
                 state.currentMatches = 0;
                 state.initialStoreSize = undefined;
                 await writeJson(STORAGE.CRAWL_STATE, state);
-                await GlobalAggregator.mergeAll(false); // don't auto-import during loop
                 continue;
             }
 
@@ -323,7 +322,6 @@ class Crawler {
      * to discover players and fetch their ranked matches.
      */
     async runCycle(rankDef, rankDir, targetLength) {
-        this.client.used = 0;
         const pStatePath = path.join(rankDir, "pageState.json");
         const pStateDefaults = {
             page: 1,
@@ -462,11 +460,7 @@ class Crawler {
             await writeJson(pStatePath, pState);
 
         } catch (e) {
-            if (e.message === "BUDGET_EXHAUSTED") {
-                Logger.info("API budget exhausted for this cycle.");
-            } else {
-                Logger.error("Cycle failed: " + e.message);
-            }
+            Logger.error("Cycle failed: " + e.message);
         }
 
         return { newMatchIds, shouldSkipRank };

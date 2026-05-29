@@ -85,6 +85,17 @@ class ImportManager {
 
         await Database.connect();
 
+        const fileName = path.basename(incomingDbPath);
+        try {
+            const alreadyImported = await Database.get("SELECT 1 FROM imported_files WHERE fileName = ?", [fileName]);
+            if (alreadyImported) {
+                Logger.info(`File ${fileName} was already imported. Skipping to prevent duplicate processing.`);
+                return { newMatches: 0, totalIncoming: 0, skipped: true };
+            }
+        } catch (e) {
+            // Ignore error if table doesn't exist yet for some reason
+        }
+
         try {
             // Read incoming DB metadata safely first
             const incomingDb = new sqlite3.Database(incomingDbPath, sqlite3.OPEN_READONLY);
@@ -160,10 +171,13 @@ class ImportManager {
             // Detach incoming database
             await Database.run(`DETACH DATABASE incoming`);
 
+            // Record this file as imported
+            await Database.run("INSERT OR REPLACE INTO imported_files (fileName, importedAt) VALUES (?, ?)", [fileName, Date.now()]);
+
             if (newMatches > 0) {
-                Logger.success(`Successfully merged ${newMatches} new matches from ${path.basename(incomingDbPath)}`);
+                Logger.success(`Successfully merged ${newMatches} new matches from ${fileName}`);
             } else {
-                Logger.info(`All matches from ${path.basename(incomingDbPath)} are already in your local database.`);
+                Logger.info(`All matches from ${fileName} are already in your local database.`);
             }
 
             return { newMatches, totalIncoming };

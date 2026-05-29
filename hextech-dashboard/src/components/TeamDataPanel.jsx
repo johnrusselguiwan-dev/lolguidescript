@@ -57,6 +57,10 @@ function TeamDataPanel({ addLog }) {
     // ── Export Handlers ──────────────────────────────────────────────────
 
     const handleExport = async () => {
+        if (isExporting || isUploading || isMerging) {
+            alert('A background process is already running. Please wait for it to finish.');
+            return;
+        }
         setIsExporting(true);
         setExportResult(null);
         addLog('Exporting database...', 'info');
@@ -93,6 +97,11 @@ function TeamDataPanel({ addLog }) {
         e.preventDefault();
         setIsDragOver(false);
 
+        if (isExporting || isUploading || isMerging) {
+            alert('A background process is already running. Please wait for it to finish.');
+            return;
+        }
+
         const files = Array.from(e.dataTransfer?.files || []).filter(f => f.name.endsWith('.db'));
         if (files.length === 0) {
             addLog('Only .db files are accepted', 'error');
@@ -114,6 +123,12 @@ function TeamDataPanel({ addLog }) {
     };
 
     const handleFileSelect = async (e) => {
+        if (isExporting || isUploading || isMerging) {
+            alert('A background process is already running. Please wait for it to finish.');
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            return;
+        }
+
         const files = Array.from(e.target.files || []).filter(f => f.name.endsWith('.db'));
         if (files.length === 0) return;
 
@@ -134,6 +149,10 @@ function TeamDataPanel({ addLog }) {
     };
 
     const handleMergeAll = async () => {
+        if (isExporting || isUploading || isMerging) {
+            alert('A background process is already running. Please wait for it to finish.');
+            return;
+        }
         setIsMerging(true);
         setMergeResult(null);
         addLog('Starting batch merge of import bin...', 'info');
@@ -395,6 +414,18 @@ function TeamDataPanel({ addLog }) {
                     </div>
                 </div>
             </div>
+
+            {/* Floating Progress */}
+            {(isUploading || isMerging) && (
+                <div className="import-progress-float">
+                    <div className="import-progress-text">
+                        {isUploading ? '⏳ Uploading Files...' : '🔄 Merging Data...'}
+                    </div>
+                    <div className="import-progress-bar">
+                        <div className="import-progress-fill"></div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

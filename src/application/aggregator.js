@@ -62,8 +62,17 @@ class GlobalAggregator {
             Logger.warn(`Current patch ${currentPatch} has only ${currentCount} matches (need ${CRAWLER.MIN_MATCHES_FOR_NEW_PATCH}). Looking for fallback...`);
         }
 
-        // Fall back to the patch with the most data
-        const bestPatch = patches.sort((a, b) => b.count - a.count)[0];
+        // Fall back to the newest patch that has enough data
+        const bestPatch = [...patches]
+            .sort((a, b) => {
+                const [aMajor, aMinor] = a.patch.split('.').map(Number);
+                const [bMajor, bMinor] = b.patch.split('.').map(Number);
+                if (aMajor !== bMajor) return bMajor - aMajor;
+                return bMinor - aMinor;
+            })
+            .find(p => p.count >= CRAWLER.MIN_MATCHES_FOR_NEW_PATCH) 
+            || [...patches].sort((a, b) => b.count - a.count)[0];
+
         Logger.info(`Using fallback patch ${bestPatch.patch} (${bestPatch.count} matches).`);
         return { patch: bestPatch.patch, isFallback: true };
     }
@@ -162,6 +171,7 @@ class GlobalAggregator {
                         ? `https://ddragon.leagueoflegends.com/cdn/${assets.ddragonVersion}/img/champion/${assets.champData[ch.id].image.full}`
                         : "",
                     lane: ch.lanes && ch.lanes.length > 0 ? ch.lanes : ["Unknown"],
+                    laneWinRates: ch.laneWinRates || {},
                     role: assets.champData[ch.id] ? assets.champData[ch.id].tags : ["Unknown"],
                     patch: patchLabel,
                     region: regionLabel,

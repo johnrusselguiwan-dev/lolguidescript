@@ -39,8 +39,6 @@ const API = {
         { name: "RANKED_FLEX_SR",  id: 440 },
     ],
     QUEUE_IDS: [420, 440],                   // Convenience array for filtering
-    MAX_REQUESTS_PER_CYCLE: 80,
-    SAFE_DELAY_MS: 1500,
     RETRY_ATTEMPTS: 3,
 };
 

@@ -117,8 +117,9 @@ class AnalyticsEngine {
                 };
 
                 const lane = (p.teamPosition && p.teamPosition !== "INVALID" && p.teamPosition !== "") ? p.teamPosition : "UNKNOWN";
-                if (!s.laneStats[lane]) s.laneStats[lane] = { items: {}, games: 0 };
+                if (!s.laneStats[lane]) s.laneStats[lane] = { items: {}, games: 0, wins: 0 };
                 s.laneStats[lane].games += weight;
+                if (p.win) s.laneStats[lane].wins += weight;
 
                 [p.item0, p.item1, p.item2, p.item3, p.item4, p.item5].forEach((id) => {
                     let normalizedId = id ? String(id) : null;
@@ -265,6 +266,19 @@ class AnalyticsEngine {
                     .sort((a, b) => b[1] - a[1])
                     .map((l) => l[0]);
                 const lanesArray = lanesKeys.map(l => LANE_LABELS[l] || l);
+
+                // Per-lane win rates
+                const laneWinRates = {};
+                for (const [laneKey, data] of Object.entries(s.laneStats)) {
+                    if (data.games > 0) {
+                        const label = LANE_LABELS[laneKey] || laneKey;
+                        laneWinRates[label] = {
+                            winRate: +((data.wins / data.games) * 100).toFixed(2),
+                            games: Math.round(data.games),
+                            pickRate: +((data.games / weightedTotalGames) * 100).toFixed(2),
+                        };
+                    }
+                }
                 
                 const primaryLane = lanesKeys[0] || "UNKNOWN";
                 
@@ -337,6 +351,7 @@ class AnalyticsEngine {
                     playstyleMobility: playstyle.mobility !== undefined ? playstyle.mobility : 1,
                     playstyleUtility: playstyle.utility !== undefined ? playstyle.utility : 1,
                     lanes: lanesArray,
+                    laneWinRates,
                     builds: [build1, build2, build3],
                     loadout: {
                         spells: getTop(s.spells),
