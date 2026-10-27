@@ -8,6 +8,7 @@
  */
 
 const { api } = require("../infrastructure/api/ddragon");
+const { validateStaticData } = require("../domain/validation/validate");
 const { fetchAndProcessChampions } = require("./champions");
 const { fetchAndProcessItems } = require("./items");
 const { fetchAndProcessRunes } = require("./runes");
@@ -24,13 +25,15 @@ const {
     printComplete,
     printError,
     showEnvMenu,
+    showCollectionMenu,
+    askTargetCollection,
     printPhase,
     printAutoMode
 } = require("../presentation/cli-utils");
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function runMasterSync() {
+async function runMasterSync(syncOptions = {}) {
     let globalVersion = "Unknown";
 
     try {
@@ -38,7 +41,7 @@ async function runMasterSync() {
         globalVersion = await api.getVersion();
         printHeader(globalVersion);
 
-        const isAuto = process.argv.includes("--auto") || process.env.AUTO_SYNC === "true";
+        const isAuto = syncOptions.auto || process.argv.includes("--auto") || process.env.AUTO_SYNC === "true";
 
         // ── Select data ──────────────────────────────────────────────────
         let dataChoice = "5";
@@ -71,6 +74,9 @@ async function runMasterSync() {
             spells = await fetchAndProcessSpells();
         }
 
+        // Validate the entire selected sync before the first upload or local export.
+        validateStaticData({ championData, items, runeTrees, spells });
+
         // ── Select destination ───────────────────────────────────────────
         let destChoice = "1";
 
@@ -89,35 +95,62 @@ async function runMasterSync() {
             if (runeTrees) exportRunes(runeTrees, globalVersion);
             if (spells) exportSpells(spells, globalVersion);
         } else {
+            let targetCollection = syncOptions.targetCollection || "staging_data";
+            const collectionArg = process.argv.find((arg) => arg.startsWith("--collection="));
+            if (syncOptions.targetCollection) {
+                targetCollection = syncOptions.targetCollection;
+            } else if (collectionArg) {
+                targetCollection = collectionArg.split("=")[1].trim();
+            } else if (process.argv.includes("--data") || process.argv.includes("--prod")) {
+                targetCollection = "data";
+            } else if (process.argv.includes("--staging")) {
+                targetCollection = "staging_data";
+            } else if (!isAuto) {
+                console.log();
+                targetCollection = await askTargetCollection();
+            }
+
             if (!isAuto) {
                 console.log();
-                const confirm = (await askQuestion(`\x1b[33m⚠ WARNING: You are about to DIRECTLY UPLOAD static data to Firebase. This overwrites production data.\x1b[0m\n    Are you sure you want to proceed? (y/N): `)).trim().toLowerCase();
-                if (confirm !== "y" && confirm !== "yes") {
-                    console.log("\n  \x1b[36mℹ Operation cancelled.\x1b[0m\n");
-                    process.exit(0);
+                if (targetCollection === "data") {
+                    const confirm = (await askQuestion(
+                        `\x1b[33m⚠ WARNING: You are about to DIRECTLY UPLOAD static data to PRODUCTION ('data') in Firebase. This overwrites production data.\x1b[0m\n    Are you sure you want to proceed? (y/N): `
+                    )).trim().toLowerCase();
+                    if (confirm !== "y" && confirm !== "yes") {
+                        console.log("\n  \x1b[36mℹ Operation cancelled.\x1b[0m\n");
+                        process.exit(0);
+                    }
+                } else {
+                    const confirm = (await askQuestion(
+                        `\x1b[36mℹ Notice: Uploading static data to STAGING ('staging_data') in Firebase.\x1b[0m\n    Do you want to proceed? (Y/n): `
+                    )).trim().toLowerCase();
+                    if (confirm === "n" || confirm === "no") {
+                        console.log("\n  \x1b[36mℹ Operation cancelled.\x1b[0m\n");
+                        process.exit(0);
+                    }
                 }
             }
 
-            printPhase(2, "Uploading to Firebase");
+            printPhase(2, `Uploading to Firebase [${targetCollection}]`);
 
             const allRcFields = [];
             let uploadPatch = globalVersion;
 
             if (championData) {
-                const result = await uploadChampions(championData, globalVersion);
+                const result = await uploadChampions(championData, globalVersion, targetCollection);
                 if (result?.rcFields) allRcFields.push(...result.rcFields);
                 if (result?.patch) uploadPatch = result.patch;
             }
             if (items) {
-                const result = await uploadItems(items, globalVersion);
+                const result = await uploadItems(items, globalVersion, targetCollection);
                 if (result?.rcFields) allRcFields.push(...result.rcFields);
             }
             if (runeTrees) {
-                const result = await uploadRunes(runeTrees, globalVersion);
+                const result = await uploadRunes(runeTrees, globalVersion, targetCollection);
                 if (result?.rcFields) allRcFields.push(...result.rcFields);
             }
             if (spells) {
-                const result = await uploadSpells(spells, globalVersion);
+                const result = await uploadSpells(spells, globalVersion, targetCollection);
                 if (result?.rcFields) allRcFields.push(...result.rcFields);
             }
 
@@ -134,12 +167,14 @@ async function runMasterSync() {
                     const preview = await previewIncrements(uniqueFields, rcOptions);
                     if (preview) {
                         showEnvMenu();
-                        const envChoice = (await askQuestion("Enter choice (1-4, Default=1): ")).trim();
+                        const defaultChoice = targetCollection === "data" ? "1" : "2";
+                        const envChoice = (await askQuestion(`Enter choice (1-5, Default=${defaultChoice}): `)).trim() || defaultChoice;
                         
                         let environment = "ALL";
-                        if (envChoice === "2") environment = "PROD";
+                        if (envChoice === "2") environment = "STAGING_DEBUG";
                         else if (envChoice === "3") environment = "Staging";
                         else if (envChoice === "4") environment = "Debug";
+                        else if (envChoice === "5") environment = "PROD";
 
                         rcOptions.environment = environment;
 

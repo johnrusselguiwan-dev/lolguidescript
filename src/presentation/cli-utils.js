@@ -79,10 +79,29 @@ function showEnvMenu() {
     console.log(`  ${c.bold}Which environment should be bumped?${c.reset}`);
     console.log();
     console.log(`    ${c.cyan}[1]${c.reset}  All Environments  ${c.dim}(Prod + Staging + Debug)${c.reset}`);
-    console.log(`    ${c.cyan}[2]${c.reset}  Prod Only`);
+    console.log(`    ${c.cyan}[2]${c.reset}  🧪 Staging & Debug Only  ${c.dim}(Staging + Debug - Recommended for staging)${c.reset}`);
     console.log(`    ${c.cyan}[3]${c.reset}  Staging Only`);
     console.log(`    ${c.cyan}[4]${c.reset}  Debug Only`);
+    console.log(`    ${c.cyan}[5]${c.reset}  Prod Only`);
     console.log();
+}
+
+function showCollectionMenu() {
+    console.log(`  ${c.bold}Where in Firebase should the data go?${c.reset}`);
+    console.log();
+    console.log(`    ${c.cyan}[1]${c.reset}  🧪 Staging  ${c.dim}(staging_data - Default / Safe)${c.reset}`);
+    console.log(`    ${c.cyan}[2]${c.reset}  🚀 Production  ${c.dim}(data - Live Mobile App)${c.reset}`);
+    console.log();
+}
+
+async function askTargetCollection(askFn = askQuestion) {
+    showCollectionMenu();
+    const raw = await askFn("Enter choice (1-2, Default=1): ");
+    const ans = (raw || "").trim();
+    if (ans === "2") {
+        return "data";
+    }
+    return "staging_data";
 }
 
 // ── Progress Bar ────────────────────────────────────────────────────────────
@@ -174,4 +193,6 @@ module.exports = {
     printAutoMode,
     printComplete,
     showEnvMenu,
+    showCollectionMenu,
+    askTargetCollection,
 };

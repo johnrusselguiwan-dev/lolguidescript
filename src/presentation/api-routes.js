@@ -178,7 +178,7 @@ router.post('/action/aggregate', async (req, res) => {
 
 router.post('/action/publish', async (req, res) => {
     try {
-        const { region = 'all' } = req.body || {};
+        const { region = 'all', targetCollection = 'staging_data' } = req.body || {};
         const regionLabel = region === 'all' ? 'Global' : region;
 
         const meta = await readJson(STORAGE.CHAMPION_META);
@@ -190,8 +190,8 @@ router.post('/action/publish', async (req, res) => {
             return res.status(400).json({ error: "Missing local data. Aggregate first." });
         }
 
-        const uploadResult = await uploadTierData(meta, rating, drafting, scaling || [], region);
-        res.json({ message: `Publish complete (${regionLabel})`, result: uploadResult });
+        const uploadResult = await uploadTierData(meta, rating, drafting, scaling || [], region, targetCollection);
+        res.json({ message: `Publish complete (${regionLabel}) [${uploadResult.targetCollection || targetCollection}]`, result: uploadResult });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -213,8 +213,13 @@ router.post('/action/bump-version', async (req, res) => {
 
 router.post('/action/sync-assets', async (req, res) => {
     try {
+        const { targetCollection = 'staging_data' } = req.body || {};
         await new Promise((resolve, reject) => {
-            const syncProcess = spawn('node', [path.join(__dirname, '../application/sync-master.js'), '--auto']);
+            const syncProcess = spawn('node', [
+                path.join(__dirname, '../application/sync-master.js'),
+                '--auto',
+                `--collection=${targetCollection}`
+            ]);
 
             syncProcess.stdout.on('data', (data) => {
                 Logger.info(`Sync: ${data.toString().trim()}`);
@@ -226,7 +231,7 @@ router.post('/action/sync-assets', async (req, res) => {
 
             syncProcess.on('close', (code) => {
                 if (code === 0) {
-                    Logger.success("Asset sync completed.");
+                    Logger.success(`Asset sync completed [${targetCollection}].`);
                     resolve();
                 } else {
                     Logger.warn(`Asset sync exited with code ${code}`);
@@ -234,7 +239,7 @@ router.post('/action/sync-assets', async (req, res) => {
                 }
             });
         });
-        res.json({ message: "Asset sync completed successfully" });
+        res.json({ message: `Asset sync completed successfully [${targetCollection}]` });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }

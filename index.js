@@ -7,7 +7,7 @@ const { uploadTierData } = require("./src/infrastructure/output/firebase-storage
 const { previewIncrements, incrementVersionFields } = require("./src/infrastructure/output/remote-config");
 const { readJson } = require("./src/infrastructure/utils/io");
 const { STORAGE, API } = require("./config/constants");
-const { c, showEnvMenu } = require("./src/presentation/cli-utils");
+const { c, showEnvMenu, askTargetCollection } = require("./src/presentation/cli-utils");
 const Logger = require("./src/infrastructure/utils/logger");
 
 function ask(query) {
@@ -44,7 +44,7 @@ async function askRegion() {
  * @param {string[]} rcFields - The version fields to increment
  * @param {string}   [patch]  - The patch version to set as latest_patch
  */
-async function promptBumpVersions(rcFields, patch) {
+async function promptBumpVersions(rcFields, patch, suggestedEnv = "ALL") {
     if (!rcFields || rcFields.length === 0) return;
 
     const options = patch && patch !== "unknown" ? { latestPatch: patch } : {};
@@ -52,12 +52,14 @@ async function promptBumpVersions(rcFields, patch) {
     if (!result) return;
 
     showEnvMenu();
-    const envChoice = (await ask("Enter choice (1-4, Default=1): ")).trim();
+    const defaultChoice = suggestedEnv === "STAGING_DEBUG" ? "2" : "1";
+    const envChoice = (await ask(`Enter choice (1-5, Default=${defaultChoice}): `)).trim() || defaultChoice;
 
     let environment = "ALL";
-    if (envChoice === "2") environment = "PROD";
+    if (envChoice === "2") environment = "STAGING_DEBUG";
     else if (envChoice === "3") environment = "Staging";
     else if (envChoice === "4") environment = "Debug";
+    else if (envChoice === "5") environment = "PROD";
 
     options.environment = environment;
 
@@ -130,9 +132,15 @@ async function main() {
                 }
             }
             else if (choice === "5") {
-                if (await confirmAction("This will UPLOAD your final stats to Firebase. This updates the live data for your mobile app users!")) {
+                const targetCollection = await askTargetCollection(ask);
+                const isProduction = targetCollection === "data";
+                const warningMsg = isProduction
+                    ? "⚠ WARNING: This will UPLOAD final stats DIRECTLY to PRODUCTION ('data') in Firebase. This overwrites live mobile app data!"
+                    : "This will upload final stats to STAGING ('staging_data') in Firebase.";
+
+                if (await confirmAction(warningMsg)) {
                     const region = await askRegion();
-                    Logger.info("Reading local aggregated data for upload...");
+                    Logger.info(`Reading local aggregated data for upload to [${targetCollection}]...`);
                     const meta = await readJson(STORAGE.CHAMPION_META);
                     const rating = await readJson(STORAGE.CHAMPION_RATING);
                     const drafting = await readJson(STORAGE.CHAMPION_DRAFTING);
@@ -140,9 +148,9 @@ async function main() {
 
                     if (!meta || !rating || !drafting) {
                         Logger.error("Failed to load local data. You must run [4] Aggregate Data first!");
-                    } else {
-                        const uploadResult = await uploadTierData(meta, rating, drafting, scaling || [], region);
-                        await promptBumpVersions(uploadResult.rcFields, uploadResult.patch);
+                        const uploadResult = await uploadTierData(meta, rating, drafting, scaling || [], region, targetCollection);
+                        const suggestedEnv = targetCollection === "data" ? "ALL" : "STAGING_DEBUG";
+                        await promptBumpVersions(uploadResult.rcFields, uploadResult.patch, suggestedEnv);
                     }
                 }
             }

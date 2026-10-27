@@ -119,9 +119,15 @@ async function incrementVersionFields(fieldNames, options = {}) {
             }
         }
 
+        const envNormalized = (targetEnv || "ALL").toUpperCase();
+        const isStagingDebug = envNormalized === "STAGING_DEBUG" ||
+                               envNormalized === "STAGING_AND_DEBUG" ||
+                               envNormalized === "STAGING+DEBUG" ||
+                               envNormalized === "STAGING & DEBUG";
+
         // ── Apply to default value (Prod) ────────────────────────────────
         const updatedConditions = [];
-        if (targetEnv === "ALL" || targetEnv.toUpperCase() === "PROD") {
+        if (!isStagingDebug && (envNormalized === "ALL" || envNormalized === "PROD")) {
             const defaultConfig = JSON.parse(param.defaultValue.value);
             applyIncrements(defaultConfig, "Prod (default)");
             param.defaultValue.value = JSON.stringify(defaultConfig, null, 2);
@@ -131,7 +137,12 @@ async function incrementVersionFields(fieldNames, options = {}) {
         // ── Apply to each conditional value (Debug, Staging) ─────────────
         if (param.conditionalValues) {
             for (const [conditionName, condValue] of Object.entries(param.conditionalValues)) {
-                if (targetEnv === "ALL" || targetEnv.toUpperCase() === conditionName.toUpperCase()) {
+                const condUpper = conditionName.toUpperCase();
+                const shouldUpdate = envNormalized === "ALL" ||
+                                     envNormalized === condUpper ||
+                                     (isStagingDebug && (condUpper === "STAGING" || condUpper === "DEBUG"));
+
+                if (shouldUpdate) {
                     const config = JSON.parse(condValue.value);
                     applyIncrements(config, conditionName);
                     condValue.value = JSON.stringify(config, null, 2);
