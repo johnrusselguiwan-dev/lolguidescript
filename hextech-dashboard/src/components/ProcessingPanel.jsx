@@ -71,23 +71,33 @@ function ProcessingPanel({ addLog, isAggregating, setIsAggregating, isPublishing
             });
             return;
         }
-        setPublishModal({ isOpen: true, environment: 'ALL' });
+        setPublishModal({ isOpen: true, environment: 'STAGING_DEBUG', targetCollection: 'staging_data' });
+    };
+
+    const handleCollectionChange = (newTarget) => {
+        setPublishModal(prev => ({
+            ...prev,
+            targetCollection: newTarget,
+            environment: newTarget === 'data' ? 'ALL' : 'STAGING_DEBUG'
+        }));
     };
 
     const confirmPublish = async () => {
         const regionLabel = publishRegion === 'all' ? 'Global' : publishRegion;
         const env = publishModal.environment;
+        const targetCollection = publishModal.targetCollection || 'staging_data';
         setPublishModal({ ...publishModal, isOpen: false });
         
         setIsPublishing(true);
-        addLog(`Starting publish to Firebase for ${regionLabel}...`, 'info');
+        addLog(`Starting publish to Firebase [${targetCollection}] for ${regionLabel}...`, 'info');
         setSidebarNotification(null);
         try {
-            const { ok, data } = await apiPost('/action/publish', { region: publishRegion });
+            const { ok, data } = await apiPost('/action/publish', { region: publishRegion, targetCollection });
             addLog(ok ? data.message : data.error, ok ? 'success' : 'error');
             
             if (ok && data.result?.rcFields?.length > 0 && env !== 'NONE') {
-                addLog(`Bumping remote config for ${env}...`, 'info');
+                const envLabel = env === 'STAGING_DEBUG' ? 'Staging & Debug' : env;
+                addLog(`Bumping remote config for ${envLabel}...`, 'info');
                 try {
                     const bumpRes = await apiPost('/action/bump-version', { 
                         rcFields: data.result.rcFields, 
@@ -120,14 +130,14 @@ function ProcessingPanel({ addLog, isAggregating, setIsAggregating, isPublishing
         setModal({
             isOpen: true,
             title: 'Confirm Asset Sync',
-            message: `Are you sure you want to trigger a background asset sync?\n\nThis will fetch the latest champions, items, and runes from Riot's servers.`,
+            message: `Are you sure you want to trigger a background asset sync?\n\nThis will fetch the latest champions, items, and runes from Riot's servers and publish them to staging_data.`,
             action: async () => {
                 setModal({ isOpen: false, title: '', message: '', action: null });
                 setIsSyncing(true);
-                addLog('Triggering background asset sync...', 'info');
+                addLog('Triggering background asset sync (staging_data)...', 'info');
                 setSidebarNotification(null);
                 try {
-                    const { ok, data } = await apiPost('/action/sync-assets');
+                    const { ok, data } = await apiPost('/action/sync-assets', { targetCollection: 'staging_data' });
                     addLog(ok ? data.message : data.error, ok ? 'success' : 'error');
                     setSidebarNotification({ type: ok ? 'success' : 'error', message: ok ? '✅ Asset Sync Complete' : '❌ Asset Sync Failed' });
                 } catch (err) {
@@ -145,31 +155,114 @@ function ProcessingPanel({ addLog, isAggregating, setIsAggregating, isPublishing
             {publishModal.isOpen && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 1000,
+                    backgroundColor: 'rgba(1, 10, 19, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    zIndex: 1000,
                     display: 'flex', justifyContent: 'center', alignItems: 'center'
                 }}>
-                    <div className="card glass" style={{ maxWidth: '500px', width: '90%', padding: '24px', border: '1px solid #c89b3c' }}>
-                        <h3 style={{ color: '#f0e6d2', marginTop: 0, marginBottom: '16px', borderBottom: '1px solid rgba(200, 155, 60, 0.3)', paddingBottom: '12px' }}>
-                            🚀 Publish & Bump Config
-                        </h3>
-                        <p style={{ color: '#a09b8c', lineHeight: 1.5, marginBottom: '24px' }}>
-                            Are you sure you want to publish data for <strong>{publishRegion === 'all' ? 'Global' : publishRegion}</strong> to Firebase? This will overwrite live data in the app.
+                    <div className="card glass" style={{
+                        maxWidth: '520px',
+                        width: '92%',
+                        padding: '24px',
+                        border: '1px solid #c89b3c',
+                        boxShadow: '0 0 30px rgba(0, 0, 0, 0.9), 0 0 15px rgba(200, 155, 60, 0.2)',
+                        textAlign: 'left'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid rgba(200, 155, 60, 0.3)', paddingBottom: '12px' }}>
+                            <h3 style={{ color: '#f0e6d2', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem', letterSpacing: '0.5px' }}>
+                                <span>🚀</span> Publish & Bump Config
+                            </h3>
+                            <button 
+                                onClick={() => setPublishModal({ ...publishModal, isOpen: false })}
+                                style={{ background: 'transparent', border: 'none', color: '#a09b8c', cursor: 'pointer', fontSize: '1.2rem', padding: '0 4px', lineHeight: 1 }}
+                                title="Close"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <p style={{ color: '#a09b8c', lineHeight: 1.5, marginBottom: '20px', fontSize: '0.9rem', textAlign: 'left' }}>
+                            Publishing data for <strong style={{ color: '#f0e6d2' }}>{publishRegion === 'all' ? 'Global (All Regions)' : publishRegion}</strong> to Firebase Firestore.
                         </p>
-                        <div className="action-card-config" style={{ marginBottom: '24px', background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: '8px' }}>
-                            <label className="config-label-sm" style={{ marginBottom: '8px' }}>Target Environment for Remote Config Bump</label>
-                            <p style={{ fontSize: '0.8rem', color: '#a09b8c', margin: '0 0 12px 0' }}>Select which environments should immediately detect the new patch update.</p>
+
+                        {/* Section 1: Target Collection */}
+                        <div style={{
+                            marginBottom: '16px',
+                            background: 'rgba(2, 14, 26, 0.75)',
+                            border: publishModal.targetCollection === 'data' ? '1px solid rgba(226, 76, 76, 0.6)' : '1px solid rgba(200, 155, 60, 0.25)',
+                            borderRadius: '6px',
+                            padding: '14px 16px',
+                            textAlign: 'left',
+                            transition: 'border-color 0.2s ease'
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#c8aa6e', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                    Target Firestore Collection
+                                </label>
+                                <span style={{
+                                    fontSize: '0.7rem',
+                                    padding: '2px 8px',
+                                    borderRadius: '3px',
+                                    fontWeight: 600,
+                                    background: publishModal.targetCollection === 'data' ? 'rgba(226, 76, 76, 0.2)' : 'rgba(10, 200, 185, 0.15)',
+                                    color: publishModal.targetCollection === 'data' ? '#ff6b6b' : '#0ac8b9',
+                                    border: publishModal.targetCollection === 'data' ? '1px solid rgba(226, 76, 76, 0.4)' : '1px solid rgba(10, 200, 185, 0.3)'
+                                }}>
+                                    {publishModal.targetCollection === 'data' ? '⚠️ PRODUCTION' : '🧪 STAGING'}
+                                </span>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: '#a09b8c', margin: '0 0 10px 0', lineHeight: 1.4, textAlign: 'left' }}>
+                                {publishModal.targetCollection === 'data'
+                                    ? 'Directly updates production Firestore. Live app users will receive this data.'
+                                    : 'Default safe route. Uploads to staging_data without affecting production users.'}
+                            </p>
+                            <select 
+                                className="hex-select hex-select-sm" 
+                                value={publishModal.targetCollection || 'staging_data'}
+                                onChange={e => handleCollectionChange(e.target.value)}
+                                id="select-publish-collection"
+                                style={{ width: '100%', boxSizing: 'border-box' }}
+                            >
+                                <option value="staging_data">🧪 Staging (staging_data) - Default Safe</option>
+                                <option value="data">🚀 Production (data) - Live Mobile App</option>
+                            </select>
+                        </div>
+
+                        {/* Section 2: Remote Config Environment */}
+                        <div style={{
+                            marginBottom: '24px',
+                            background: 'rgba(2, 14, 26, 0.75)',
+                            border: '1px solid rgba(200, 155, 60, 0.25)',
+                            borderRadius: '6px',
+                            padding: '14px 16px',
+                            textAlign: 'left'
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#c8aa6e', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                    Target Environment for Remote Config Bump
+                                </label>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: '#a09b8c', margin: '0 0 10px 0', lineHeight: 1.4, textAlign: 'left' }}>
+                                Select which app environments should immediately increment version counters and detect the update.
+                            </p>
                             <select 
                                 className="hex-select hex-select-sm" 
                                 value={publishModal.environment}
                                 onChange={e => setPublishModal({...publishModal, environment: e.target.value})}
+                                id="select-publish-environment"
+                                style={{ width: '100%', boxSizing: 'border-box' }}
                             >
-                                <option value="ALL">ALL (Prod + Staging + Debug)</option>
-                                <option value="PROD">PROD Only</option>
-                                <option value="Staging">Staging Only</option>
-                                <option value="Debug">Debug Only</option>
-                                <option value="NONE">None (Just upload data)</option>
+                                <option value="STAGING_DEBUG">🧪 Staging & Debug Only (Staging + Debug)</option>
+                                <option value="ALL">🌍 ALL (Prod + Staging + Debug)</option>
+                                <option value="Staging">🧪 Staging Only</option>
+                                <option value="Debug">🐞 Debug Only</option>
+                                <option value="PROD">🚀 PROD Only</option>
+                                <option value="NONE">❌ None (Only upload data)</option>
                             </select>
                         </div>
+
+                        {/* Modal Action Buttons */}
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                             <Button onClick={() => setPublishModal({...publishModal, isOpen: false})} style={{ background: 'transparent', border: '1px solid #a09b8c', color: '#a09b8c' }}>
                                 Cancel
@@ -186,14 +279,17 @@ function ProcessingPanel({ addLog, isAggregating, setIsAggregating, isPublishing
             {modal.isOpen && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 1000,
+                    backgroundColor: 'rgba(1, 10, 19, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    zIndex: 1000,
                     display: 'flex', justifyContent: 'center', alignItems: 'center'
                 }}>
-                    <div className="card glass" style={{ maxWidth: '500px', width: '90%', padding: '24px', border: '1px solid #c89b3c' }}>
-                        <h3 style={{ color: '#f0e6d2', marginTop: 0, marginBottom: '16px', borderBottom: '1px solid rgba(200, 155, 60, 0.3)', paddingBottom: '12px' }}>
+                    <div className="card glass" style={{ maxWidth: '500px', width: '90%', padding: '24px', border: '1px solid #c89b3c', textAlign: 'left' }}>
+                        <h3 style={{ color: '#f0e6d2', marginTop: 0, marginBottom: '16px', borderBottom: '1px solid rgba(200, 155, 60, 0.3)', paddingBottom: '12px', textAlign: 'left' }}>
                             {modal.title}
                         </h3>
-                        <p style={{ color: '#a09b8c', lineHeight: 1.5, whiteSpace: 'pre-wrap', marginBottom: '24px' }}>
+                        <p style={{ color: '#a09b8c', lineHeight: 1.5, whiteSpace: 'pre-wrap', marginBottom: '24px', textAlign: 'left' }}>
                             {modal.message}
                         </p>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
