@@ -1,0 +1,871 @@
+{
+  "contractVersion": 1,
+  "datasets": {
+    "champion_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nonblank": true
+          },
+          "name": {
+            "type": "string",
+            "nonblank": true
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "lanes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "avatar",
+          "image",
+          "region",
+          "lanes",
+          "roles"
+        ]
+      },
+      "minItems": 1,
+      "uniqueBy": "id"
+    },
+    "champion_details": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nonblank": true
+          },
+          "name": {
+            "type": "string",
+            "nonblank": true
+          },
+          "title": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "background": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "lore": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "passiveName": {
+            "type": "string"
+          },
+          "passiveDescription": {
+            "type": "string"
+          },
+          "passiveIcon": {
+            "type": "string"
+          },
+          "damageType": {
+            "type": "string"
+          },
+          "patchVersion": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "lanes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "skillNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "skillDescriptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "skillIcons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "skillCooldowns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "skillCosts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "attack": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "defense": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "magic": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "difficulty": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "playstyleDamage": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "playstyleDurability": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "playstyleCrowdControl": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "playstyleMobility": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "playstyleUtility": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "hp": {
+            "type": "number",
+            "minimum": 0
+          },
+          "mp": {
+            "type": "number",
+            "minimum": 0
+          },
+          "attackDamage": {
+            "type": "number",
+            "minimum": 0
+          },
+          "attackSpeed": {
+            "type": "number",
+            "minimum": 0
+          },
+          "armor": {
+            "type": "number",
+            "minimum": 0
+          },
+          "spellBlock": {
+            "type": "number",
+            "minimum": 0
+          },
+          "moveSpeed": {
+            "type": "number",
+            "minimum": 0
+          },
+          "priceBlueEssence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "priceRiotPoints": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "winRate": {
+            "type": "string",
+            "pattern": "^(?:100(?:\\.0+)?|[0-9]{1,2}(?:\\.[0-9]+)?)%$"
+          },
+          "pickRate": {
+            "type": "string",
+            "pattern": "^(?:100(?:\\.0+)?|[0-9]{1,2}(?:\\.[0-9]+)?)%$"
+          },
+          "banRate": {
+            "type": "string",
+            "pattern": "^(?:100(?:\\.0+)?|[0-9]{1,2}(?:\\.[0-9]+)?)%$"
+          },
+          "builds": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "boots": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 0
+                },
+                "spareItems": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "items",
+                "spareItems"
+              ]
+            },
+            "minItems": 0
+          },
+          "loadout": {
+            "type": "object",
+            "properties": {
+              "spells": {
+                "type": "string"
+              },
+              "runes": {
+                "type": "string"
+              },
+              "skills": {
+                "type": "object",
+                "values": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 3
+                }
+              }
+            },
+            "required": [
+              "spells",
+              "runes",
+              "skills"
+            ]
+          },
+          "drafting": {
+            "type": "object",
+            "properties": {
+              "strongAgainst": {
+                "type": "object",
+                "values": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "weakAgainst": {
+                "type": "object",
+                "values": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "synergizesWith": {
+                "type": "object",
+                "values": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              }
+            },
+            "required": [
+              "strongAgainst",
+              "weakAgainst"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "skillNames",
+          "skillDescriptions",
+          "skillIcons",
+          "skillCooldowns",
+          "skillCosts"
+        ],
+        "equalLengths": [
+          "skillNames",
+          "skillDescriptions",
+          "skillIcons",
+          "skillCooldowns",
+          "skillCosts"
+        ]
+      },
+      "minItems": 1,
+      "uniqueBy": "id"
+    },
+    "champion_meta": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nonblank": true
+          },
+          "name": {
+            "type": "string",
+            "nonblank": true
+          },
+          "championId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "builds": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "boots": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 0
+                },
+                "spareItems": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "items",
+                "spareItems"
+              ]
+            },
+            "minItems": 0
+          },
+          "loadout": {
+            "type": "object",
+            "properties": {
+              "spells": {
+                "type": "string"
+              },
+              "runes": {
+                "type": "string"
+              },
+              "skills": {
+                "type": "object",
+                "values": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 3
+                }
+              }
+            },
+            "required": [
+              "spells",
+              "runes",
+              "skills"
+            ]
+          },
+          "patch": {
+            "type": "string",
+            "nonblank": true
+          },
+          "region": {
+            "type": "string",
+            "nonblank": true
+          },
+          "isFallback": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "builds",
+          "loadout"
+        ]
+      },
+      "minItems": 1,
+      "uniqueBy": "id"
+    },
+    "champion_rating": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nonblank": true
+          },
+          "name": {
+            "type": "string",
+            "nonblank": true
+          },
+          "winRate": {
+            "type": "string",
+            "pattern": "^(?:100(?:\\.0+)?|[0-9]{1,2}(?:\\.[0-9]+)?)%$"
+          },
+          "pickRate": {
+            "type": "string",
+            "pattern": "^(?:100(?:\\.0+)?|[0-9]{1,2}(?:\\.[0-9]+)?)%$"
+          },
+          "banRate": {
+            "type": "string",
+            "pattern": "^(?:100(?:\\.0+)?|[0-9]{1,2}(?:\\.[0-9]+)?)%$"
+          },
+          "score": {
+            "type": "number"
+          },
+          "championId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "icon": {
+            "type": "string"
+          },
+          "lane": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "lanes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "role": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "patch": {
+            "type": "string",
+            "nonblank": true
+          },
+          "region": {
+            "type": "string",
+            "nonblank": true
+          },
+          "isFallback": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "winRate",
+          "pickRate",
+          "banRate"
+        ]
+      },
+      "minItems": 1,
+      "uniqueBy": "id"
+    },
+    "champion_drafting": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nonblank": true
+          },
+          "name": {
+            "type": "string",
+            "nonblank": true
+          },
+          "drafting": {
+            "type": "object",
+            "properties": {
+              "strongAgainst": {
+                "type": "object",
+                "values": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "weakAgainst": {
+                "type": "object",
+                "values": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "synergizesWith": {
+                "type": "object",
+                "values": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              }
+            },
+            "required": [
+              "strongAgainst",
+              "weakAgainst"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "drafting"
+        ]
+      },
+      "minItems": 1,
+      "uniqueBy": "id"
+    },
+    "champion_scaling": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nonblank": true
+          },
+          "name": {
+            "type": "string",
+            "nonblank": true
+          },
+          "championName": {
+            "type": "string",
+            "nonblank": true
+          },
+          "scalingData": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "minute": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "winRate": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "required": [
+                "minute",
+                "winRate"
+              ]
+            },
+            "minItems": 0
+          },
+          "scalingPoints": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "minute": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "winRate": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "required": [
+                "minute",
+                "winRate"
+              ]
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "requiredOneOf": [
+          [
+            "championName",
+            "name"
+          ],
+          [
+            "scalingData",
+            "scalingPoints"
+          ]
+        ]
+      },
+      "minItems": 1,
+      "uniqueBy": "id"
+    },
+    "item_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nonblank": true
+          },
+          "name": {
+            "type": "string",
+            "nonblank": true
+          },
+          "shortDesc": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "stats": {
+            "type": "string"
+          },
+          "requiredChampion": {
+            "type": "string"
+          },
+          "totalCost": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sellCost": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "depth": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "from": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "into": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          },
+          "maps": {
+            "type": "object",
+            "values": {
+              "type": "boolean"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "shortDesc",
+          "description",
+          "icon",
+          "stats",
+          "requiredChampion",
+          "totalCost",
+          "sellCost",
+          "depth",
+          "tags",
+          "from",
+          "into",
+          "maps"
+        ]
+      },
+      "minItems": 1,
+      "uniqueBy": "id"
+    },
+    "summoner_spells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nonblank": true
+          },
+          "name": {
+            "type": "string",
+            "nonblank": true
+          },
+          "description": {
+            "type": "string"
+          },
+          "cooldown": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "cooldown",
+          "imageUrl"
+        ]
+      },
+      "minItems": 1,
+      "uniqueBy": "id"
+    },
+    "rune_trees": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "key": {
+            "type": "string",
+            "nonblank": true
+          },
+          "name": {
+            "type": "string",
+            "nonblank": true
+          },
+          "icon": {
+            "type": "string"
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "runes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "key": {
+                        "type": "string",
+                        "nonblank": true
+                      },
+                      "name": {
+                        "type": "string",
+                        "nonblank": true
+                      },
+                      "icon": {
+                        "type": "string"
+                      },
+                      "shortDesc": {
+                        "type": "string"
+                      },
+                      "longDesc": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "key",
+                      "name",
+                      "icon",
+                      "shortDesc",
+                      "longDesc"
+                    ]
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "runes"
+              ]
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "icon",
+          "slots"
+        ]
+      },
+      "minItems": 1,
+      "uniqueBy": "id"
+    }
+  }
+}

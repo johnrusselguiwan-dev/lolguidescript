@@ -1,0 +1,1121 @@
+[
+  {
+    "name": "champion_details valid",
+    "dataset": "champion_details",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "skillNames": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillDescriptions": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillIcons": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCooldowns": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCosts": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ]
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "champion_details empty rejected",
+    "dataset": "champion_details",
+    "value": [],
+    "valid": false
+  },
+  {
+    "name": "champion_details duplicate rejected",
+    "dataset": "champion_details",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "skillNames": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillDescriptions": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillIcons": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCooldowns": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCosts": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ]
+      },
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "skillNames": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillDescriptions": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillIcons": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCooldowns": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCosts": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ]
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_details null row rejected",
+    "dataset": "champion_details",
+    "value": [
+      null
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_meta valid",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": null,
+            "items": [
+              "Infinity Edge"
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 0
+          }
+        }
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "champion_meta empty rejected",
+    "dataset": "champion_meta",
+    "value": [],
+    "valid": false
+  },
+  {
+    "name": "champion_meta duplicate rejected",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": null,
+            "items": [
+              "Infinity Edge"
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 0
+          }
+        }
+      },
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": null,
+            "items": [
+              "Infinity Edge"
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 0
+          }
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_meta null row rejected",
+    "dataset": "champion_meta",
+    "value": [
+      null
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_rating valid",
+    "dataset": "champion_rating",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "winRate": "50.10%",
+        "pickRate": "1.00%",
+        "banRate": "0%"
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "champion_rating empty rejected",
+    "dataset": "champion_rating",
+    "value": [],
+    "valid": false
+  },
+  {
+    "name": "champion_rating duplicate rejected",
+    "dataset": "champion_rating",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "winRate": "50.10%",
+        "pickRate": "1.00%",
+        "banRate": "0%"
+      },
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "winRate": "50.10%",
+        "pickRate": "1.00%",
+        "banRate": "0%"
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_rating null row rejected",
+    "dataset": "champion_rating",
+    "value": [
+      null
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_drafting valid",
+    "dataset": "champion_drafting",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "drafting": {
+          "strongAgainst": {},
+          "weakAgainst": {}
+        }
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "champion_drafting empty rejected",
+    "dataset": "champion_drafting",
+    "value": [],
+    "valid": false
+  },
+  {
+    "name": "champion_drafting duplicate rejected",
+    "dataset": "champion_drafting",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "drafting": {
+          "strongAgainst": {},
+          "weakAgainst": {}
+        }
+      },
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "drafting": {
+          "strongAgainst": {},
+          "weakAgainst": {}
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_drafting null row rejected",
+    "dataset": "champion_drafting",
+    "value": [
+      null
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_scaling valid",
+    "dataset": "champion_scaling",
+    "value": [
+      {
+        "id": "Nilah",
+        "championName": "Nilah",
+        "scalingData": [
+          {
+            "minute": 15,
+            "winRate": 50
+          }
+        ]
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "champion_scaling empty rejected",
+    "dataset": "champion_scaling",
+    "value": [],
+    "valid": false
+  },
+  {
+    "name": "champion_scaling duplicate rejected",
+    "dataset": "champion_scaling",
+    "value": [
+      {
+        "id": "Nilah",
+        "championName": "Nilah",
+        "scalingData": [
+          {
+            "minute": 15,
+            "winRate": 50
+          }
+        ]
+      },
+      {
+        "id": "Nilah",
+        "championName": "Nilah",
+        "scalingData": [
+          {
+            "minute": 15,
+            "winRate": 50
+          }
+        ]
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_scaling null row rejected",
+    "dataset": "champion_scaling",
+    "value": [
+      null
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_list valid",
+    "dataset": "champion_list",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "avatar": "",
+        "image": "",
+        "region": "",
+        "lanes": [],
+        "roles": []
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "champion_list empty rejected",
+    "dataset": "champion_list",
+    "value": [],
+    "valid": false
+  },
+  {
+    "name": "champion_list duplicate rejected",
+    "dataset": "champion_list",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "avatar": "",
+        "image": "",
+        "region": "",
+        "lanes": [],
+        "roles": []
+      },
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "avatar": "",
+        "image": "",
+        "region": "",
+        "lanes": [],
+        "roles": []
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "champion_list null row rejected",
+    "dataset": "champion_list",
+    "value": [
+      null
+    ],
+    "valid": false
+  },
+  {
+    "name": "item_list valid",
+    "dataset": "item_list",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "shortDesc": "",
+        "description": "",
+        "icon": "",
+        "stats": "",
+        "requiredChampion": "",
+        "totalCost": 0,
+        "sellCost": 0,
+        "depth": 0,
+        "tags": [],
+        "from": [],
+        "into": [],
+        "maps": {
+          "11": true
+        }
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "item_list empty rejected",
+    "dataset": "item_list",
+    "value": [],
+    "valid": false
+  },
+  {
+    "name": "item_list duplicate rejected",
+    "dataset": "item_list",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "shortDesc": "",
+        "description": "",
+        "icon": "",
+        "stats": "",
+        "requiredChampion": "",
+        "totalCost": 0,
+        "sellCost": 0,
+        "depth": 0,
+        "tags": [],
+        "from": [],
+        "into": [],
+        "maps": {
+          "11": true
+        }
+      },
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "shortDesc": "",
+        "description": "",
+        "icon": "",
+        "stats": "",
+        "requiredChampion": "",
+        "totalCost": 0,
+        "sellCost": 0,
+        "depth": 0,
+        "tags": [],
+        "from": [],
+        "into": [],
+        "maps": {
+          "11": true
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "item_list null row rejected",
+    "dataset": "item_list",
+    "value": [
+      null
+    ],
+    "valid": false
+  },
+  {
+    "name": "summoner_spells valid",
+    "dataset": "summoner_spells",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "description": "",
+        "cooldown": "180",
+        "imageUrl": ""
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "summoner_spells empty rejected",
+    "dataset": "summoner_spells",
+    "value": [],
+    "valid": false
+  },
+  {
+    "name": "summoner_spells duplicate rejected",
+    "dataset": "summoner_spells",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "description": "",
+        "cooldown": "180",
+        "imageUrl": ""
+      },
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "description": "",
+        "cooldown": "180",
+        "imageUrl": ""
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "summoner_spells null row rejected",
+    "dataset": "summoner_spells",
+    "value": [
+      null
+    ],
+    "valid": false
+  },
+  {
+    "name": "rune_trees valid",
+    "dataset": "rune_trees",
+    "value": [
+      {
+        "id": 8000,
+        "name": "Precision",
+        "key": "Precision",
+        "icon": "",
+        "slots": [
+          {
+            "runes": [
+              {
+                "id": 8005,
+                "name": "Press the Attack",
+                "key": "PressTheAttack",
+                "icon": "",
+                "shortDesc": "",
+                "longDesc": ""
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "rune_trees empty rejected",
+    "dataset": "rune_trees",
+    "value": [],
+    "valid": false
+  },
+  {
+    "name": "rune_trees duplicate rejected",
+    "dataset": "rune_trees",
+    "value": [
+      {
+        "id": 8000,
+        "name": "Precision",
+        "key": "Precision",
+        "icon": "",
+        "slots": [
+          {
+            "runes": [
+              {
+                "id": 8005,
+                "name": "Press the Attack",
+                "key": "PressTheAttack",
+                "icon": "",
+                "shortDesc": "",
+                "longDesc": ""
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 8000,
+        "name": "Precision",
+        "key": "Precision",
+        "icon": "",
+        "slots": [
+          {
+            "runes": [
+              {
+                "id": 8005,
+                "name": "Press the Attack",
+                "key": "PressTheAttack",
+                "icon": "",
+                "shortDesc": "",
+                "longDesc": ""
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "rune_trees null row rejected",
+    "dataset": "rune_trees",
+    "value": [
+      null
+    ],
+    "valid": false
+  },
+  {
+    "name": "missing boots accepted",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "items": [
+              "Infinity Edge"
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 0
+          }
+        }
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "null items",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": null,
+            "items": null,
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 0
+          }
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "null item element",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": null,
+            "items": [
+              null
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 0
+          }
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "wrong boots type",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": 123,
+            "items": [
+              "Infinity Edge"
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 0
+          }
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "string skill index",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": null,
+            "items": [
+              "Infinity Edge"
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": "0"
+          }
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "invalid skill index",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": null,
+            "items": [
+              "Infinity Edge"
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 4
+          }
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "null loadout",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": null,
+            "items": [
+              "Infinity Edge"
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": null
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "missing builds",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 0
+          }
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "blank champion id",
+    "dataset": "champion_meta",
+    "value": [
+      {
+        "id": " ",
+        "name": "Nilah",
+        "builds": [
+          {
+            "boots": null,
+            "items": [
+              "Infinity Edge"
+            ],
+            "spareItems": []
+          }
+        ],
+        "loadout": {
+          "spells": "",
+          "runes": "",
+          "skills": {
+            "1": 0
+          }
+        }
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "mismatched skill arrays",
+    "dataset": "champion_details",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "skillNames": [],
+        "skillDescriptions": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillIcons": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCooldowns": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCosts": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ]
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "explicit null optional field rejected",
+    "dataset": "champion_details",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "skillNames": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillDescriptions": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillIcons": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCooldowns": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCosts": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "lore": null
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "numeric string rejected",
+    "dataset": "champion_details",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "skillNames": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillDescriptions": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillIcons": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCooldowns": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCosts": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "attack": "3"
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "unknown fields accepted",
+    "dataset": "champion_details",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "skillNames": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillDescriptions": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillIcons": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCooldowns": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "skillCosts": [
+          "Q",
+          "W",
+          "E",
+          "R"
+        ],
+        "futureField": {
+          "anything": true
+        }
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "invalid percentage NaN%",
+    "dataset": "champion_rating",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "winRate": "NaN%",
+        "pickRate": "1.00%",
+        "banRate": "0%"
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "invalid percentage 101%",
+    "dataset": "champion_rating",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "winRate": "101%",
+        "pickRate": "1.00%",
+        "banRate": "0%"
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "invalid percentage 50",
+    "dataset": "champion_rating",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "winRate": "50",
+        "pickRate": "1.00%",
+        "banRate": "0%"
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "invalid percentage 50.0oops%",
+    "dataset": "champion_rating",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "winRate": "50.0oops%",
+        "pickRate": "1.00%",
+        "banRate": "0%"
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "legacy scaling field aliases accepted",
+    "dataset": "champion_scaling",
+    "value": [
+      {
+        "id": "Nilah",
+        "name": "Nilah",
+        "scalingPoints": []
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "scaling missing points rejected",
+    "dataset": "champion_scaling",
+    "value": [
+      {
+        "id": "Nilah",
+        "championName": "Nilah"
+      }
+    ],
+    "valid": false
+  }
+]

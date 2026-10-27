@@ -7,7 +7,9 @@
     "sync": "node scripts/sync-master.js",
     "sync:auto": "node scripts/sync-master.js --auto",
     "crawl": "node scripts/crawl.js",
-    "draft": "node scripts/draft.js"
+    "draft": "node scripts/draft.js",
+    "test:validation": "node test/validation.test.js",
+    "validate": "node scripts/validate-data.js"
   },
   "engines": {
     "node": ">=18.0.0"

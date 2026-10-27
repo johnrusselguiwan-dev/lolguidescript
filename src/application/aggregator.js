@@ -19,6 +19,8 @@ const { STORAGE, RANK_HIERARCHY, CRAWLER, DDRAGON } = require("../../config/cons
 const { writeJson } = require("../infrastructure/utils/io");
 const Logger = require("../infrastructure/utils/logger");
 
+const { validateTierData } = require("../domain/validation/validate");
+
 class GlobalAggregator {
     /**
      * Fetch the current patch version from DDragon realm.
@@ -155,7 +157,6 @@ class GlobalAggregator {
                     isFallback,
                 };
             });
-            await writeJson(STORAGE.CHAMPION_META, metaData, true); // true = minify
 
             // CHAMPION_RATING — slim rates
             const ratingData = globalRanking.map((ch) => {
@@ -178,8 +179,6 @@ class GlobalAggregator {
                     isFallback,
                 };
             });
-            await writeJson(STORAGE.CHAMPION_RATING, ratingData, true);
-            await writeJson(STORAGE.RATES_SUMMARY, ratingData, true);
 
             // CHAMPION_DRAFTING — matchups
             const draftData = globalRanking.map((ch) => ({
@@ -188,7 +187,6 @@ class GlobalAggregator {
                 name: ch.name,
                 drafting: ch.drafting,
             }));
-            await writeJson(STORAGE.CHAMPION_DRAFTING, draftData, true);
 
             // CHAMPION_SCALING — power spikes
             const scalingData = globalRanking.map((ch) => ({
@@ -196,6 +194,12 @@ class GlobalAggregator {
                 championName: ch.name,
                 scalingData: ch.scalingData,
             }));
+
+            validateTierData(metaData, ratingData, draftData, scalingData, regionFilter);
+            await writeJson(STORAGE.CHAMPION_META, metaData, true);
+            await writeJson(STORAGE.CHAMPION_RATING, ratingData, true);
+            await writeJson(STORAGE.RATES_SUMMARY, ratingData, true);
+            await writeJson(STORAGE.CHAMPION_DRAFTING, draftData, true);
             await writeJson(STORAGE.CHAMPION_SCALING, scalingData, true);
 
             Logger.success(
